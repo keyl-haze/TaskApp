@@ -33,7 +33,7 @@ const eslintConfig = [
           reportUsedIgnorePattern: false,
         },
       ],
-      
+
       // * require-default-props rule
       "react/require-default-props": [
         "warn",
@@ -45,4 +45,5 @@ const eslintConfig = [
     },
   },
 ];
+
 export default eslintConfig;
