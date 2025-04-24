@@ -1,23 +1,23 @@
-const dotenv = require("dotenv");
-const express = require("express");
-const cors = require("cors");
+const dotenv = require('dotenv')
+const express = require('express')
+const cors = require('cors')
 
-dotenv.config();
+dotenv.config()
 
-const app = express();
-const PORT = parseInt(process.env.PORT || "8080", 10);
+const app = express()
+const PORT = parseInt(process.env.PORT || '8080', 10)
 
-app.use(cors());
-app.use(express.json());
+app.use(cors())
+app.use(express.json())
 
-app.get("/api/v1/test", (req, res) => {
-	res.json({ message: "Hello from the backend! :)" });
-});
+app.get('/api/v1/test', (req, res) => {
+  res.json({ message: 'Hello from the backend! :)' })
+})
 
 try {
-	app.listen(PORT, () => {
-		console.log(`Backend server running on http://localhost:${PORT}`);
-	});
+  app.listen(PORT, () => {
+    console.log(`Backend server running on http://localhost:${PORT}`)
+  })
 } catch (error) {
-	console.error(`Error occurred: ${error.message}`);
+  console.error(`Error occurred: ${error.message}`)
 }
