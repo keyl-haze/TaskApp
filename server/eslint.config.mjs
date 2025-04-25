@@ -1,8 +1,9 @@
+import js from '@eslint/js'
+import globals from 'globals'
+import { defineConfig } from 'eslint/config'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { FlatCompat } from '@eslint/eslintrc'
-import js from '@eslint/js'
-import globals from 'globals'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -11,19 +12,21 @@ const compat = new FlatCompat({
   baseDirectory: __dirname
 })
 
-export default [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
-
+export default defineConfig([
+  // * JS and TS base config
   {
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node
+      }
+    },
     plugins: {
       js
     },
-    languageOptions: {
-      globals: globals.browser
-    },
     rules: {
-      // * no-console rule
+      // * Allow console.warn and console.error only
       'no-console': [
         'warn',
         {
@@ -31,7 +34,7 @@ export default [
         }
       ],
 
-      // * no-unused-vars rule
+      // * Unused variables config
       'no-unused-vars': [
         'warn',
         {
@@ -41,16 +44,7 @@ export default [
           ignoreRestSiblings: true,
           reportUsedIgnorePattern: false
         }
-      ],
-
-      // * require-default-props rule
-      'react/require-default-props': [
-        'warn',
-        {
-          forbidDefaultForRequired: true,
-          ignoreFunctionalComponents: true
-        }
       ]
     }
   }
-]
+])
