@@ -13,6 +13,14 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
+  "globals": {
+    "config": {
+      "local": {
+        "envConfig": "local",
+        "nodeConfig": "local"
+      }
+    }
+  },
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
