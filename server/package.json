@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
+    "dev:local": "cross-env NODE_ENV=$npm_package_globals_config_local_envConfig nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write .",
     "lint": "eslint . ",
