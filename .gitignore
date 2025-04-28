@@ -50,3 +50,6 @@ Thumbs.db
 
 # Environment files
 .env
+
+# Secret files
+/server/secrets
