@@ -1,13 +1,16 @@
-// const envConstants = require(`${__serverRoot}/constants`).envs;
+const secrets = require(`${__serverRoot}/secrets/${__env}`).database
+  .taskManagement;
 
-const local = {
-  username: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: 'task-management',
-  host: '127.0.0.1',
-  dialect: 'postgres',
-  port: 5432,
-  logging: false
+const config = {
+  local: {
+    username: secrets.username,
+    password: secrets.password,
+    database: 'taskManagement',
+    host: '127.0.0.1',
+    dialect: 'postgres',
+    port: 5432,
+    logging: false
+  }
 };
 
-module.exports = local;
+module.exports = config[__env];
