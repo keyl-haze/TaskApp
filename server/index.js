@@ -19,7 +19,7 @@ app.get('/api/v1/test', (req, res) => {
 });
 
 const serverSequelizeStore = new SequelizeStore({
-  db: sequelize,
+  db: sequelize
 });
 serverSequelizeStore.sync();
 app.use(
@@ -27,7 +27,7 @@ app.use(
     resave: true,
     saveUninitialized: true,
     secret: secrets.sessionKey,
-    store: serverSequelizeStore,
+    store: serverSequelizeStore
   })
 );
 
@@ -36,11 +36,7 @@ app.listen(PORT, (err) => {
     return console.error(err.message);
   }
 
-  /* eslint-disable-next-line-console, no-console, no-console */ 
+  /* eslint-disable-next-line-console, no-console, no-console */
   console.log(`Backend server running on http://localhost:${PORT}`);
   return null;
 });
-
-
-
-
