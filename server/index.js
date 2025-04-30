@@ -36,7 +36,7 @@ app.listen(PORT, (err) => {
     return console.error(err.message);
   }
 
-  /* eslint-disable-next-line-console, no-console, no-console */
+  // eslint-disable-next-line no-console
   console.log(`Backend server running on http://localhost:${PORT}`);
   return null;
 });
