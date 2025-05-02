@@ -1,5 +1,6 @@
 'use strict';
 const { Model } = require('sequelize');
+const bcrypt = require('bcrypt');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -8,7 +9,17 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      // * Association with Team model
+      User.hasMany(models.Team, {
+        foreignKey: 'createdBy',
+        as: 'teams',
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE'
+      });
+    }
+    // * Check if password is valid
+    async isValidPassword(password) {
+      return await bcrypt.compare(password, this.password);
     }
   }
   User.init(
@@ -48,7 +59,21 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: 'User'
+      modelName: 'User',
+
+      // * Hooks to hash password before creating or updating user
+      hooks: {
+        beforeCreate: async (user) => {
+          const saltRounds = 10;
+          user.password = await bcrypt.hash(user.password, saltRounds);
+        },
+        beforeUpdate: async (user) => {
+          if (user.changed('password')) {
+            const saltRounds = 10;
+            user.password = await bcrypt.hash(user.password, saltRounds);
+          }
+        }
+      }
     }
   );
   return User;
