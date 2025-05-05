@@ -18,6 +18,9 @@ app.get('/api/v1/test', (req, res) => {
   res.json({ message: 'Hello from the backend! :)' });
 });
 
+const userRoutes = require('./routes/user');
+app.use('/api/superadmin/users', userRoutes);
+
 const serverSequelizeStore = new SequelizeStore({
   db: sequelize
 });
