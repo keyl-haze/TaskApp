@@ -1,10 +1,26 @@
+const { Op } = require('sequelize');
 const { User } = require('../models');
 
 // * GET all users details, except password
 exports.getAllUsers = async (req, res) => {
   try {
+    const filters = req.query.filter || {};
+    const parsedFilters =
+      typeof filters === 'string' ? JSON.parse(filters) : filters;
+
+    const where = {};
+
+    Object.keys(parsedFilters).forEach((key) => {
+      if (key === 'role') {
+        where.role = parsedFilters[key];
+      } else {
+        where[key] = { [Op.iLike]: `%${parsedFilters[key]}%` };
+      }
+    });
+
     const users = await User.findAll({
-      attributes: { exclude: ['password'] }
+      attributes: { exclude: ['password'] },
+      where
     });
 
     res.status(200).json(users);
@@ -16,7 +32,8 @@ exports.getAllUsers = async (req, res) => {
 
 // * POST create user
 exports.createUser = async (req, res) => {
-  const { username, firstName, middleName, lastName, role, email, password } = req.body;
+  const { username, firstName, middleName, lastName, role, email, password } =
+    req.body;
 
   try {
     // * Check if user already exists
@@ -36,10 +53,11 @@ exports.createUser = async (req, res) => {
       password
     });
 
-    res.status(201).json({ message: 'User created successfully', user: newUser });
+    res
+      .status(201)
+      .json({ message: 'User created successfully', user: newUser });
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Failed to create user' });
   }
 };
-
