@@ -4,19 +4,35 @@ const { User } = require('../models');
 // * GET all users details, except password
 exports.getAllUsers = async (req, res) => {
   try {
-    const filters = req.query.filter || {};
-    const parsedFilters =
-      typeof filters === 'string' ? JSON.parse(filters) : filters;
+    /*const filters = req.query.filter || {};
+    const parsedFilters = typeof filters === 'string' ? JSON.parse(filters) : filters;*/
+
+    const query = req.query; // full query object
+    const filters = {};
+
+    Object.keys(query).forEach((key) => {
+      if (key.startsWith('filter[') && key.endsWith(']')) {
+        const field = key.slice(7, -1); 
+        filters[field] = query[key];
+      }
+    });
+
+    // console.log('Filters received:', filters);
 
     const where = {};
 
-    Object.keys(parsedFilters).forEach((key) => {
+    Object.keys(filters).forEach((key) => {
+      const value = filters[key];
+
       if (key === 'role') {
-        where.role = parsedFilters[key];
+        where.role = value;
       } else {
-        where[key] = { [Op.iLike]: `%${parsedFilters[key]}%` };
+        where[key] = { [Op.iLike]: `%${value}%` }; 
       }
     });
+
+    // console.log('Sequelize WHERE:', where);
+
 
     const users = await User.findAll({
       attributes: { exclude: ['password'] },
