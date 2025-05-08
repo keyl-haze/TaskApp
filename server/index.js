@@ -12,7 +12,7 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '8080', 10);
 
 app.use(cors());
-app.set("query parser", "extended");
+app.set('query parser', 'extended');
 app.use(express.json());
 
 app.get('/api/v1/test', (req, res) => {
