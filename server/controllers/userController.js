@@ -1,7 +1,8 @@
 const { Op } = require('sequelize');
 const { parseFilters } = require('../utils/parseFilters');
 const { User } = require('../models');
-const { doesUserExist } = require('../utils/usersUtils');
+const { doesEmailExist } = require('../utils/usersUtils');
+const { doesUsernameExist } = require('../utils/usersUtils');
 
 // * GET all users details, except password
 exports.getAllUsers = async (req, res) => {
@@ -43,9 +44,12 @@ exports.createUser = async (req, res) => {
 
   try {
     // * Check if user already exists
-    const userExists = await doesUserExist(email);
-    if (userExists) {
-      return res.status(400).json({ error: 'User already exists' });
+    const emailExists = await doesEmailExist(email);
+    const usernameExists = await doesUsernameExist(username);
+    if (emailExists) {
+      return res.status(400).json({ error: 'Email already exists' });
+    } else if (usernameExists) {
+      return res.status(400).json({ error: 'Username already exists' });
     }
 
     // * Create new user
