@@ -20,7 +20,7 @@ app.get('/api/v1/test', (req, res) => {
 });
 
 const userRoutes = require('./routes/user');
-app.use('/api/superadmin/users', userRoutes);
+app.use('/api/v1/users', userRoutes);
 
 const serverSequelizeStore = new SequelizeStore({
   db: sequelize
