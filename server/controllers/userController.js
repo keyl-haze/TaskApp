@@ -1,29 +1,15 @@
-const { Op } = require('sequelize');
-const { parseFilters } = require('../utils/parseFilters');
 const { User } = require('../models');
 const { doesEmailExist } = require('../utils/usersUtils');
 const { doesUsernameExist } = require('../utils/usersUtils');
+const { parseFilters } = require('../utils/parseFilters');
+const { userWhereClause } = require('../utils/parseFilters');
 
 // * GET all users details, except password
 exports.getAllUsers = async (req, res) => {
   try {
     const filters = parseFilters(req.query);
 
-    const where = {};
-
-    // console.log('req.query:', req.query);
-    // console.log('req.query:', req.query.filter);
-    // console.log('req.query:', req.query.filter.firstName);
-
-    Object.keys(filters).forEach((key) => {
-      const value = filters[key];
-
-      if (key === 'role') {
-        where.role = value;
-      } else {
-        where[key] = { [Op.iLike]: `%${value}%` };
-      }
-    });
+    const where = userWhereClause(filters);
 
     const users = await User.findAll({
       attributes: { exclude: ['password'] },
@@ -43,7 +29,7 @@ exports.createUser = async (req, res) => {
     req.body;
 
   try {
-    // * Check if user already exists
+
     const emailExists = await doesEmailExist(email);
     const usernameExists = await doesUsernameExist(username);
     if (emailExists) {

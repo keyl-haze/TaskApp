@@ -1,3 +1,5 @@
+const { Op } = require('sequelize');
+
 function parseFilters(query) {
   // * for wgeb query has "filter" and it is an object
   if (typeof query.filter === 'object' && query.filter !== null) {
@@ -17,4 +19,24 @@ function parseFilters(query) {
   return filters;
 }
 
-module.exports = { parseFilters };
+/**
+ * @param {Object} filters - The filters object to be parsed.
+ * @returns {Object} - Where clause for Sequelize.
+ */
+function userWhereClause(filters) {
+  const where = {};
+
+  Object.keys(filters).forEach((key) => {
+    const value = filters[key];
+
+    if (key === 'role') {
+      where.role = value;
+    } else {
+      where[key] = { [Op.iLike]: `%${value}%` };
+    }
+  });
+
+  return where;
+}
+
+module.exports = { parseFilters, userWhereClause };
