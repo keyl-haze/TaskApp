@@ -1,6 +1,8 @@
 'use strict';
 const { Model } = require('sequelize');
 const bcrypt = require('bcrypt');
+const { hashPassword, comparePassword } = require('../utils/passwordUtils');  
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -19,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     }
     // * Check if password is valid
     async isValidPassword(password) {
-      return await bcrypt.compare(password, this.password);
+      return await comparePassword(password, this.password);
     }
   }
   User.init(
@@ -69,13 +71,11 @@ module.exports = (sequelize, DataTypes) => {
       // * Hooks to hash password before creating or updating user
       hooks: {
         beforeCreate: async (user) => {
-          const saltRounds = 10;
-          user.password = await bcrypt.hash(user.password, saltRounds);
+          user.password = await hashPassword(user.password);
         },
         beforeUpdate: async (user) => {
           if (user.changed('password')) {
-            const saltRounds = 10;
-            user.password = await bcrypt.hash(user.password, saltRounds);
+            user.password = await hashPassword(user.password);
           }
         }
       }
