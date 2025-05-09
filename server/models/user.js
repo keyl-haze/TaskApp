@@ -1,6 +1,5 @@
 'use strict';
 const { Model } = require('sequelize');
-const bcrypt = require('bcrypt');
 const { hashPassword, comparePassword } = require('../utils/passwordUtils');  
 
 module.exports = (sequelize, DataTypes) => {
