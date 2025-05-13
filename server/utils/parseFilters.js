@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 
 function parseFilters(query) {
-  // * for wgeb query has "filter" and it is an object
+  // * for when then query has "filter" and it is an object
   if (typeof query.filter === 'object' && query.filter !== null) {
     return query.filter;
   }
