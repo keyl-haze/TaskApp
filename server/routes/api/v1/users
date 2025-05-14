@@ -1,0 +1,12 @@
+const express = require('express');
+const router = new express.Router();
+
+const controller = require(`${__serverRoot}/api/v1/user/controller`);
+
+console.log('controller', controller)
+
+router.get('/', controller.list);
+// TODO Keil and Julia :)
+// router.post('/', controller.create); 
+
+module.exports = router;

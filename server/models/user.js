@@ -11,12 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // * Association with Team model
-      User.hasMany(models.Team, {
-        foreignKey: 'createdBy',
-        as: 'teams',
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE'
-      });
+      // User.hasMany(models.Team, {
+      //   foreignKey: 'createdBy',
+      //   as: 'teams',
+      //   onDelete: 'SET NULL',
+      //   onUpdate: 'CASCADE'
+      // });
     }
     // * Check if password is valid
     async isValidPassword(password) {
