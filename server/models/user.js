@@ -9,15 +9,6 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
-      // * Association with Team model
-      User.hasMany(models.Team, {
-        foreignKey: 'createdBy',
-        as: 'teams',
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE'
-      });
-    }
     // * Check if password is valid
     async isValidPassword(password) {
       return await comparePassword(password, this.password);
