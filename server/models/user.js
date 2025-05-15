@@ -1,6 +1,5 @@
 'use strict';
 const { Model } = require('sequelize');
-const { hashPassword, comparePassword } = require('../utils/passwordUtils');  
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
@@ -9,10 +8,6 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    // * Check if password is valid
-    async isValidPassword(password) {
-      return await comparePassword(password, this.password);
-    }
   }
   User.init(
     {
@@ -57,18 +52,6 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'User',
-
-      // * Hooks to hash password before creating or updating user
-      hooks: {
-        beforeCreate: async (user) => {
-          user.password = await hashPassword(user.password);
-        },
-        beforeUpdate: async (user) => {
-          if (user.changed('password')) {
-            user.password = await hashPassword(user.password);
-          }
-        }
-      }
     }
   );
   return User;
