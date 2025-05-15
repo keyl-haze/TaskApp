@@ -12,12 +12,25 @@ const list = async (req, res) => {
 };
 
 const get = async (req, res) => {
+  const { id } = req.params;
+
+  if (!/^\d+$/.test(id)) {
+    return res.status(400).json({
+      error: 'Invalid ID format',
+      message: 'ID must be a positive integer'
+    });
+  }
+
   try {
-    const user = await service.get(
-      req.params.id
-    );
+    const user = await service.get(id);
     res.status(200).json(user);
   } catch (error) {
+    if (error.name === 'UserNotFoundError') {
+      return res.status(404).json({
+        error: 'User not found',
+        message: `User with ID ${id} not found`
+      });
+    }
     console.error('Error fetching user:', error);
     res.status(500).json({ error: 'Failed to fetch user' });
   }
