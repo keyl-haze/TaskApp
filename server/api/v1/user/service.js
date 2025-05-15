@@ -1,9 +1,5 @@
 const { buildWhereFilter } = require('../utils/queries');
-const {
-  doesEmailExist,
-  doesUsernameExist,
-  hashPassword
-} = require('../utils/account');
+const { doesEmailExist, doesUsernameExist, hashPassword } = require('../utils/account');
 const { User } = require(`${__serverRoot}/models`);
 const _validQueryProps = [
   'id',
@@ -24,24 +20,21 @@ const list = async (query) => {
     User.name
   );
   const users = await User.findAll({
-    attributes: { exclude: ['password'] },
     where
   });
   return users;
 };
 
 // * Get user by id
-const get = async (query, options = {}) => {
-  const { id } = query;
+const get = async (id, options = {}) => {
   const user = await User.findByPk(id, options);
   if (!user) {
     const error = new Error();
     error.name = 'UserNotFoundError';
     throw error;
   }
-  console.log('user', user);
   return user;
-};
+}
 
 // * Create user
 const create = async (user) => {
@@ -62,7 +55,7 @@ const create = async (user) => {
 
   // * Hash password
   const hashedPassword = await hashPassword(password);
-
+  
   // * Create new user
   const newUser = await User.create({
     username,

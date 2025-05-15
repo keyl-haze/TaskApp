@@ -14,10 +14,7 @@ const list = async (req, res) => {
 const get = async (req, res) => {
   try {
     const user = await service.get(
-      { id: req.params.id },
-      {
-        attributes: { exclude: ['password'] }
-      }
+      req.params.id
     );
     res.status(200).json(user);
   } catch (error) {
