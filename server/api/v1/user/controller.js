@@ -11,6 +11,21 @@ const list = async (req, res) => {
   return;
 };
 
+const get = async (req, res) => {
+  try {
+    const user = await service.get(
+      { id: req.params.id },
+      {
+        attributes: { exclude: ['password'] }
+      }
+    );
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Failed to fetch user' });
+  }
+};
+
 const create = async (req, res) => {
   try {
     const user = await service.create(req.body);
@@ -24,5 +39,6 @@ const create = async (req, res) => {
 
 module.exports = {
   list,
+  get,
   create
 };

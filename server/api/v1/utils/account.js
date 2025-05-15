@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt');
 const { User } = require(`${__serverRoot}/models`);
 
-
 /**
  * Hashes a plaintext password with bcrypt.
  * @param {string} password - Plaintext password.
