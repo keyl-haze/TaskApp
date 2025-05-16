@@ -1,50 +1,46 @@
 const service = require('./service');
+const { success, clientError, serverError } = require('../utils/response');
 
 const list = async (req, res) => {
   try {
     const users = await service.list(req.query);
-    res.status(200).json(users);
+    return success(res, users, 'Users fetched successfully');
   } catch (error) {
     console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Failed to fetch users' });
+    return serverError(res, 'Failed to fetch users', 500, error.message);
   }
-  return;
 };
 
 const get = async (req, res) => {
   const { id } = req.params;
 
   if (!/^\d+$/.test(id)) {
-    return res.status(400).json({
-      error: 'Invalid ID format',
-      message: 'ID must be a positive integer'
-    });
+    return clientError(res, 'Entered ID is incorrect type', 400);
   }
 
   try {
     const user = await service.get(id);
-    res.status(200).json(user);
+    if (!user) {
+      return clientError(res, `User with ID ${id} not found`, 404);
+    }
+    return success(res, user, 'User fetched successfully');
   } catch (error) {
     if (error.name === 'UserNotFoundError') {
-      return res.status(404).json({
-        error: 'User not found',
-        message: `User with ID ${id} not found`
-      });
+      return clientError(res, `User with ID ${id} not found`, 404);
     }
     console.error('Error fetching user:', error);
-    res.status(500).json({ error: 'Failed to fetch user' });
+    return serverError(res, 'Failed to fetch user', 500, error.message);
   }
 };
 
 const create = async (req, res) => {
   try {
     const user = await service.create(req.body);
-    res.status(201).json(user);
+    return success(res, user, 'User created successfully', 201);
   } catch (error) {
     console.error('Error creating user:', error);
-    res.status(500).json({ error: 'Failed to create user' });
+    return serverError(res, 'Failed to create user', 500, error.message);
   }
-  return;
 };
 
 module.exports = {
