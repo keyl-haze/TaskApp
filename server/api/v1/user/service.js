@@ -27,10 +27,25 @@ const list = async (query) => {
 
 // * Get user by id
 const get = async (id, options = {}) => {
+  if (!/^\d+$/.test(id)) {
+    const error = new Error();
+    error.name = 'InvalidIdError';
+    error.status = 400;
+    error.message = 'User not found';
+    error.details = {
+      id
+    };
+    throw error;
+  } 
   const user = await User.findByPk(id, options);
   if (!user) {
     const error = new Error();
     error.name = 'UserNotFoundError';
+    error.status = 404;
+    error.message = 'User not found';
+    error.details = {
+      id
+    };
     throw error;
   }
   return user;
@@ -44,13 +59,21 @@ const create = async (user) => {
   // * Check if email or username already exists
   const emailExists = await doesEmailExist(email);
   if (emailExists) {
-    throw new Error('Email already exists');
+    const error = new Error();
+    error.name = 'EmailExistsError';
+    error.status = 400;
+    error.message = 'Client already exists';
+    throw error;
   }
 
   // * Check if username already exists
   const usernameExists = await doesUsernameExist(username);
   if (usernameExists) {
-    throw new Error('Username already exists');
+    const error = new Error();
+    error.name = 'UsernameExistsError';
+    error.status = 400;
+    error.message = 'Client already exists';
+    throw error;
   }
 
   // * Hash password
