@@ -27,10 +27,17 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write .",
     "lint": "eslint . ",
-    "lint:fix": "eslint . --fix "
+    "lint:fix": "eslint . --fix ",
+    "sequelize:migrate:local": "cross-env NODE_ENV=local sequelize db:migrate",
+    "sequelize:migrate:local:undo": "cross-env NODE_ENV=local sequelize db:migrate:undo",
+    "sequelize:migrate:local:undo:all": "cross-env NODE_ENV=local sequelize db:migrate:undo:all",
+    "sequelize:seed:local": "cross-env NODE_ENV=local sequelize db:seed:all",
+    "sequelize:seed:local:undo": "cross-env NODE_ENV=local sequelize db:seed:undo",
+    "sequelize:seed:local:undo:all": "cross-env NODE_ENV=local sequelize db:seed:undo:all"
   },
   "description": "",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "connect-session-sequelize": "^7.1.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",

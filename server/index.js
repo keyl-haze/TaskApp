@@ -12,11 +12,14 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '8080', 10);
 
 app.use(cors());
+app.set('query parser', 'extended');
 app.use(express.json());
 
 app.get('/api/v1/test', (req, res) => {
   res.json({ message: 'Hello from the backend! :)' });
 });
+
+require('./routes')(app);
 
 const serverSequelizeStore = new SequelizeStore({
   db: sequelize
@@ -36,7 +39,7 @@ app.listen(PORT, (err) => {
     return console.error(err.message);
   }
 
-  /* eslint-disable-next-line-console, no-console, no-console */
+  // eslint-disable-next-line no-console
   console.log(`Backend server running on http://localhost:${PORT}`);
   return null;
 });

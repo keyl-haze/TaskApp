@@ -1,3 +1,5 @@
+require('../globals');
+
 const secrets = require(`${__serverRoot}/secrets/${__env}`).database
   .taskManagement;
 
