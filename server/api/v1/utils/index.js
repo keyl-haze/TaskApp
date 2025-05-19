@@ -1,10 +1,10 @@
 const promiseController = (api) => async (req, res) => {
-  try{
+  try {
     const { status = 200, message = 'Success', data } = await api(req, res);
     return res.status(status).json({
       status: 'success',
       message,
-      data,
+      data
     });
   } catch (error) {
     console.error('Controller error:', error);
@@ -16,11 +16,11 @@ const promiseController = (api) => async (req, res) => {
       status: 'error',
       type,
       message: error.message || 'An error occurred',
-      error: error.details || null,
+      error: error.details || null
     });
   }
-}
+};
 
 module.exports = {
-  promiseController,
+  promiseController
 };

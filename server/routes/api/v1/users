@@ -1,9 +1,8 @@
 const express = require('express');
 const router = new express.Router();
 const controller = require(`${__serverRoot}/api/v1/user/controller`);
-const { promiseController } = require(`${__serverRoot}/api/v1/utils`);
 console.log('controller', controller);
-router.get('/', promiseController(controller.list));
-router.get('/:id', promiseController(controller.get));
-router.post('/', promiseController(controller.create));
+router.get('/', controller.list);
+router.get('/:id', controller.get);
+router.post('/', controller.create);
 module.exports = router;

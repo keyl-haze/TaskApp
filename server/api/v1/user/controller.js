@@ -1,6 +1,7 @@
+const { promiseController } = require('../utils');
 const service = require('./service');
 
-const list = async (req) => {
+const list = promiseController(async (req) => {
   const users = await service.list(req.query);
 
   return {
@@ -8,9 +9,9 @@ const list = async (req) => {
     message: 'Users fetched successfully',
     data: users
   };
-};
+});
 
-const get = async (req) => {
+const get = promiseController(async (req) => {
   const user = await service.get(req.params.id);
 
   return {
@@ -18,9 +19,9 @@ const get = async (req) => {
     message: 'User fetched successfully',
     data: user
   };
-};
+});
 
-const create = async (req) => {
+const create = promiseController(async (req) => {
   const user = await service.create(req.body);
 
   return {
@@ -28,7 +29,7 @@ const create = async (req) => {
     message: 'User created successfully',
     data: user
   };
-};
+});
 
 module.exports = {
   list,

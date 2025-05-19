@@ -40,9 +40,22 @@ async function doesUsernameExist(username) {
   return !!existingUsername;
 }
 
+/**
+ * @param {string} username
+ * @returns {Promise<boolean>} - Returns true if username is valid, false  if otherwise
+ */
+async function isUsernameValid(username) {
+  if (typeof username !== 'string') return false;
+
+  const regex = /^[A-Za-z0-9_]{5,}$/; // * Allow letters, numbers, and underscores only for username
+
+  return regex.test(username);
+}
+
 module.exports = {
   hashPassword,
   comparePassword,
   doesEmailExist,
-  doesUsernameExist
+  doesUsernameExist,
+  isUsernameValid
 };

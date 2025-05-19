@@ -1,5 +1,10 @@
 const { buildWhereFilter } = require('../utils/queries');
-const { doesEmailExist, doesUsernameExist, hashPassword } = require('../utils/account');
+const {
+  doesEmailExist,
+  doesUsernameExist,
+  hashPassword,
+  isUsernameValid
+} = require('../utils/account');
 const { User } = require(`${__serverRoot}/models`);
 const _validQueryProps = [
   'id',
@@ -36,7 +41,7 @@ const get = async (id, options = {}) => {
       id
     };
     throw error;
-  } 
+  }
   const user = await User.findByPk(id, options);
   if (!user) {
     const error = new Error();
@@ -49,14 +54,14 @@ const get = async (id, options = {}) => {
     throw error;
   }
   return user;
-}
+};
 
 // * Create user
 const create = async (user) => {
   const { username, firstName, middleName, lastName, role, email, password } =
     user;
 
-  // * Check if email or username already exists
+  // * Check if email already exists
   const emailExists = await doesEmailExist(email);
   if (emailExists) {
     const error = new Error();
@@ -76,9 +81,18 @@ const create = async (user) => {
     throw error;
   }
 
+  const usernameValid = await isUsernameValid(username);
+  if (!usernameValid) {
+    const error = new Error();
+    error.name = 'InvalidUsernameError';
+    error.status = 400;
+    error.message = 'Username is invalid';
+    throw error;
+  }
+
   // * Hash password
   const hashedPassword = await hashPassword(password);
-  
+
   // * Create new user
   const newUser = await User.create({
     username,
