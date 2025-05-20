@@ -1,35 +1,15 @@
 'use client'
 
+import AuthLayout from '../layouts/authLayout'
 import { useState, useEffect } from 'react'
-import {
-  Search,
-  Filter,
-  MoreVertical,
-  HelpCircle,
-  Settings,
-  Info,
-  Trash2
-} from 'lucide-react'
+import { Search, Filter, MoreVertical, Info, Trash2 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink
-} from '@/components/ui/pagination'
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink } from '@/components/ui/pagination'
 
 interface User {
   id: string
@@ -64,7 +44,7 @@ export default function UsersPage() {
             role: users.role.charAt(0).toUpperCase() + users.role.slice(1),
             email: users.email,
             status: 'Active',
-            avatarSrc: undefined
+            avatarSrc: undefined,
           }));
           setUsers(mappedUsers);
         } else {
@@ -96,46 +76,8 @@ export default function UsersPage() {
   }
 
   return (
+    <AuthLayout>
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b">
-        <div className="flex items-center justify-between p-4">
-          {/* Left side: (empty or add logo/title here) */}
-          <div />
-          {/* Right side: user info and icons */}
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground"
-            >
-              <HelpCircle className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground"
-            >
-              <Settings className="h-5 w-5" />
-            </Button>
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <div className="text-sm font-medium">JOHN DOE</div>
-                <div className="text-xs text-muted-foreground">
-                  D. IN MEDICINE
-                </div>
-              </div>
-              <Avatar className="h-10 w-10 border-2 border-primary">
-                <AvatarImage
-                  src="/placeholder.svg?height=40&width=40"
-                  alt="User"
-                />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Main content */}
       <main className="p-4 md:p-6">
@@ -279,5 +221,6 @@ export default function UsersPage() {
         </Pagination>
       </main>
     </div>
+    </AuthLayout>
   )
 }
