@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Search,
   Filter,
@@ -44,37 +44,40 @@ interface User {
 
 export default function UsersPage() {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const users: User[] = [
-    {
-      id: '1',
-      name: 'Jane Cooper',
-      username: '@jane',
-      initials: 'JC',
-      status: 'Active',
-      role: 'Admin',
-      email: 'jessica.hanson@example.com'
-    },
-    {
-      id: '2',
-      name: 'Wade Warren',
-      username: '@wade456',
-      initials: 'WW',
-      status: 'Active',
-      role: 'Member',
-      email: 'willie.jennings@example.com',
-      avatarSrc: '/placeholder.svg?height=40&width=40'
-    },
-    {
-      id: '3',
-      name: 'Esther Howard',
-      username: '@esther',
-      initials: 'EH',
-      status: 'Offline',
-      role: 'Admin',
-      email: 'd.chambers@example.com'
+  useEffect(() => {
+    async function fetchUsers() {
+      setLoading(true)
+      setError(null)
+      try {
+        const res = await fetch('http://localhost:8080/api/v1/users')
+        const json = await res.json()
+        if (json.status === 'success') {
+          const mappedUsers = json.data.map((users: any) => ({
+            id: String(users.id),
+            name: `${users.firstName} ${users.lastName}`,
+            username: `@${users.username}`,
+            initials: `${users.firstName[0] ?? ''}${users.lastName[0] ?? ''}`.toUpperCase(),
+            role: users.role.charAt(0).toUpperCase() + users.role.slice(1),
+            email: users.email,
+            status: 'Active',
+            avatarSrc: undefined
+          }));
+          setUsers(mappedUsers);
+        } else {
+          setError(json.message || 'Failed to fetch users');
+        }
+      } catch (error: any) {
+        setError(error.message || 'Failed to fetch users');
+      } finally {
+        setLoading(false);
+      }
     }
-  ]
+    fetchUsers();
+  }, []);
 
   const toggleSelectUser = (userId: string) => {
     setSelectedUsers((prev) =>
@@ -97,7 +100,7 @@ export default function UsersPage() {
       {/* Header */}
       <header className="border-b">
         <div className="flex items-center justify-between p-4">
-          {/* Left side: (empty or add logo/title here if needed) */}
+          {/* Left side: (empty or add logo/title here) */}
           <div />
           {/* Right side: user info and icons */}
           <div className="flex items-center gap-4">
@@ -155,7 +158,7 @@ export default function UsersPage() {
               Filter
             </Button>
             <Button variant="outline">Add user</Button>
-            <Button variant="ghost" size="icon">
+            <Button variant="outline" size="icon">
               <MoreVertical className="h-5 w-5" />
             </Button>
           </div>
