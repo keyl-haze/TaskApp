@@ -24,6 +24,7 @@ import {
   PaginationItem,
   PaginationLink
 } from '@/components/ui/pagination'
+import AddUser from '@/components/custom/addUser'
 
 interface User extends UserType {
   name: string
@@ -113,7 +114,7 @@ export default function UsersPage() {
                 <Filter className="mr-2 h-4 w-4" />
                 Filter
               </Button>
-              <Button variant="outline">Add user</Button>
+              <AddUser />
               <Button variant="outline" size="icon">
                 <MoreVertical className="h-5 w-5" />
               </Button>
