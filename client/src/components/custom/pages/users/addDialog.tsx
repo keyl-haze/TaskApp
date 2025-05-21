@@ -142,7 +142,6 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
                 <span className="text-red-500 text-xs">{usernameError}</span>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="firstName">First Name</Label>
                 <Input
@@ -154,27 +153,28 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
                   required
                 />
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="middleName">Middle Name</Label>
+                  <Input
+                    id="middleName"
+                    name="middleName"
+                    value={formData.middleName}
+                    onChange={handleChange}
+                    placeholder="Middle name (optional)"
+                  />
+                </div>
               <div className="grid gap-2">
-                <Label htmlFor="middleName">Middle Name</Label>
+                <Label htmlFor="lastName">Last Name</Label>
                 <Input
-                  id="middleName"
-                  name="middleName"
-                  value={formData.middleName}
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
                   onChange={handleChange}
-                  placeholder="Middle name (optional)"
+                  placeholder="Last name"
+                  required
                 />
               </div>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                placeholder="Last name"
-                required
-              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
