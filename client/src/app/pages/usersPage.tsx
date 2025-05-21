@@ -24,7 +24,7 @@ import {
   PaginationItem,
   PaginationLink
 } from '@/components/ui/pagination'
-import AddUser from '@/components/custom/addUser'
+import AddUser from '@/components/custom/pages/users/addUser'
 
 interface User extends UserType {
   name: string
@@ -38,16 +38,15 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    async function fetchUsers() {
-      setLoading(true)
-      setError(null)
+  const [refreshFlag, setRefreshFlag] = useState(0)
 
       // * Fetch users from the API
+      const fetchUsers = async () => {
+        setLoading(true)
+        setError(null)
       try {
-        const res = await fetch(USER_API.list)
-        const json = await res.json()
+        const res = await fetch(USER_API.list);
+        const json = await res.json();
         if (json.status === 'success') {
           // * Map the users to the frontend
           const mappedUsers: User[] = json.data.map((users: UserType) => ({
@@ -57,10 +56,10 @@ export default function UsersPage() {
               `${users.firstName[0] ?? ''}${users.lastName[0] ?? ''}`.toUpperCase(),
             status: 'Active',
             avatarSrc: undefined
-          }))
-          setUsers(mappedUsers)
+          }));
+          setUsers(mappedUsers);
         } else {
-          setError(json.message || 'Failed to fetch users')
+          setError(json.message || 'Failed to fetch users');
         }
       } catch (error: unknown) {
         if (error instanceof Error) {
@@ -71,10 +70,14 @@ export default function UsersPage() {
       } finally {
         setLoading(false)
       }
-    }
-    fetchUsers()
-  }, [])
+    };
 
+    useEffect(() => {
+      fetchUsers();
+    }, [refreshFlag]);
+
+    const handleUserCreated = () => setRefreshFlag((prev) => prev + 1);
+    
   const toggleSelectUser = (userId: number) => {
     setSelectedUsers((prev) =>
       prev.includes(userId)
@@ -114,7 +117,7 @@ export default function UsersPage() {
                 <Filter className="mr-2 h-4 w-4" />
                 Filter
               </Button>
-              <AddUser />
+              <AddUser onUserCreated={handleUserCreated} />
               <Button variant="outline" size="icon">
                 <MoreVertical className="h-5 w-5" />
               </Button>

@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -22,7 +23,7 @@ import {
 } from '@/components/ui/select'
 import { USER_API } from '@/../routes/user'
 
-export default function AddUserDialog() {
+export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => void }) {
   const [formData, setFormData] = useState({
     username: '',
     firstName: '',
@@ -47,7 +48,7 @@ export default function AddUserDialog() {
     setFormData((prev) => ({ ...prev, [name]: value }))
     if (name === 'username') {
       if (!isValidUsername(value)) {
-        setUsernameError('Username must be at least 5 characters, alphanumeric, and can only use _')
+        setUsernameError('Username must be 5+ characters, using letters, numbers, . or _')
       } else {
         setUsernameError(null)
       }
@@ -85,7 +86,8 @@ export default function AddUserDialog() {
           email: '',
           password: '',
           role: ''
-        })
+        });
+        if (onUserCreated) onUserCreated();
         setTimeout(() => {
           setOpen(false)
           setSuccess(null)
