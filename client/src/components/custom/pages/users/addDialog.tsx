@@ -22,6 +22,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { USER_API } from '@/../routes/user'
+import { showErrorToast, showSuccessToast } from '../../utils/errorSonner'
 
 export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => void }) {
   const [formData, setFormData] = useState({
@@ -35,8 +36,6 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
   })
   const [usernameError, setUsernameError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
 
   function isValidUsername(username: string) {
@@ -61,8 +60,6 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSuccess(null)
-    setError(null)
     if (!isValidUsername(formData.username)) {
       setUsernameError('Username must be at least 5 characters, alphanumeric, and can only use _')
       return
@@ -77,7 +74,7 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
       })
       const json = await res.json()
       if (res.ok) {
-        setSuccess('User created!')
+        showSuccessToast('User created!')
         setFormData({
           username: '',
           firstName: '',
@@ -90,16 +87,23 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
         if (onUserCreated) onUserCreated();
         setTimeout(() => {
           setOpen(false)
-          setSuccess(null)
         }, 1000)
       } else {
-        setError(json.message || 'Failed to create user')
+        if (
+          json.error &&
+          typeof json.error === 'string' &&
+          json.error.toLowerCase().includes('username')
+        ) {
+          setUsernameError(json.error)
+        } else {
+          showErrorToast(json.message || 'Failed to create user')
+        }
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message || 'Failed to create user')
+        showErrorToast(err.message || 'Failed to create user')
       } else {
-        setError('Failed to create user')
+        showErrorToast('Failed to create user')
       }
     } finally {
       setLoading(false)
@@ -210,8 +214,6 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
                 </SelectContent>
               </Select>
             </div>
-            {error && <div className="text-red-500 text-sm">{error}</div>}
-            {success && <div className="text-green-600 text-sm">{success}</div>}
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" className="mr-2" onClick={() => setOpen(false)}>

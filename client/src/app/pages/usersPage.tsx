@@ -24,7 +24,7 @@ import {
   PaginationItem,
   PaginationLink
 } from '@/components/ui/pagination'
-import AddUser from '@/components/custom/pages/users/addUser'
+import AddUser from '@/components/custom/pages/users/addDialog'
 
 interface User extends UserType {
   name: string
