@@ -4,7 +4,7 @@ import AuthLayout from '../layouts/authLayout'
 import { USER_API } from '../../../routes/user'
 import type { User as UserType } from '@/../types/types'
 import { useState, useEffect } from 'react'
-import { Search, Filter, MoreVertical, Info, Trash2 } from 'lucide-react'
+import { Search, MoreVertical, Info, Trash2 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -19,6 +19,7 @@ import {
 import AddUser from '@/components/custom/pages/users/addDialog'
 import GenericTable from '@/components/custom/utils/genericTable'
 import { type ColumnDef } from '@tanstack/react-table'
+import FilterPopover, { FilterValue } from '@/components/custom/pages/users/filterTablePopover'
 
 interface User extends UserType {
   name: string
@@ -40,6 +41,7 @@ export default function UsersPage() {
   >([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [filters, setFilters] = useState<FilterValue>({})
 
   // * Fetch users from the API
   const fetchUsers = async () => {
@@ -77,12 +79,33 @@ export default function UsersPage() {
     fetchUsers()
   }, [refreshFlag])
 
-  // * Reset to first page if users change or filter changes
+  // * Reset to first page if users change, search, or filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [users.length, globalFilter])
+  }, [users.length, globalFilter, filters.role, filters.status])
 
   const handleUserCreated = () => setRefreshFlag((prev) => prev + 1)
+
+  // * Search and filter, then paginate
+  const filteredUsers = users.filter(user => {
+  const matchesSearch =
+    user.name.toLowerCase().includes(globalFilter.toLowerCase()) ||
+    user.username.toLowerCase().includes(globalFilter.toLowerCase()) ||
+    user.email.toLowerCase().includes(globalFilter.toLowerCase())
+
+  const matchesRole =
+    !filters.role || filters.role.length === 0 || filters.role.includes(user.role)
+  const matchesStatus =
+    !filters.status || filters.status.length === 0 || filters.status.includes(user.status)
+
+  return matchesSearch && matchesRole && matchesStatus
+})
+
+  const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE)
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  )
 
   const toggleSelectUser = (userId: number) => {
     setSelectedUsers((prev) =>
@@ -208,16 +231,12 @@ export default function UsersPage() {
     }
   ]
 
-  // * Pagination logic
-  const totalPages = Math.ceil(users.length / PAGE_SIZE)
-  const paginatedUsers = users.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page)
   }
 
   return (
-    <AuthLayout header='Users'>
+    <AuthLayout header="Users">
       <div className="min-h-screen bg-background">
         <main className="p-4 md:p-6">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -232,10 +251,10 @@ export default function UsersPage() {
               />
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" className="text-primary border-primary">
-                <Filter className="mr-2 h-4 w-4" />
-                Filter
-              </Button>
+              <FilterPopover
+                onFilterChange={setFilters}
+                activeFilters={filters}
+              />
               <AddUser onUserCreated={handleUserCreated} />
               <Button variant="outline" size="icon">
                 <MoreVertical className="h-5 w-5" />
@@ -258,14 +277,14 @@ export default function UsersPage() {
           )}
 
           {/* Empty table */}
-          {!loading && !error && users.length === 0 && (
+          {!loading && !error && filteredUsers.length === 0 && (
             <div className="flex items-center justify-center">
               <div className="text-gray-500">No users found</div>
             </div>
           )}
 
           {/* Loaded table */}
-          {!loading && !error && users.length > 0 && (
+          {!loading && !error && filteredUsers.length > 0 && (
             <GenericTable
               data={paginatedUsers}
               columns={columns}
@@ -299,7 +318,7 @@ export default function UsersPage() {
                       isActive={currentPage === i + 1}
                       onClick={() => handlePageChange(i + 1)}
                     >
-                      {(i + 1).toString().padStart(2, "0")}
+                      {(i + 1).toString().padStart(2, '0')}
                     </PaginationLink>
                   </PaginationItem>
                 ))}

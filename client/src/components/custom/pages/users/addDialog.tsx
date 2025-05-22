@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/select'
 import { USER_API } from '@/../routes/user'
 import { showErrorToast, showSuccessToast } from '../../utils/errorSonner'
+import { UserRoundPlus } from 'lucide-react'
 
 export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => void }) {
   const [formData, setFormData] = useState({
@@ -113,8 +114,8 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
-          Add User
+        <Button variant="outline" className='center'>
+          <UserRoundPlus className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[450px]">
