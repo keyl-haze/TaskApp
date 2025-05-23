@@ -12,6 +12,12 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
 
 export type FilterValue = {
   role?: string[]
@@ -43,7 +49,8 @@ export default function FilterPopover({
   const [open, setOpen] = useState(false)
   const [filters, setFilters] = useState<FilterValue>(activeFilters)
   const [activeFilterCount, setActiveFilterCount] = useState(0)
-  const [lastAppliedFilters, setLastAppliedFilters] = useState<FilterValue>(activeFilters)
+  const [lastAppliedFilters, setLastAppliedFilters] =
+    useState<FilterValue>(activeFilters)
 
   useEffect(() => {
     setFilters(activeFilters)
@@ -76,30 +83,44 @@ export default function FilterPopover({
 
   return (
     <div className="relative">
-      <Popover open={open} onOpenChange={(isOpen) => {
-        setOpen(isOpen);
-        if (isOpen) {
-          setFilters(lastAppliedFilters);
-        }
-      }}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className="text-primary border-primary relative"
-          >
-            <Filter className="h-4 w-4" />
-            {activeFilterCount > 0 && (
-              <Badge className="ml-2 bg-primary text-primary-foreground h-5 w-5 p-0 flex items-center justify-center rounded-full">
-                {activeFilterCount}
-              </Badge>
-            )}
-          </Button>
-        </PopoverTrigger>
+      <Popover
+        open={open}
+        onOpenChange={(isOpen) => {
+          setOpen(isOpen)
+          if (isOpen) {
+            setFilters(lastAppliedFilters)
+          }
+        }}
+      >
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="text-primary border-primary relative"
+                >
+                  <Filter className="h-4 w-4" />
+                  {activeFilterCount > 0 && (
+                    <Badge className="ml-2 bg-primary text-primary-foreground h-5 w-5 p-0 flex items-center justify-center rounded-full">
+                      {activeFilterCount}
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Filter Users</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
         <PopoverContent className="w-80">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="font-medium">Filter Users</h4>
-              {(filters.role?.length || 0) > 0 || (filters.status?.length || 0) > 0 ? (
+              {(filters.role?.length || 0) > 0 ||
+              (filters.status?.length || 0) > 0 ? (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -116,11 +137,13 @@ export default function FilterPopover({
             <div className="space-y-2">
               <Label>Role</Label>
               <div className="flex flex-wrap gap-2">
-                {roleOptions.map(opt => (
+                {roleOptions.map((opt) => (
                   <label key={opt.value} className="flex items-center gap-2">
                     <Checkbox
                       checked={filters.role?.includes(opt.value) || false}
-                      onCheckedChange={() => handleCheckboxChange('role', opt.value)}
+                      onCheckedChange={() =>
+                        handleCheckboxChange('role', opt.value)
+                      }
                     />
                     {opt.label}
                   </label>
@@ -131,11 +154,13 @@ export default function FilterPopover({
             <div className="space-y-2">
               <Label>Status</Label>
               <div className="flex flex-wrap gap-2">
-                {statusOptions.map(opt => (
+                {statusOptions.map((opt) => (
                   <label key={opt.value} className="flex items-center gap-2">
                     <Checkbox
                       checked={filters.status?.includes(opt.value) || false}
-                      onCheckedChange={() => handleCheckboxChange('status', opt.value)}
+                      onCheckedChange={() =>
+                        handleCheckboxChange('status', opt.value)
+                      }
                     />
                     {opt.label}
                   </label>
@@ -148,18 +173,20 @@ export default function FilterPopover({
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  setOpen(false);
+                  setOpen(false)
                   // If no filters were applied before, reset all
                   if (
-                    (!lastAppliedFilters.role || lastAppliedFilters.role.length === 0) &&
-                    (!lastAppliedFilters.status || lastAppliedFilters.status.length === 0)
+                    (!lastAppliedFilters.role ||
+                      lastAppliedFilters.role.length === 0) &&
+                    (!lastAppliedFilters.status ||
+                      lastAppliedFilters.status.length === 0)
                   ) {
-                    const emptyFilters: FilterValue = { role: [], status: [] };
-                    setFilters(emptyFilters);
-                    onFilterChange(emptyFilters);
+                    const emptyFilters: FilterValue = { role: [], status: [] }
+                    setFilters(emptyFilters)
+                    onFilterChange(emptyFilters)
                   } else {
-                    setFilters(lastAppliedFilters);
-                    onFilterChange(lastAppliedFilters);
+                    setFilters(lastAppliedFilters)
+                    onFilterChange(lastAppliedFilters)
                   }
                 }}
               >

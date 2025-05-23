@@ -24,6 +24,7 @@ import {
 import { USER_API } from '@/../routes/user'
 import { showErrorToast, showSuccessToast } from '../../utils/errorSonner'
 import { UserRoundPlus } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => void }) {
   const [formData, setFormData] = useState({
@@ -127,9 +128,20 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className='center'>
-          <UserRoundPlus className="h-4 w-4" />
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="center">
+                  <UserRoundPlus className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              Add User
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[450px]">
         <form onSubmit={handleSubmit}>
