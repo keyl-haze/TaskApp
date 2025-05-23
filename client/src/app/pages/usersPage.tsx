@@ -89,9 +89,10 @@ export default function UsersPage() {
   // * Search and filter, then paginate
   const filteredUsers = users.filter(user => {
   const matchesSearch =
-    user.name.toLowerCase().includes(globalFilter.toLowerCase()) ||
-    user.username.toLowerCase().includes(globalFilter.toLowerCase()) ||
-    user.email.toLowerCase().includes(globalFilter.toLowerCase())
+    globalFilter.trim() === '' ||
+    Object.values(user).some(value =>
+      String(value).toLowerCase().includes(globalFilter.toLowerCase())
+    );
 
   const matchesRole =
     !filters.role || filters.role.length === 0 || filters.role.includes(user.role)

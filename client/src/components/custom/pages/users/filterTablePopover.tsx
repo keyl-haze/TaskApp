@@ -43,6 +43,7 @@ export default function FilterPopover({
   const [open, setOpen] = useState(false)
   const [filters, setFilters] = useState<FilterValue>(activeFilters)
   const [activeFilterCount, setActiveFilterCount] = useState(0)
+  const [lastAppliedFilters, setLastAppliedFilters] = useState<FilterValue>(activeFilters)
 
   useEffect(() => {
     setFilters(activeFilters)
@@ -63,6 +64,7 @@ export default function FilterPopover({
 
   const applyFilters = () => {
     onFilterChange(filters)
+    setLastAppliedFilters(filters)
     setOpen(false)
   }
 
@@ -74,7 +76,12 @@ export default function FilterPopover({
 
   return (
     <div className="relative">
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (isOpen) {
+          setFilters(lastAppliedFilters);
+        }
+      }}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -97,7 +104,7 @@ export default function FilterPopover({
                   variant="ghost"
                   size="sm"
                   onClick={resetFilters}
-                  className="h-8 px-2"
+                  className="h-8 px-2 text font-normal"
                 >
                   Reset all
                 </Button>
@@ -140,7 +147,21 @@ export default function FilterPopover({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setOpen(false);
+                  // If no filters were applied before, reset all
+                  if (
+                    (!lastAppliedFilters.role || lastAppliedFilters.role.length === 0) &&
+                    (!lastAppliedFilters.status || lastAppliedFilters.status.length === 0)
+                  ) {
+                    const emptyFilters: FilterValue = { role: [], status: [] };
+                    setFilters(emptyFilters);
+                    onFilterChange(emptyFilters);
+                  } else {
+                    setFilters(lastAppliedFilters);
+                    onFilterChange(lastAppliedFilters);
+                  }
+                }}
               >
                 Cancel
               </Button>

@@ -111,6 +111,19 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
     }
   }
 
+  const resetForm = () => {
+    setFormData({
+      username: '',
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      role: ''
+    })
+    setUsernameError(null)
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -217,7 +230,7 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" className="mr-2" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" className="mr-2" onClick={() => {setOpen(false); resetForm();}}>
               Cancel
             </Button>
             <Button type="submit" disabled={loading || !!usernameError}>
