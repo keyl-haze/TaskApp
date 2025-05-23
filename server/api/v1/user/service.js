@@ -25,7 +25,8 @@ const list = async (query) => {
     User.name
   );
   const users = await User.findAll({
-    where
+    where,
+    // TODO order: [['column', 'ASC or DESC']],
   });
   return users;
 };
@@ -106,8 +107,82 @@ const create = async (user) => {
   return newUser;
 };
 
+// * Update user
+const update = async (id, updates) => {
+  // * Check if user exists
+  const user = await User.findByPk(id);
+  if (!user) {
+    const error = new Error();
+    error.name = 'UserNotFoundError';
+    error.status = 404;
+    error.message = 'User not found';
+    error.details = { id };
+    throw error;
+  }
+
+  // * Allowed fields to update
+  const allowedFields = [
+    'username',
+    'firstName',
+    'middleName',
+    'lastName',
+    'role',
+    'email'
+    // TODO: add password, eventually
+  ];
+
+  // * Filter out fields that are null or undefined
+  const filteredUpdates = {};
+  for (const field of allowedFields) {
+    if (updates.hasOwnProperty(field) && updates[field] != null) {
+      filteredUpdates[field] = updates[field];
+    }
+  }
+
+  // * Disallow updating username or email to an already existing one
+  if (
+    filteredUpdates.email &&
+    filteredUpdates.email !== user.email
+  ) {
+    const emailExists = await doesEmailExist(filteredUpdates.email);
+    if (emailExists) {
+      const error = new Error();
+      error.name = 'EmailExistsError';
+      error.status = 400;
+      error.message = 'Invalid change';
+      throw error;
+    }
+  }
+  if (
+    filteredUpdates.username &&
+    filteredUpdates.username !== user.username
+  ) {
+    const usernameExists = await doesUsernameExist(filteredUpdates.username);
+    if (usernameExists) {
+      const error = new Error();
+      error.name = 'UsernameExistsError';
+      error.status = 400;
+      error.message = 'Invalid change';
+      throw error;
+    }
+    const usernameValid = await isUsernameValid(filteredUpdates.username);
+    if (!usernameValid) {
+      const error = new Error();
+      error.name = 'InvalidUsernameError';
+      error.status = 400;
+      error.message = 'Username is invalid';
+      throw error;
+    }
+  }
+
+  // * Update user only with filtered fields
+  await user.update(filteredUpdates);
+  return user;
+};
+
 module.exports = {
   list,
   get,
-  create
+  create,
+  update
 };
