@@ -25,7 +25,7 @@ const list = async (query) => {
     User.name
   );
   const users = await User.findAll({
-    where,
+    where
     // TODO order: [['column', 'ASC or DESC']],
   });
   return users;
@@ -128,7 +128,7 @@ const update = async (id, updates) => {
     'lastName',
     'role',
     'email'
-    // TODO: add password, eventually
+    // TODO: allow update password, eventually
   ];
 
   // * Filter out fields that are null or undefined
@@ -140,10 +140,7 @@ const update = async (id, updates) => {
   }
 
   // * Disallow updating username or email to an already existing one
-  if (
-    filteredUpdates.email &&
-    filteredUpdates.email !== user.email
-  ) {
+  if (filteredUpdates.email && filteredUpdates.email !== user.email) {
     const emailExists = await doesEmailExist(filteredUpdates.email);
     if (emailExists) {
       const error = new Error();
@@ -153,10 +150,7 @@ const update = async (id, updates) => {
       throw error;
     }
   }
-  if (
-    filteredUpdates.username &&
-    filteredUpdates.username !== user.username
-  ) {
+  if (filteredUpdates.username && filteredUpdates.username !== user.username) {
     const usernameExists = await doesUsernameExist(filteredUpdates.username);
     if (usernameExists) {
       const error = new Error();
