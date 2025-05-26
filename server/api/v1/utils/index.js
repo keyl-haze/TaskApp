@@ -1,5 +1,13 @@
 const promiseController = (api) => async (req, res) => {
   try {
+    // * Check if request is PATCH or PUT
+    req.updateMode =
+      req.method === 'PATCH'
+        ? 'patch'
+        : req.method === 'PUT'
+          ? 'put'
+          : undefined;
+
     const { status = 200, message = 'Success', data } = await api(req, res);
     return res.status(status).json({
       status: 'success',

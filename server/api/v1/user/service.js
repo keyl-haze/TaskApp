@@ -108,7 +108,7 @@ const create = async (user) => {
 };
 
 // * Update user
-const update = async (id, updates) => {
+const update = async (id, updates, mode = 'patch') => {
   // * Check if user exists
   const user = await User.findByPk(id);
   if (!user) {
@@ -131,11 +131,22 @@ const update = async (id, updates) => {
     // TODO: allow update password, eventually
   ];
 
-  // * Filter out fields that are null or undefined
-  const filteredUpdates = {};
-  for (const field of allowedFields) {
-    if (updates.hasOwnProperty(field) && updates[field] != null) {
-      filteredUpdates[field] = updates[field];
+  // * Check if PUT or PATCH request
+  let filteredUpdates = {};
+
+  if (mode === 'PUT') {
+    //  * PUT request: all fields must be present or set to NULL
+    for (const field of allowedFields) {
+      filteredUpdates[field] = updates.hasOwnProperty(field)
+        ? updates[field]
+        : null;
+    }
+  } else {
+    // * PATCH request: only update fields that are provided
+    for (const field of allowedFields) {
+      if (updates.hasOwnProperty(field) && updates[field] !== null) {
+        filteredUpdates[field] = updates[field];
+      }
     }
   }
 

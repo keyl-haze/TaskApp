@@ -32,7 +32,8 @@ const create = promiseController(async (req) => {
 });
 
 const update = promiseController(async (req) => {
-  const user = await service.update(req.params.id, req.body);
+  const mode = req.updateMode || 'patch';
+  const user = await service.update(req.params.id, req.body, mode);
 
   return {
     status: 200,
