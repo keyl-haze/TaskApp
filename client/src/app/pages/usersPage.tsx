@@ -4,7 +4,7 @@ import AuthLayout from '../layouts/authLayout'
 import { USER_API } from '../../../routes/user'
 import type { User as UserType } from '@/../types/types'
 import { useState, useEffect } from 'react'
-import { Search, MoreVertical, Pencil, Trash2 } from 'lucide-react'
+import { Search, MoreVertical, Trash2 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -19,7 +19,9 @@ import {
 import AddUser from '@/components/custom/pages/users/addDialog'
 import GenericTable from '@/components/custom/utils/genericTable'
 import { type ColumnDef } from '@tanstack/react-table'
-import FilterPopover, { FilterValue } from '@/components/custom/pages/users/filterTablePopover'
+import FilterPopover, {
+  FilterValue
+} from '@/components/custom/pages/users/filterTablePopover'
 import EditUserDialog from '@/components/custom/pages/users/editDialog'
 
 interface User extends UserType {
@@ -43,8 +45,6 @@ export default function UsersPage() {
   const [globalFilter, setGlobalFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState<FilterValue>({})
-  const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const [selectedUserForEdit, setSelectedUserForEdit] = useState<User | null>(null)
 
   // * Fetch users from the API
   const fetchUsers = async () => {
@@ -89,32 +89,29 @@ export default function UsersPage() {
 
   const handleUserCreated = () => setRefreshFlag((prev) => prev + 1)
 
-  const handleEditUser = (user: User) => {
-    setSelectedUserForEdit(user)
-    setEditDialogOpen(true)
-  }
-
   const handleUserUpdated = () => {
     setRefreshFlag((prev) => prev + 1)
-    setEditDialogOpen(false)
-    setSelectedUserForEdit(null)
   }
 
   // * Search and filter, then paginate
-  const filteredUsers = users.filter(user => {
-  const matchesSearch =
-    globalFilter.trim() === '' ||
-    Object.values(user).some(value =>
-      String(value).toLowerCase().includes(globalFilter.toLowerCase())
-    );
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      globalFilter.trim() === '' ||
+      Object.values(user).some((value) =>
+        String(value).toLowerCase().includes(globalFilter.toLowerCase())
+      )
 
-  const matchesRole =
-    !filters.role || filters.role.length === 0 || filters.role.includes(user.role)
-  const matchesStatus =
-    !filters.status || filters.status.length === 0 || filters.status.includes(user.status)
+    const matchesRole =
+      !filters.role ||
+      filters.role.length === 0 ||
+      filters.role.includes(user.role)
+    const matchesStatus =
+      !filters.status ||
+      filters.status.length === 0 ||
+      filters.status.includes(user.status)
 
-  return matchesSearch && matchesRole && matchesStatus
-})
+    return matchesSearch && matchesRole && matchesStatus
+  })
 
   const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE)
   const paginatedUsers = filteredUsers.slice(
@@ -232,18 +229,16 @@ export default function UsersPage() {
     {
       id: 'actions',
       header: 'Actions',
-      cell: ({row}) => {
+      cell: ({ row }) => {
         const user = row.original
         return (
           <div className="flex justify-items-center">
-            <Button variant="ghost" size="icon" 
-              className="h-8 w-8  text-blue-500 hover:text-blue-400 cursor-pointer" 
-              onClick={() => handleEditUser(user)}>
-              <Pencil className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" 
-              className="h-8 w-8  text-red-500 hover:text-red-400 cursor-pointer" 
-              onClick={() => handleDeleteUser(user.id)}>
+            <EditUserDialog user={user} onUserUpdated={handleUserUpdated} />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8  text-red-500 hover:text-red-400 cursor-pointer"
+            >
               <Trash2 className="h-5 w-5" />
             </Button>
           </div>
@@ -330,6 +325,7 @@ export default function UsersPage() {
                     disabled={currentPage === 1}
                     onClick={() => handlePageChange(currentPage - 1)}
                   >
+                    {/* Renders < */}
                     &lt;
                   </Button>
                 </PaginationItem>
@@ -338,6 +334,7 @@ export default function UsersPage() {
                     <PaginationLink
                       isActive={currentPage === i + 1}
                       onClick={() => handlePageChange(i + 1)}
+                      className="cursor-pointer"
                     >
                       {(i + 1).toString().padStart(2, '0')}
                     </PaginationLink>
@@ -350,7 +347,8 @@ export default function UsersPage() {
                     disabled={currentPage === totalPages}
                     onClick={() => handlePageChange(currentPage + 1)}
                   >
-                    &gt;
+                    {/* Renders > */}
+                    &gt; 
                   </Button>
                 </PaginationItem>
               </PaginationContent>
@@ -358,12 +356,6 @@ export default function UsersPage() {
           )}
         </main>
       </div>
-      <EditUserDialog
-        user={selectedUserForEdit}
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-        onUserUpdated={handleUserUpdated}
-      />
     </AuthLayout>
   )
 }

@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
+  DialogTrigger,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -16,6 +17,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { USER_API } from "@/../routes/user"
 import { showErrorToast, showSuccessToast } from "../../utils/errorSonner"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Pencil } from 'lucide-react'
 
 interface User {
   id: number
@@ -27,14 +30,14 @@ interface User {
   role: string
 }
 
-interface EditUserDialogProps {
-  user: User | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
+export default function EditUserDialog({ 
+  user, 
+  onUserUpdated,
+}: {
+  user: User
   onUserUpdated?: () => void
-}
-
-export default function EditUserDialog({ user, open, onOpenChange, onUserUpdated }: EditUserDialogProps) {
+}) {
+  const [open, setOpen] = useState(false)
   const [formData, setFormData] = useState({
     username: "",
     firstName: "",
@@ -43,12 +46,13 @@ export default function EditUserDialog({ user, open, onOpenChange, onUserUpdated
     email: "",
     role: "",
   })
+
   const [usernameError, setUsernameError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   // Populate form when user changes
   useEffect(() => {
-    if (user) {
+    if (open && user) {
       setFormData({
         username: user.username || "",
         firstName: user.firstName || "",
@@ -58,7 +62,7 @@ export default function EditUserDialog({ user, open, onOpenChange, onUserUpdated
         role: user.role || "",
       })
     }
-  }, [user])
+  }, [open, user])
 
   function isValidUsername(username: string) {
     return /^[a-zA-Z0-9_.]{5,}$/.test(username)
@@ -115,7 +119,7 @@ export default function EditUserDialog({ user, open, onOpenChange, onUserUpdated
         showSuccessToast("User updated successfully!")
         if (onUserUpdated) onUserUpdated()
         setTimeout(() => {
-          onOpenChange(false)
+          setOpen(false)
         }, 1000)
       } else {
         if (json.error && typeof json.error === "string" && json.error.toLowerCase().includes("username")) {
@@ -135,14 +139,27 @@ export default function EditUserDialog({ user, open, onOpenChange, onUserUpdated
     }
   }
 
-  const handleClose = () => {
-    onOpenChange(false)
-  }
-
   if (!user) return null
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-blue-500 hover:text-blue-400 cursor-pointer"
+                onClick={() => setOpen(true)}
+              >
+                <Pencil className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Edit User</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        </DialogTrigger>
       <DialogContent className="sm:max-w-[450px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader className="space-y-1 pb-4">
@@ -224,7 +241,7 @@ export default function EditUserDialog({ user, open, onOpenChange, onUserUpdated
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" className="mr-2" onClick={handleClose}>
+            <Button type="button" variant="outline" className="mr-2" onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={loading || !!usernameError}>
