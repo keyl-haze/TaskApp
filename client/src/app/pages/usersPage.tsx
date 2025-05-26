@@ -20,6 +20,9 @@ import AddUser from '@/components/custom/pages/users/addDialog'
 import GenericTable from '@/components/custom/utils/genericTable'
 import { type ColumnDef } from '@tanstack/react-table'
 import FilterPopover, { FilterValue } from '@/components/custom/pages/users/filterTablePopover'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import EditUserDialog from '@/components/custom/pages/users/editDialog'
+import { set } from 'react-hook-form'
 
 interface User extends UserType {
   name: string
@@ -42,6 +45,8 @@ export default function UsersPage() {
   const [globalFilter, setGlobalFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState<FilterValue>({})
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [selectedUserForEdit, setSelectedUserForEdit] = useState<User | null>(null)
 
   // * Fetch users from the API
   const fetchUsers = async () => {
@@ -85,6 +90,17 @@ export default function UsersPage() {
   }, [users.length, globalFilter, filters.role, filters.status])
 
   const handleUserCreated = () => setRefreshFlag((prev) => prev + 1)
+
+  const handleEditUser = (user: User) => {
+    setSelectedUserForEdit(user)
+    setEditDialogOpen(true)
+  }
+
+  const handleUserUpdated = () => {
+    setRefreshFlag((prev) => prev + 1)
+    setEditDialogOpen(false)
+    setSelectedUserForEdit(null)
+  }
 
   // * Search and filter, then paginate
   const filteredUsers = users.filter(user => {
@@ -217,15 +233,29 @@ export default function UsersPage() {
     },
     {
       id: 'actions',
-      cell: () => {
+      header: 'Actions',
+      cell: ({row}) => {
+        const user = row.original
         return (
-          <div className="flex justify-end gap-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Info className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Trash2 className="h-4 w-4" />
-            </Button>
+          <div className="flex justify-items-center">
+            <Select
+              onValueChange={(value) => {
+                if (value === "edit") {
+                  handleEditUser(user)
+                } else if (value === "delete") {
+                  handleDeleteUser(user.id)
+                }
+              }}
+            >
+            <SelectTrigger className="w-[100px] h-8">
+              <SelectValue placeholder="Action" />
+            </SelectTrigger>
+            <SelectContent >
+                <SelectItem value="edit">✏️ Edit</SelectItem>
+                <SelectItem value="delete">🗑️ Delete</SelectItem>
+              </SelectContent>
+            </Select>
+
           </div>
         )
       }
@@ -338,6 +368,12 @@ export default function UsersPage() {
           )}
         </main>
       </div>
+      <EditUserDialog
+        user={selectedUserForEdit}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onUserUpdated={handleUserUpdated}
+      />
     </AuthLayout>
   )
 }
