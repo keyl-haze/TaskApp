@@ -4,7 +4,7 @@ import AuthLayout from '../layouts/authLayout'
 import { USER_API } from '../../../routes/user'
 import type { User as UserType } from '@/../types/types'
 import { useState, useEffect } from 'react'
-import { Search, MoreVertical, Info, Trash2 } from 'lucide-react'
+import { Search, MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -20,9 +20,7 @@ import AddUser from '@/components/custom/pages/users/addDialog'
 import GenericTable from '@/components/custom/utils/genericTable'
 import { type ColumnDef } from '@tanstack/react-table'
 import FilterPopover, { FilterValue } from '@/components/custom/pages/users/filterTablePopover'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import EditUserDialog from '@/components/custom/pages/users/editDialog'
-import { set } from 'react-hook-form'
 
 interface User extends UserType {
   name: string
@@ -238,24 +236,16 @@ export default function UsersPage() {
         const user = row.original
         return (
           <div className="flex justify-items-center">
-            <Select
-              onValueChange={(value) => {
-                if (value === "edit") {
-                  handleEditUser(user)
-                } else if (value === "delete") {
-                  handleDeleteUser(user.id)
-                }
-              }}
-            >
-            <SelectTrigger className="w-[100px] h-8">
-              <SelectValue placeholder="Action" />
-            </SelectTrigger>
-            <SelectContent >
-                <SelectItem value="edit">✏️ Edit</SelectItem>
-                <SelectItem value="delete">🗑️ Delete</SelectItem>
-              </SelectContent>
-            </Select>
-
+            <Button variant="ghost" size="icon" 
+              className="h-8 w-8  text-blue-500 hover:text-blue-400 cursor-pointer" 
+              onClick={() => handleEditUser(user)}>
+              <Pencil className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" 
+              className="h-8 w-8  text-red-500 hover:text-red-400 cursor-pointer" 
+              onClick={() => handleDeleteUser(user.id)}>
+              <Trash2 className="h-5 w-5" />
+            </Button>
           </div>
         )
       }

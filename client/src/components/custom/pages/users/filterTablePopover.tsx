@@ -98,7 +98,7 @@ export default function FilterPopover({
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="text-primary border-primary relative"
+                  className="text-primary relative"
                 >
                   <Filter className="h-4 w-4" />
                   {activeFilterCount > 0 && (

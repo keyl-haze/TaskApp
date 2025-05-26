@@ -93,8 +93,19 @@ export default function EditUserDialog({ user, open, onOpenChange, onUserUpdated
     setLoading(true)
 
     try {
+      type FormDataKey = keyof typeof formData;
+      const changedFields = (Object.keys(formData) as FormDataKey[]).reduce((acc, key) => {
+        if (formData[key] !== user[key]) acc[key] = formData[key];
+        return acc;
+      }, {} as Partial<typeof formData>)
+
+      const method = Object.keys(changedFields).length < Object.keys(formData).length ? "PATCH" : "PUT";
+
+      // * For checking what request is being sent
+      //console.log("Updating user with method:", method, "and data:", method === "PATCH" ? changedFields : formData);
+
       const res = await fetch(USER_API.update(String(user.id)), {
-        method: "PUT",
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       })
