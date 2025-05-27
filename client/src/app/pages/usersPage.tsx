@@ -4,7 +4,7 @@ import AuthLayout from '../layouts/authLayout'
 import { USER_API } from '../../../routes/user'
 import type { User as UserType } from '@/../types/types'
 import { useState, useEffect } from 'react'
-import { Search, MoreVertical, Trash2 } from 'lucide-react'
+import { Search, MoreVertical } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -23,6 +23,7 @@ import FilterPopover, {
   FilterValue
 } from '@/components/custom/pages/users/filterTablePopover'
 import EditUserDialog from '@/components/custom/pages/users/editDialog'
+import DeleteUserDialog from '@/components/custom/pages/users/deleteDialog'
 
 interface User extends UserType {
   name: string
@@ -88,10 +89,9 @@ export default function UsersPage() {
   }, [users.length, globalFilter, filters.role, filters.status])
 
   const handleUserCreated = () => setRefreshFlag((prev) => prev + 1)
-
-  const handleUserUpdated = () => {
-    setRefreshFlag((prev) => prev + 1)
-  }
+  const handleUserUpdated = () => setRefreshFlag((prev) => prev + 1)
+  const handleUserDeleted = () => setRefreshFlag((prev) => prev + 1)
+  
 
   // * Search and filter, then paginate
   const filteredUsers = users.filter((user) => {
@@ -234,13 +234,7 @@ export default function UsersPage() {
         return (
           <div className="flex justify-items-center">
             <EditUserDialog user={user} onUserUpdated={handleUserUpdated} />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8  text-red-500 hover:text-red-400 cursor-pointer"
-            >
-              <Trash2 className="h-5 w-5" />
-            </Button>
+            <DeleteUserDialog user={user} onUserDeleted={handleUserDeleted} />
           </div>
         )
       }
