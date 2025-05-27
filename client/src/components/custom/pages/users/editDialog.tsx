@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import type React from 'react'
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogTrigger,
@@ -10,14 +10,25 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { USER_API } from "@/../routes/user"
-import { showErrorToast, showSuccessToast } from "../../utils/errorSonner"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { USER_API } from '@/../routes/user'
+import { showErrorToast, showSuccessToast } from '../../utils/errorSonner'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
 import { Pencil } from 'lucide-react'
 
 interface User {
@@ -30,21 +41,21 @@ interface User {
   role: string
 }
 
-export default function EditUserDialog({ 
-  user, 
-  onUserUpdated,
+export default function EditUserDialog({
+  user,
+  onUserUpdated
 }: {
   user: User
   onUserUpdated?: () => void
 }) {
   const [open, setOpen] = useState(false)
   const [formData, setFormData] = useState({
-    username: "",
-    firstName: "",
-    middleName: "",
-    lastName: "",
-    email: "",
-    role: "",
+    username: '',
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    email: '',
+    role: ''
   })
 
   const [usernameError, setUsernameError] = useState<string | null>(null)
@@ -54,12 +65,12 @@ export default function EditUserDialog({
   useEffect(() => {
     if (open && user) {
       setFormData({
-        username: user.username || "",
-        firstName: user.firstName || "",
-        middleName: user.middleName || "",
-        lastName: user.lastName || "",
-        email: user.email || "",
-        role: user.role || "",
+        username: user.username || '',
+        firstName: user.firstName || '',
+        middleName: user.middleName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        role: user.role || ''
       })
     }
   }, [open, user])
@@ -71,9 +82,11 @@ export default function EditUserDialog({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-    if (name === "username") {
+    if (name === 'username') {
       if (!isValidUsername(value)) {
-        setUsernameError("Username must be 5+ characters, using letters, numbers, . or _")
+        setUsernameError(
+          'Username must be 5+ characters, using letters, numbers, . or _'
+        )
       } else {
         setUsernameError(null)
       }
@@ -89,7 +102,9 @@ export default function EditUserDialog({
     if (!user) return
 
     if (!isValidUsername(formData.username)) {
-      setUsernameError("Username must be at least 5 characters, alphanumeric, and can only use _")
+      setUsernameError(
+        'Username must be at least 5 characters, alphanumeric, and can only use _'
+      )
       return
     }
 
@@ -97,42 +112,52 @@ export default function EditUserDialog({
     setLoading(true)
 
     try {
-      type FormDataKey = keyof typeof formData;
-      const changedFields = (Object.keys(formData) as FormDataKey[]).reduce((acc, key) => {
-        if (formData[key] !== user[key]) acc[key] = formData[key];
-        return acc;
-      }, {} as Partial<typeof formData>)
+      type FormDataKey = keyof typeof formData
+      const changedFields = (Object.keys(formData) as FormDataKey[]).reduce(
+        (acc, key) => {
+          if (formData[key] !== user[key]) acc[key] = formData[key]
+          return acc
+        },
+        {} as Partial<typeof formData>
+      )
 
-      const method = Object.keys(changedFields).length < Object.keys(formData).length ? "PATCH" : "PUT";
+      const method =
+        Object.keys(changedFields).length < Object.keys(formData).length
+          ? 'PATCH'
+          : 'PUT'
 
       // * For checking what request is being sent
       //console.log("Updating user with method:", method, "and data:", method === "PATCH" ? changedFields : formData);
 
       const res = await fetch(USER_API.update(String(user.id)), {
         method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
       })
       const json = await res.json()
 
       if (res.ok) {
-        showSuccessToast("User updated successfully!")
+        showSuccessToast('User updated successfully!')
         if (onUserUpdated) onUserUpdated()
         setTimeout(() => {
           setOpen(false)
         }, 1000)
       } else {
-        if (json.error && typeof json.error === "string" && json.error.toLowerCase().includes("username")) {
+        if (
+          json.error &&
+          typeof json.error === 'string' &&
+          json.error.toLowerCase().includes('username')
+        ) {
           setUsernameError(json.error)
         } else {
-          showErrorToast(json.message || "Failed to update user")
+          showErrorToast(json.message || 'Failed to update user')
         }
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        showErrorToast(err.message || "Failed to update user")
+        showErrorToast(err.message || 'Failed to update user')
       } else {
-        showErrorToast("Failed to update user")
+        showErrorToast('Failed to update user')
       }
     } finally {
       setLoading(false)
@@ -159,12 +184,16 @@ export default function EditUserDialog({
             <TooltipContent>Edit User</TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        </DialogTrigger>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[450px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader className="space-y-1 pb-4">
-            <DialogTitle className="text-xl font-semibold">Edit User</DialogTitle>
-            <DialogDescription className="text-gray-500">Update user details and permissions</DialogDescription>
+            <DialogTitle className="text-xl font-semibold">
+              Edit User
+            </DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Update user details and permissions
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -177,7 +206,9 @@ export default function EditUserDialog({
                 placeholder="Enter username"
                 required
               />
-              {usernameError && <span className="text-red-500 text-xs">{usernameError}</span>}
+              {usernameError && (
+                <span className="text-red-500 text-xs">{usernameError}</span>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="edit-firstName">First Name</Label>
@@ -241,11 +272,16 @@ export default function EditUserDialog({
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" className="mr-2" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              className="mr-2"
+              onClick={() => setOpen(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={loading || !!usernameError}>
-              {loading ? "Updating..." : "Update User"}
+              {loading ? 'Updating...' : 'Update User'}
             </Button>
           </DialogFooter>
         </form>

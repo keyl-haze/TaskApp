@@ -50,7 +50,7 @@ const remove = promiseController(async (req) => {
     message: 'User deleted successfully',
     data: user
   };
-})
+});
 
 module.exports = {
   list,

@@ -96,10 +96,7 @@ export default function FilterPopover({
           <Tooltip>
             <TooltipTrigger asChild>
               <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="text-primary relative"
-                >
+                <Button variant="outline" className="text-primary relative">
                   <Filter className="h-4 w-4" />
                   {activeFilterCount > 0 && (
                     <Badge className="ml-2 bg-primary text-primary-foreground h-5 w-5 p-0 flex items-center justify-center rounded-full">

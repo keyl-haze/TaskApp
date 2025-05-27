@@ -198,7 +198,7 @@ const softDelete = async (id) => {
   }
   await user.destroy();
   return user;
-}
+};
 
 module.exports = {
   list,

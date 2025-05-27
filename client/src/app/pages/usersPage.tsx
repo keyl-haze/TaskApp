@@ -348,7 +348,7 @@ export default function UsersPage() {
                     onClick={() => handlePageChange(currentPage + 1)}
                   >
                     {/* Renders > */}
-                    &gt; 
+                    &gt;
                   </Button>
                 </PaginationItem>
               </PaginationContent>

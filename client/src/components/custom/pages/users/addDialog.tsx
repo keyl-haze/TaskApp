@@ -24,9 +24,18 @@ import {
 import { USER_API } from '@/../routes/user'
 import { showErrorToast, showSuccessToast } from '../../utils/errorSonner'
 import { UserRoundPlus } from 'lucide-react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
 
-export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => void }) {
+export default function AddUserDialog({
+  onUserCreated
+}: {
+  onUserCreated?: () => void
+}) {
   const [formData, setFormData] = useState({
     username: '',
     firstName: '',
@@ -49,7 +58,9 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
     setFormData((prev) => ({ ...prev, [name]: value }))
     if (name === 'username') {
       if (!isValidUsername(value)) {
-        setUsernameError('Username must be 5+ characters, using letters, numbers, . or _')
+        setUsernameError(
+          'Username must be 5+ characters, using letters, numbers, . or _'
+        )
       } else {
         setUsernameError(null)
       }
@@ -63,7 +74,9 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!isValidUsername(formData.username)) {
-      setUsernameError('Username must be at least 5 characters, alphanumeric, and can only use _')
+      setUsernameError(
+        'Username must be at least 5 characters, alphanumeric, and can only use _'
+      )
       return
     }
     setUsernameError(null)
@@ -85,8 +98,8 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
           email: '',
           password: '',
           role: ''
-        });
-        if (onUserCreated) onUserCreated();
+        })
+        if (onUserCreated) onUserCreated()
         setTimeout(() => {
           setOpen(false)
         }, 1000)
@@ -123,7 +136,7 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
       role: ''
     })
     setUsernameError(null)
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -137,9 +150,7 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
                 </Button>
               </DialogTrigger>
             </TooltipTrigger>
-            <TooltipContent>
-              Add User
-            </TooltipContent>
+            <TooltipContent>Add User</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </DialogTrigger>
@@ -168,28 +179,28 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
                 <span className="text-red-500 text-xs">{usernameError}</span>
               )}
             </div>
+            <div className="grid gap-2">
+              <Label htmlFor="firstName">First Name</Label>
+              <Input
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                placeholder="First name"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="middleName">Middle Name</Label>
                 <Input
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
+                  id="middleName"
+                  name="middleName"
+                  value={formData.middleName}
                   onChange={handleChange}
-                  placeholder="First name"
-                  required
+                  placeholder="Middle name (optional)"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="middleName">Middle Name</Label>
-                  <Input
-                    id="middleName"
-                    name="middleName"
-                    value={formData.middleName}
-                    onChange={handleChange}
-                    placeholder="Middle name (optional)"
-                  />
-                </div>
               <div className="grid gap-2">
                 <Label htmlFor="lastName">Last Name</Label>
                 <Input
@@ -229,7 +240,7 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
             <div className="grid gap-2 w-full">
               <Label htmlFor="accessRights">Access Rights</Label>
               <Select onValueChange={handleRoleChange} value={formData.role}>
-                <SelectTrigger id="role" className='w-full'>
+                <SelectTrigger id="role" className="w-full">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
                 <SelectContent>
@@ -242,7 +253,15 @@ export default function AddUserDialog({onUserCreated}: { onUserCreated?: () => v
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" className="mr-2" onClick={() => {setOpen(false); resetForm();}}>
+            <Button
+              type="button"
+              variant="outline"
+              className="mr-2"
+              onClick={() => {
+                setOpen(false)
+                resetForm()
+              }}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={loading || !!usernameError}>
