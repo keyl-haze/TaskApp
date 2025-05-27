@@ -185,9 +185,25 @@ const update = async (id, updates, mode = 'patch') => {
   return user;
 };
 
+// * Soft delete user
+const softDelete = async (id) => {
+  const user = await User.findByPk(id);
+  if (!user) {
+    const error = new Error();
+    error.name = 'UserNotFoundError';
+    error.status = 404;
+    error.message = 'User does not exist';
+    error.details = { id };
+    throw error;
+  }
+  await user.destroy();
+  return user;
+}
+
 module.exports = {
   list,
   get,
   create,
-  update
+  update,
+  softDelete
 };

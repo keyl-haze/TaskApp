@@ -42,9 +42,20 @@ const update = promiseController(async (req) => {
   };
 });
 
+const remove = promiseController(async (req) => {
+  const user = await service.softDelete(req.params.id);
+
+  return {
+    status: 200,
+    message: 'User deleted successfully',
+    data: user
+  };
+})
+
 module.exports = {
   list,
   get,
   create,
-  update
+  update,
+  remove
 };
