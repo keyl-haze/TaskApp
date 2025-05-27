@@ -200,10 +200,38 @@ const softDelete = async (id) => {
   return user;
 };
 
+// * Restore soft deleted user
+const restore = async (id) => {
+  // * Check if user exists, even soft-deleted users
+  const user = await User.findByPk(id, { paranoid: false });
+  if (!user) {
+    const error = new Error();
+    error.name = 'UserNotFoundError';
+    error.status = 404;
+    error.message = 'User does not exist';
+    error.details = { id };
+    throw error;
+  }
+
+  // * Restore only if it is soft-deleted (deletedAt is not NULL)
+  if (!user.deletedAt) {
+    const error = new Error();
+    error.name = 'UserNotSoftDeletedError';
+    error.status = 400;
+    error.message = 'Restore request is invalid';
+    error.details = { id };
+    throw error;
+  }
+
+  await user.restore();
+  return user;
+};
+
 module.exports = {
   list,
   get,
   create,
   update,
-  softDelete
+  softDelete,
+  restore
 };

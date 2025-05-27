@@ -52,10 +52,21 @@ const remove = promiseController(async (req) => {
   };
 });
 
+const restore = promiseController(async (req) => {
+  const user = await service.restore(req.params.id);
+
+  return{
+    status: 200,
+    message: 'User restored successfully',
+    data: user
+  };
+});
+
 module.exports = {
   list,
   get,
   create,
   update,
-  remove
+  remove,
+  restore
 };
