@@ -14,7 +14,10 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Task App',
+  title: {
+    template: 'Task App | %s',
+    default: 'Task App'
+  },
   description: 'A simple task management application'
 }
 
