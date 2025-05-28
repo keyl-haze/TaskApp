@@ -46,8 +46,8 @@ export default function GenericTable<T extends { id: number }>({
   })
 
   return (
-    <div className="rounded-lg border">
-      <Table>
+    <div className="rounded-lg border overflow-x-auto w-full">
+      <Table className="min-w-[600px] w-full">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
