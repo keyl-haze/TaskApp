@@ -91,7 +91,6 @@ export default function UsersPage() {
   const handleUserCreated = () => setRefreshFlag((prev) => prev + 1)
   const handleUserUpdated = () => setRefreshFlag((prev) => prev + 1)
   const handleUserDeleted = () => setRefreshFlag((prev) => prev + 1)
-  
 
   // * Search and filter, then paginate
   const filteredUsers = users.filter((user) => {
@@ -246,7 +245,7 @@ export default function UsersPage() {
   }
 
   return (
-    <AuthLayout header="Users">
+    <AuthLayout header='Users'>
       <div className="min-h-screen bg-background">
         <main className="p-4 md:p-6">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

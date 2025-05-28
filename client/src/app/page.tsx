@@ -1,11 +1,7 @@
 'use client'
 
-import UsersPage from './pages/usersPage'
+import { redirect } from 'next/navigation'
 
 export default function Home() {
-  return (
-    <main>
-      <UsersPage />
-    </main>
-  )
+  redirect('/users')
 }
