@@ -175,7 +175,7 @@ export default function EditUserDialog({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-blue-500 hover:text-blue-400 cursor-pointer"
+                className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-950/20 transition-colors"
                 onClick={() => setOpen(true)}
               >
                 <Pencil className="h-5 w-5" />

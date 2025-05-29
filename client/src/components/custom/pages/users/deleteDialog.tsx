@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { AlertDialogTrigger } from '@/components/ui/alert-dialog'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,12 +12,17 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { USER_API } from "@/../routes/user"
-import { showErrorToast, showSuccessToast } from "../../utils/errorSonner"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Trash2, AlertTriangle } from "lucide-react"
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
+import { USER_API } from '@/../routes/user'
+import { showErrorToast, showSuccessToast } from '../../utils/errorSonner'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
+import { Trash2, AlertTriangle } from 'lucide-react'
 
 interface User {
   id: number
@@ -34,7 +39,10 @@ interface DeleteUserDialogProps {
   onUserDeleted?: () => void
 }
 
-export default function DeleteUserDialog({ user, onUserDeleted }: DeleteUserDialogProps) {
+export default function DeleteUserDialog({
+  user,
+  onUserDeleted
+}: DeleteUserDialogProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -45,22 +53,22 @@ export default function DeleteUserDialog({ user, onUserDeleted }: DeleteUserDial
 
     try {
       const res = await fetch(USER_API.delete(String(user.id)), {
-        method: "DELETE",
+        method: 'DELETE'
       })
       const json = await res.json()
 
       if (res.ok) {
-        showSuccessToast("User deleted successfully!")
+        showSuccessToast('User deleted successfully!')
         if (onUserDeleted) onUserDeleted()
         setOpen(false)
       } else {
-        showErrorToast(json.message || "Failed to delete user")
+        showErrorToast(json.message || 'Failed to delete user')
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        showErrorToast(err.message || "Failed to delete user")
+        showErrorToast(err.message || 'Failed to delete user')
       } else {
-        showErrorToast("Failed to delete user")
+        showErrorToast('Failed to delete user')
       }
     } finally {
       setLoading(false)
@@ -78,7 +86,7 @@ export default function DeleteUserDialog({ user, onUserDeleted }: DeleteUserDial
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-red-500 hover:text-red-400 cursor-pointer"
+                className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/20 transition-colors"
                 onClick={() => setOpen(true)}
               >
                 <Trash2 className="h-5 w-5" />
@@ -95,7 +103,9 @@ export default function DeleteUserDialog({ user, onUserDeleted }: DeleteUserDial
               <AlertTriangle className="h-6 w-6 text-red-600" />
             </div>
             <div>
-              <AlertDialogTitle className="text-lg font-semibold">Remove User</AlertDialogTitle>
+              <AlertDialogTitle className="text-lg font-semibold">
+                Remove User
+              </AlertDialogTitle>
               <AlertDialogDescription className="text-sm text-muted-foreground">
                 This action cannot be undone easily.
               </AlertDialogDescription>
@@ -104,7 +114,8 @@ export default function DeleteUserDialog({ user, onUserDeleted }: DeleteUserDial
         </AlertDialogHeader>
         <div className="py-4">
           <AlertDialogDescription className="text-sm">
-            Are you sure you want to remove <span className="font-semibold text-foreground">{userName}</span>?
+            Are you sure you want to remove{' '}
+            <span className="font-semibold text-foreground">{userName}</span>?
           </AlertDialogDescription>
           <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 p-3">
             <div className="flex items-start gap-2">

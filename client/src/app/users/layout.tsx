@@ -5,6 +5,10 @@ export const metadata: Metadata = {
   description: 'Manage users in the system'
 }
 
-export default function UsersLayout({ children }: { children: React.ReactNode }) {
+export default function UsersLayout({
+  children
+}: {
+  children: React.ReactNode
+}) {
   return <>{children}</>
 }

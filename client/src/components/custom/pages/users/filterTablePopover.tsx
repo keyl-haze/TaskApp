@@ -25,6 +25,7 @@ export type FilterValue = {
 }
 
 type FilterPopoverProps = {
+  // eslint-disable-next-line no-unused-vars
   onFilterChange: (filters: FilterValue) => void
   activeFilters: FilterValue
 }

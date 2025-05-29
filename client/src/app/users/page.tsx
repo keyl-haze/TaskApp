@@ -237,20 +237,26 @@ export default function UsersPage() {
     },
     {
       id: 'actions',
-    header: 'Actions',
-    cell: ({ row }) => {
-      const user = row.original
-      return (
-        <div className="flex justify-items-center">
-          {user.status === 'Inactive' ? (
-            <RestoreUserDialog user={user} onUserRestored={handleUserUpdated} />
-          ) : (
-            <>
-              <EditUserDialog user={user} onUserUpdated={handleUserUpdated} />
-              <DeleteUserDialog user={user} onUserDeleted={handleUserDeleted} />
-            </>
-          )}
-        </div>
+      header: 'Actions',
+      cell: ({ row }) => {
+        const user = row.original
+        return (
+          <div className="flex justify-items-center">
+            {user.status === 'Inactive' ? (
+              <RestoreUserDialog
+                user={user}
+                onUserRestored={handleUserUpdated}
+              />
+            ) : (
+              <>
+                <EditUserDialog user={user} onUserUpdated={handleUserUpdated} />
+                <DeleteUserDialog
+                  user={user}
+                  onUserDeleted={handleUserDeleted}
+                />
+              </>
+            )}
+          </div>
         )
       }
     }
