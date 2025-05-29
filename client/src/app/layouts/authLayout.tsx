@@ -55,7 +55,7 @@ const navigationItems = [
     icon: Home
   },
   {
-    title: 'Team',
+    title: 'Users',
     url: '/users',
     icon: Users
   },

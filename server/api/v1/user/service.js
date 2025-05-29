@@ -19,7 +19,7 @@ const _validQueryProps = [
 
 // * List users
 const list = async (query) => {
-  const { deleted, ...otherQuery } = query;
+  const { deleted, all, ...otherQuery } = query;
 
   const where = buildWhereFilter(
     _validQueryProps,
@@ -29,9 +29,12 @@ const list = async (query) => {
 
   let findOptions = { where };
 
-  if (deleted === 'true') {
-    // Fetch only soft-deleted users
-    findOptions.paranoid = false; 
+  if (all === 'true') {
+    // Return all users, including soft-deleted
+    findOptions.paranoid = false;
+  } else if (deleted === 'true') {
+    // Only soft-deleted users
+    findOptions.paranoid = false;
     findOptions.where.deletedAt = { [Op.not]: null };
   }
 

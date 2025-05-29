@@ -38,7 +38,7 @@ const roleOptions = [
 
 const statusOptions = [
   { value: 'Active', label: 'Active' },
-  { value: 'Offline', label: 'Offline' },
+  { value: 'Inactive', label: 'Inactive' },
   { value: 'Wait', label: 'Wait' }
 ]
 

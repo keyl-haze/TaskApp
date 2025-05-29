@@ -29,7 +29,7 @@ import RestoreUserDialog from '@/components/custom/pages/users/restoreDialog'
 interface User extends UserType {
   name: string
   initials: string
-  status: 'Active' | 'Offline' | 'Wait'
+  status: 'Active' | 'Inactive' | 'Wait'
   avatarSrc?: string
 }
 
@@ -46,14 +46,17 @@ export default function UsersPage() {
   >([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const [filters, setFilters] = useState<FilterValue>({})
+  const [filters, setFilters] = useState<FilterValue>({
+    status: ['Active'],
+    role: []
+  })
 
   // * Fetch users from the API
   const fetchUsers = async () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(USER_API.list)
+      const res = await fetch(`${USER_API.list}?all=true`)
       const json = await res.json()
       if (json.status === 'success') {
         // * Map the users to the frontend
@@ -62,7 +65,7 @@ export default function UsersPage() {
           name: `${users.firstName} ${users.lastName}`,
           initials:
             `${users.firstName[0] ?? ''}${users.lastName[0] ?? ''}`.toUpperCase(),
-          status: 'Active',
+          status: users.deletedAt ? 'Inactive' : 'Active',
           avatarSrc: undefined
         }))
         setUsers(mappedUsers)
@@ -92,26 +95,31 @@ export default function UsersPage() {
   const handleUserCreated = () => setRefreshFlag((prev) => prev + 1)
   const handleUserUpdated = () => setRefreshFlag((prev) => prev + 1)
   const handleUserDeleted = () => setRefreshFlag((prev) => prev + 1)
-  const handleUserRestored = () => setRefreshFlag((prev) => prev + 1)
 
   // * Search and filter, then paginate
   const filteredUsers = users.filter((user) => {
+    // Search filter
     const matchesSearch =
       globalFilter.trim() === '' ||
       Object.values(user).some((value) =>
         String(value).toLowerCase().includes(globalFilter.toLowerCase())
       )
 
-    const matchesRole =
-      !filters.role ||
-      filters.role.length === 0 ||
-      filters.role.includes(user.role)
-    const matchesStatus =
-      !filters.status ||
-      filters.status.length === 0 ||
-      filters.status.includes(user.status)
+    // Role filter
+    const roleMatch = !filters.role?.length || filters.role.includes(user.role)
 
-    return matchesSearch && matchesRole && matchesStatus
+    // Status filter
+    let statusMatch = true
+    if (filters.status?.length) {
+      statusMatch = filters.status.some((status) => {
+        if (status === 'Active') return !user.deletedAt
+        if (status === 'Inactive') return !!user.deletedAt
+        if (status === 'Wait') return user.status === 'Wait'
+        return false
+      })
+    }
+
+    return matchesSearch && roleMatch && statusMatch
   })
 
   const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE)
@@ -202,7 +210,7 @@ export default function UsersPage() {
             {user.status === 'Wait' && (
               <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span>
             )}
-            {user.status === 'Offline' && (
+            {user.status === 'Inactive' && (
               <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-gray-500"></span>
             )}
             {user.status}
@@ -229,14 +237,20 @@ export default function UsersPage() {
     },
     {
       id: 'actions',
-      header: 'Actions',
-      cell: ({ row }) => {
-        const user = row.original
-        return (
-          <div className="flex justify-items-center">
-            <EditUserDialog user={user} onUserUpdated={handleUserUpdated} />
-            <DeleteUserDialog user={user} onUserDeleted={handleUserDeleted} />
-          </div>
+    header: 'Actions',
+    cell: ({ row }) => {
+      const user = row.original
+      return (
+        <div className="flex justify-items-center">
+          {user.status === 'Inactive' ? (
+            <RestoreUserDialog user={user} onUserRestored={handleUserUpdated} />
+          ) : (
+            <>
+              <EditUserDialog user={user} onUserUpdated={handleUserUpdated} />
+              <DeleteUserDialog user={user} onUserDeleted={handleUserDeleted} />
+            </>
+          )}
+        </div>
         )
       }
     }
@@ -267,7 +281,6 @@ export default function UsersPage() {
                 activeFilters={filters}
               />
               <AddUser onUserCreated={handleUserCreated} />
-              <RestoreUserDialog onUserRestored={handleUserRestored} />
             </div>
           </div>
 

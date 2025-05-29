@@ -6,4 +6,5 @@ export interface User {
   username: string
   role: 'super_admin' | 'admin' | 'manager' | 'viewer'
   email: string
+  deletedAt?: string | null
 }
