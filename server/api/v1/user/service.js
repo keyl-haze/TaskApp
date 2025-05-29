@@ -1,4 +1,5 @@
 const { buildWhereFilter } = require('../utils/queries');
+const { Op } = require('sequelize');
 const {
   doesEmailExist,
   doesUsernameExist,
@@ -18,16 +19,24 @@ const _validQueryProps = [
 
 // * List users
 const list = async (query) => {
-  const { ...otherQuery } = query;
+  const { deleted, ...otherQuery } = query;
+
   const where = buildWhereFilter(
     _validQueryProps,
     otherQuery.filter,
     User.name
   );
-  const users = await User.findAll({
-    where
-    // TODO order: [['column', 'ASC or DESC']],
-  });
+
+  let findOptions = { where };
+
+  if (deleted === 'true') {
+    // Fetch only soft-deleted users
+    findOptions.paranoid = false; 
+    findOptions.where.deletedAt = { [Op.not]: null };
+  }
+
+  const users = await User.findAll(findOptions); 
+  // TODO order: [['column', 'ASC or DESC']],
   return users;
 };
 

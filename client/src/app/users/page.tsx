@@ -4,7 +4,7 @@ import AuthLayout from '../layouts/authLayout'
 import { USER_API } from '../../../routes/user'
 import type { User as UserType } from '@/../types/types'
 import { useState, useEffect } from 'react'
-import { Search, MoreVertical } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -24,6 +24,7 @@ import FilterPopover, {
 } from '@/components/custom/pages/users/filterTablePopover'
 import EditUserDialog from '@/components/custom/pages/users/editDialog'
 import DeleteUserDialog from '@/components/custom/pages/users/deleteDialog'
+import RestoreUserDialog from '@/components/custom/pages/users/restoreDialog'
 
 interface User extends UserType {
   name: string
@@ -91,6 +92,7 @@ export default function UsersPage() {
   const handleUserCreated = () => setRefreshFlag((prev) => prev + 1)
   const handleUserUpdated = () => setRefreshFlag((prev) => prev + 1)
   const handleUserDeleted = () => setRefreshFlag((prev) => prev + 1)
+  const handleUserRestored = () => setRefreshFlag((prev) => prev + 1)
 
   // * Search and filter, then paginate
   const filteredUsers = users.filter((user) => {
@@ -265,9 +267,7 @@ export default function UsersPage() {
                 activeFilters={filters}
               />
               <AddUser onUserCreated={handleUserCreated} />
-              <Button variant="outline" size="icon">
-                <MoreVertical className="h-5 w-5" />
-              </Button>
+              <RestoreUserDialog onUserRestored={handleUserRestored} />
             </div>
           </div>
 
