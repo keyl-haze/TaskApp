@@ -1,4 +1,5 @@
 const { Task } = require('../../../models');
+const { taskWhereFilter } = require('../utils/queries');
 
 const create = async (data) => {
   const { title, description, type, priority, reporter, assignee } = data;
@@ -49,6 +50,50 @@ const create = async (data) => {
   return newTask;
 };
 
+const _validQueryProps = [
+  'id',
+  'title',
+  'description',
+  'type',
+  'priority',
+  'reporter',
+  'assignee'
+];
+
+const list = async (query) => {
+  const { deleted, all, ...otherQuery } = query;
+
+  const where = taskWhereFilter(_validQueryProps, otherQuery.filter, Task.name);
+
+  let findOptions = { where };
+
+  const tasks = await Task.findAll(findOptions);
+  return tasks;
+};
+
+const get = async (id, options = {}) => {
+  if (!/^\d+$/.test(id)) {
+    const error = new Error();
+    error.name = 'InvalidIdError';
+    error.status = 400;
+    error.message = 'Task not found';
+    error.details = { id };
+    throw error;
+  }
+  const task = await Task.findByPk(id, options);
+  if (!task) {
+    const error = new Error();
+    error.name = 'TaskNotFoundError';
+    error.status = 404;
+    error.message = 'Task not found';
+    error.details = { id };
+    throw error;
+  }
+  return task;
+};
+
 module.exports = {
-  create
+  create,
+  list,
+  get
 };
