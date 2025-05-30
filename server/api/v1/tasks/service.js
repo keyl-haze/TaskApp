@@ -92,8 +92,79 @@ const get = async (id, options = {}) => {
   return task;
 };
 
+const update = async (id, updates, mode = 'patch') => {
+   console.log('Update mode:', mode);
+  const task = await Task.findByPk(id);
+  if (!task) {
+    const error = new Error();
+    error.name = 'TaskNotFoundError';
+    error.status = 404;
+    error.message = 'Task not found';
+    error.details = { id };
+    throw error;
+  }
+
+  const allowedFields = [
+    'title',
+    'description',
+    'type',
+    'priority',
+    'reporter',
+    'assignee'
+  ];
+
+  let filteredUpdates = {};
+
+  if (mode === 'PUT') {
+    // For PUT, set all allowed fields, missing ones to null
+    for (const field of allowedFields) {
+      filteredUpdates[field] = updates.hasOwnProperty(field)
+        ? updates[field]
+        : null;
+    }
+  } else {
+    // For PATCH, only update provided fields
+    for (const field of allowedFields) {
+      if (updates.hasOwnProperty(field) && updates[field] !== null) {
+        filteredUpdates[field] = updates[field];
+      }
+    }
+  }
+
+  // Validate type and priority if present
+  const validTypes = ['bug', 'feature', 'task'];
+  if (
+    filteredUpdates.hasOwnProperty('type') &&
+    filteredUpdates.type !== null &&
+    !validTypes.includes(filteredUpdates.type)
+  ) {
+    const error = new Error();
+    error.name = 'ValidationError';
+    error.status = 400;
+    error.message = `Task type must be one of: ${validTypes.join(', ')}`;
+    throw error;
+  }
+
+  const validPriorities = ['low', 'medium', 'high'];
+  if (
+    filteredUpdates.hasOwnProperty('priority') &&
+    filteredUpdates.priority !== null &&
+    !validPriorities.includes(filteredUpdates.priority)
+  ) {
+    const error = new Error();
+    error.name = 'ValidationError';
+    error.status = 400;
+    error.message = `Task priority must be one of: ${validPriorities.join(', ')}`;
+    throw error;
+  }
+
+  await task.update(filteredUpdates);
+  return task;
+};
+
 module.exports = {
   create,
   list,
-  get
+  get,
+  update
 };

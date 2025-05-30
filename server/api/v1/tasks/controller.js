@@ -31,8 +31,20 @@ const get = promiseController(async (req) => {
   };
 });
 
+const update = promiseController(async (req) => {
+  const mode = req.updateMode || 'patch';
+  const task = await service.update(req.params.id, req.body, mode);
+
+  return {
+    status: 200,
+    message: 'Task updated successfully',
+    data: task
+  };
+});
+
 module.exports = {
   create,
   list,
-  get
+  get,
+  update
 };
