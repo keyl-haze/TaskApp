@@ -17,7 +17,6 @@ const _validQueryProps = [
   'role'
 ];
 
-
 const list = async (query) => {
   const { deleted, all, ...otherQuery } = query;
 
@@ -38,11 +37,10 @@ const list = async (query) => {
     findOptions.where.deletedAt = { [Op.not]: null };
   }
 
-  const users = await User.findAll(findOptions); 
+  const users = await User.findAll(findOptions);
   // TODO order: [['column', 'ASC or DESC']],
   return users;
 };
-
 
 const get = async (id, options = {}) => {
   if (!/^\d+$/.test(id)) {
@@ -69,12 +67,10 @@ const get = async (id, options = {}) => {
   return user;
 };
 
-
 const create = async (user) => {
   const { username, firstName, middleName, lastName, role, email, password } =
     user;
 
-  
   const emailExists = await doesEmailExist(email);
   if (emailExists) {
     const error = new Error();
@@ -84,7 +80,6 @@ const create = async (user) => {
     throw error;
   }
 
-  
   const usernameExists = await doesUsernameExist(username);
   if (usernameExists) {
     const error = new Error();
@@ -103,10 +98,8 @@ const create = async (user) => {
     throw error;
   }
 
-  
   const hashedPassword = await hashPassword(password);
 
-  
   const newUser = await User.create({
     username,
     firstName,
@@ -119,9 +112,7 @@ const create = async (user) => {
   return newUser;
 };
 
-
 const update = async (id, updates, mode = 'patch') => {
-  
   const user = await User.findByPk(id);
   if (!user) {
     const error = new Error();
@@ -132,7 +123,6 @@ const update = async (id, updates, mode = 'patch') => {
     throw error;
   }
 
-  
   const allowedFields = [
     'username',
     'firstName',
@@ -160,7 +150,6 @@ const update = async (id, updates, mode = 'patch') => {
     }
   }
 
-  
   if (filteredUpdates.email && filteredUpdates.email !== user.email) {
     const emailExists = await doesEmailExist(filteredUpdates.email);
     if (emailExists) {
@@ -194,7 +183,6 @@ const update = async (id, updates, mode = 'patch') => {
   return user;
 };
 
-
 const softDelete = async (id) => {
   const user = await User.findByPk(id);
   if (!user) {
@@ -209,9 +197,7 @@ const softDelete = async (id) => {
   return user;
 };
 
-
 const restore = async (id) => {
-  
   const user = await User.findByPk(id, { paranoid: false });
   if (!user) {
     const error = new Error();
@@ -222,7 +208,6 @@ const restore = async (id) => {
     throw error;
   }
 
-  
   if (!user.deletedAt) {
     const error = new Error();
     error.name = 'UserNotSoftDeletedError';

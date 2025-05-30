@@ -14,7 +14,10 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import { USER_API } from '@/routes/user'
-import { showErrorToast, showSuccessToast } from '@/components/custom/utils/errorSonner'
+import {
+  showErrorToast,
+  showSuccessToast
+} from '@/components/custom/utils/errorSonner'
 import { RotateCcw, UserCheck, Info } from 'lucide-react'
 import {
   Tooltip,

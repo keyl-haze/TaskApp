@@ -55,7 +55,7 @@ const remove = promiseController(async (req) => {
 const restore = promiseController(async (req) => {
   const user = await service.restore(req.params.id);
 
-  return{
+  return {
     status: 200,
     message: 'User restored successfully',
     data: user
