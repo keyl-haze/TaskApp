@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'Reporter'
       });
       Task.belongsTo(models.User, {
-        foreignKey: 'assignedTo',
+        foreignKey: 'assignee',
         as: 'Assignee'
       });
     }
@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BIGINT,
         allowNull: false
       },
-      assignedTo: {
+      assignee: {
         type: DataTypes.BIGINT,
         allowNull: true
       }

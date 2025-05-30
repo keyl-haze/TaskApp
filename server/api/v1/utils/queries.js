@@ -1,5 +1,6 @@
 const { Op, Sequelize } = require('sequelize');
-const buildWhereFilter = (validQueryProps, query = {}, modelName = '') => {
+
+const userWhereFilter = (validQueryProps, query = {}, modelName = '') => {
   const fields = Object.keys(query);
   let where = {};
   if (fields.length) {
@@ -93,6 +94,7 @@ const buildWhereFilter = (validQueryProps, query = {}, modelName = '') => {
   }
   return where;
 };
+
 module.exports = {
-  buildWhereFilter
+  userWhereFilter
 };

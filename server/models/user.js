@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'reportedTasks'
       });
       User.hasMany(models.Task, {
-        foreignKey: 'assignedTo',
+        foreignKey: 'assignee',
         as: 'assignedTasks'
       });
     }

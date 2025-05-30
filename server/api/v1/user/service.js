@@ -1,4 +1,4 @@
-const { buildWhereFilter } = require('../utils/queries');
+const { userWhereFilter } = require('../utils/queries');
 const { Op } = require('sequelize');
 const {
   doesEmailExist,
@@ -20,7 +20,7 @@ const _validQueryProps = [
 const list = async (query) => {
   const { deleted, all, ...otherQuery } = query;
 
-  const where = buildWhereFilter(
+  const where = userWhereFilter(
     _validQueryProps,
     otherQuery.filter,
     User.name

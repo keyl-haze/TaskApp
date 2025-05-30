@@ -37,7 +37,7 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
       },
-      assignedTo: {
+      assignee: {
         type: Sequelize.BIGINT,
         allowNull: true,
         references: {
