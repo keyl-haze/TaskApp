@@ -13,8 +13,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
-import { USER_API } from '@/../routes/user'
-import { showErrorToast, showSuccessToast } from '../../utils/errorSonner'
+import { USER_API } from '@/routes/user'
+import { showErrorToast, showSuccessToast } from '@/components/custom/utils/errorSonner'
 import { RotateCcw, UserCheck, Info } from 'lucide-react'
 import {
   Tooltip,
@@ -22,7 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
-import type { User as UserType } from '@/../types/types'
+import type { User as UserType } from '@/types/types'
 
 interface RestoreUserDialogProps {
   user: UserType & { name: string; initials: string }

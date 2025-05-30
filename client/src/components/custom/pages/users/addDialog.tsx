@@ -21,8 +21,8 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { USER_API } from '@/../routes/user'
-import { showErrorToast, showSuccessToast } from '../../utils/errorSonner'
+import { USER_API } from '@/routes/user'
+import { showErrorToast, showSuccessToast } from '@/components/custom/utils/errorSonner'
 import { UserRoundPlus } from 'lucide-react'
 import {
   Tooltip,

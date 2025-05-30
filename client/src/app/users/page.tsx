@@ -1,7 +1,7 @@
 'use client'
 
-import AuthLayout from '../layouts/authLayout'
-import { USER_API } from '../../../routes/user'
+import AuthLayout from '@/app/layouts/authLayout'
+import { USER_API } from '@/routes/user'
 import type { User as UserType } from '@/../types/types'
 import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'

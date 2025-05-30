@@ -1,6 +1,6 @@
 'use client'
 
-import AuthLayout from './layouts/authLayout'
+import AuthLayout from '@/app/layouts/authLayout'
 
 export default function Home() {
   return (

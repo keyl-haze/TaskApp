@@ -15,7 +15,7 @@ import {
   getCoreRowModel,
   getFilteredRowModel
 } from '@tanstack/react-table'
-import type { GenericTableProps } from '@/../types/table'
+import type { GenericTableProps } from '@/types/table'
 
 export default function GenericTable<T extends { id: number }>({
   data,

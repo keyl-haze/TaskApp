@@ -17,7 +17,7 @@ const _validQueryProps = [
   'role'
 ];
 
-// * List users
+
 const list = async (query) => {
   const { deleted, all, ...otherQuery } = query;
 
@@ -43,7 +43,7 @@ const list = async (query) => {
   return users;
 };
 
-// * Get user by id
+
 const get = async (id, options = {}) => {
   if (!/^\d+$/.test(id)) {
     const error = new Error();
@@ -69,12 +69,12 @@ const get = async (id, options = {}) => {
   return user;
 };
 
-// * Create user
+
 const create = async (user) => {
   const { username, firstName, middleName, lastName, role, email, password } =
     user;
 
-  // * Check if email already exists
+  
   const emailExists = await doesEmailExist(email);
   if (emailExists) {
     const error = new Error();
@@ -84,7 +84,7 @@ const create = async (user) => {
     throw error;
   }
 
-  // * Check if username already exists
+  
   const usernameExists = await doesUsernameExist(username);
   if (usernameExists) {
     const error = new Error();
@@ -103,10 +103,10 @@ const create = async (user) => {
     throw error;
   }
 
-  // * Hash password
+  
   const hashedPassword = await hashPassword(password);
 
-  // * Create new user
+  
   const newUser = await User.create({
     username,
     firstName,
@@ -119,9 +119,9 @@ const create = async (user) => {
   return newUser;
 };
 
-// * Update user
+
 const update = async (id, updates, mode = 'patch') => {
-  // * Check if user exists
+  
   const user = await User.findByPk(id);
   if (!user) {
     const error = new Error();
@@ -132,7 +132,7 @@ const update = async (id, updates, mode = 'patch') => {
     throw error;
   }
 
-  // * Allowed fields to update
+  
   const allowedFields = [
     'username',
     'firstName',
@@ -147,14 +147,12 @@ const update = async (id, updates, mode = 'patch') => {
   let filteredUpdates = {};
 
   if (mode === 'PUT') {
-    //  * PUT request: all fields must be present or set to NULL
     for (const field of allowedFields) {
       filteredUpdates[field] = updates.hasOwnProperty(field)
         ? updates[field]
         : null;
     }
   } else {
-    // * PATCH request: only update fields that are provided
     for (const field of allowedFields) {
       if (updates.hasOwnProperty(field) && updates[field] !== null) {
         filteredUpdates[field] = updates[field];
@@ -162,7 +160,7 @@ const update = async (id, updates, mode = 'patch') => {
     }
   }
 
-  // * Disallow updating username or email to an already existing one
+  
   if (filteredUpdates.email && filteredUpdates.email !== user.email) {
     const emailExists = await doesEmailExist(filteredUpdates.email);
     if (emailExists) {
@@ -192,12 +190,11 @@ const update = async (id, updates, mode = 'patch') => {
     }
   }
 
-  // * Update user only with filtered fields
   await user.update(filteredUpdates);
   return user;
 };
 
-// * Soft delete user
+
 const softDelete = async (id) => {
   const user = await User.findByPk(id);
   if (!user) {
@@ -212,9 +209,9 @@ const softDelete = async (id) => {
   return user;
 };
 
-// * Restore soft deleted user
+
 const restore = async (id) => {
-  // * Check if user exists, even soft-deleted users
+  
   const user = await User.findByPk(id, { paranoid: false });
   if (!user) {
     const error = new Error();
@@ -225,7 +222,7 @@ const restore = async (id) => {
     throw error;
   }
 
-  // * Restore only if it is soft-deleted (deletedAt is not NULL)
+  
   if (!user.deletedAt) {
     const error = new Error();
     error.name = 'UserNotSoftDeletedError';
