@@ -93,7 +93,6 @@ const get = async (id, options = {}) => {
 };
 
 const update = async (id, updates, mode = 'patch') => {
-   console.log('Update mode:', mode);
   const task = await Task.findByPk(id);
   if (!task) {
     const error = new Error();
@@ -116,14 +115,12 @@ const update = async (id, updates, mode = 'patch') => {
   let filteredUpdates = {};
 
   if (mode === 'PUT') {
-    // For PUT, set all allowed fields, missing ones to null
     for (const field of allowedFields) {
       filteredUpdates[field] = updates.hasOwnProperty(field)
         ? updates[field]
         : null;
     }
   } else {
-    // For PATCH, only update provided fields
     for (const field of allowedFields) {
       if (updates.hasOwnProperty(field) && updates[field] !== null) {
         filteredUpdates[field] = updates[field];
