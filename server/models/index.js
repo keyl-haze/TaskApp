@@ -21,7 +21,6 @@ if (config.use_env_variable) {
 }
 
 if (process.env.NODE_ENV === 'local') {
-
   sequelize
     .authenticate()
     .then(() => {

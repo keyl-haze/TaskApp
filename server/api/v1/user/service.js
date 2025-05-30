@@ -1,4 +1,5 @@
 const { buildWhereFilter } = require('../utils/queries');
+const { Op } = require('sequelize');
 const {
   doesEmailExist,
   doesUsernameExist,
@@ -16,21 +17,31 @@ const _validQueryProps = [
   'role'
 ];
 
-// * List users
 const list = async (query) => {
-  const { ...otherQuery } = query;
+  const { deleted, all, ...otherQuery } = query;
+
   const where = buildWhereFilter(
     _validQueryProps,
     otherQuery.filter,
     User.name
   );
-  const users = await User.findAll({
-    where
-  });
+
+  let findOptions = { where };
+
+  if (all === 'true') {
+    // Return all users, including soft-deleted
+    findOptions.paranoid = false;
+  } else if (deleted === 'true') {
+    // Only soft-deleted users
+    findOptions.paranoid = false;
+    findOptions.where.deletedAt = { [Op.not]: null };
+  }
+
+  const users = await User.findAll(findOptions);
+  // TODO order: [['column', 'ASC or DESC']],
   return users;
 };
 
-// * Get user by id
 const get = async (id, options = {}) => {
   if (!/^\d+$/.test(id)) {
     const error = new Error();
@@ -56,12 +67,10 @@ const get = async (id, options = {}) => {
   return user;
 };
 
-// * Create user
 const create = async (user) => {
   const { username, firstName, middleName, lastName, role, email, password } =
     user;
 
-  // * Check if email already exists
   const emailExists = await doesEmailExist(email);
   if (emailExists) {
     const error = new Error();
@@ -71,7 +80,6 @@ const create = async (user) => {
     throw error;
   }
 
-  // * Check if username already exists
   const usernameExists = await doesUsernameExist(username);
   if (usernameExists) {
     const error = new Error();
@@ -90,10 +98,8 @@ const create = async (user) => {
     throw error;
   }
 
-  // * Hash password
   const hashedPassword = await hashPassword(password);
 
-  // * Create new user
   const newUser = await User.create({
     username,
     firstName,
@@ -106,8 +112,120 @@ const create = async (user) => {
   return newUser;
 };
 
+const update = async (id, updates, mode = 'patch') => {
+  const user = await User.findByPk(id);
+  if (!user) {
+    const error = new Error();
+    error.name = 'UserNotFoundError';
+    error.status = 404;
+    error.message = 'User not found';
+    error.details = { id };
+    throw error;
+  }
+
+  const allowedFields = [
+    'username',
+    'firstName',
+    'middleName',
+    'lastName',
+    'role',
+    'email'
+    // TODO: allow update password, eventually
+  ];
+
+  // * Check if PUT or PATCH request
+  let filteredUpdates = {};
+
+  if (mode === 'PUT') {
+    for (const field of allowedFields) {
+      filteredUpdates[field] = updates.hasOwnProperty(field)
+        ? updates[field]
+        : null;
+    }
+  } else {
+    for (const field of allowedFields) {
+      if (updates.hasOwnProperty(field) && updates[field] !== null) {
+        filteredUpdates[field] = updates[field];
+      }
+    }
+  }
+
+  if (filteredUpdates.email && filteredUpdates.email !== user.email) {
+    const emailExists = await doesEmailExist(filteredUpdates.email);
+    if (emailExists) {
+      const error = new Error();
+      error.name = 'EmailExistsError';
+      error.status = 400;
+      error.message = 'Invalid change';
+      throw error;
+    }
+  }
+  if (filteredUpdates.username && filteredUpdates.username !== user.username) {
+    const usernameExists = await doesUsernameExist(filteredUpdates.username);
+    if (usernameExists) {
+      const error = new Error();
+      error.name = 'UsernameExistsError';
+      error.status = 400;
+      error.message = 'Invalid change';
+      throw error;
+    }
+    const usernameValid = await isUsernameValid(filteredUpdates.username);
+    if (!usernameValid) {
+      const error = new Error();
+      error.name = 'InvalidUsernameError';
+      error.status = 400;
+      error.message = 'Username is invalid';
+      throw error;
+    }
+  }
+
+  await user.update(filteredUpdates);
+  return user;
+};
+
+const softDelete = async (id) => {
+  const user = await User.findByPk(id);
+  if (!user) {
+    const error = new Error();
+    error.name = 'UserNotFoundError';
+    error.status = 404;
+    error.message = 'User does not exist';
+    error.details = { id };
+    throw error;
+  }
+  await user.destroy();
+  return user;
+};
+
+const restore = async (id) => {
+  const user = await User.findByPk(id, { paranoid: false });
+  if (!user) {
+    const error = new Error();
+    error.name = 'UserNotFoundError';
+    error.status = 404;
+    error.message = 'User does not exist';
+    error.details = { id };
+    throw error;
+  }
+
+  if (!user.deletedAt) {
+    const error = new Error();
+    error.name = 'UserNotSoftDeletedError';
+    error.status = 400;
+    error.message = 'Restore request is invalid';
+    error.details = { id };
+    throw error;
+  }
+
+  await user.restore();
+  return user;
+};
+
 module.exports = {
   list,
   get,
-  create
+  create,
+  update,
+  softDelete,
+  restore
 };

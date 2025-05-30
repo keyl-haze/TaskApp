@@ -47,7 +47,7 @@ async function doesUsernameExist(username) {
 async function isUsernameValid(username) {
   if (typeof username !== 'string') return false;
 
-  const regex = /^[A-Za-z0-9_]{5,}$/; // * Allow letters, numbers, and underscores only for username
+  const regex = /^[A-Za-z0-9_.]{5,}$/; // * Allow letters, numbers, and underscores only for username
 
   return regex.test(username);
 }

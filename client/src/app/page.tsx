@@ -1,13 +1,14 @@
 'use client'
 
-import { useState /* useEffect */ } from 'react'
+import AuthLayout from '@/app/layouts/authLayout'
 
 export default function Home() {
-  const [message /* setMessage */] = useState<string>('Loading...')
-
   return (
-    <main>
-      <p>Message from backend: {message}</p>
-    </main>
+    <AuthLayout header="Dashboard">
+      <div className="p-4">
+        <h1 className="text-2xl font-bold">Welcome to the Dashboard</h1>
+        <p className="mt-2 text-gray-600">This is your main dashboard area.</p>
+      </div>
+    </AuthLayout>
   )
 }

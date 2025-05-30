@@ -31,8 +31,42 @@ const create = promiseController(async (req) => {
   };
 });
 
+const update = promiseController(async (req) => {
+  const mode = req.updateMode || 'patch';
+  const user = await service.update(req.params.id, req.body, mode);
+
+  return {
+    status: 200,
+    message: 'User updated successfully',
+    data: user
+  };
+});
+
+const remove = promiseController(async (req) => {
+  const user = await service.softDelete(req.params.id);
+
+  return {
+    status: 200,
+    message: 'User deleted successfully',
+    data: user
+  };
+});
+
+const restore = promiseController(async (req) => {
+  const user = await service.restore(req.params.id);
+
+  return {
+    status: 200,
+    message: 'User restored successfully',
+    data: user
+  };
+});
+
 module.exports = {
   list,
   get,
-  create
+  create,
+  update,
+  remove,
+  restore
 };
