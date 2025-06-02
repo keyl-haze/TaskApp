@@ -42,9 +42,31 @@ const update = promiseController(async (req) => {
   };
 });
 
+const remove = promiseController(async (req) => {
+  const task = await service.softDelete(req.params.id);
+
+  return {
+    status: 200,
+    message: 'Task deleted successfully',
+    data: task
+  };
+});
+
+const restore = promiseController(async (req) => {
+  const task = await service.restore(req.params.id);
+
+  return {
+    status: 200,
+    message: 'Task restored successfully',
+    data: task
+  };
+});
+
 module.exports = {
   create,
   list,
   get,
-  update
+  update,
+  remove,
+  restore
 };

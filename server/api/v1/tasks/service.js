@@ -159,9 +159,49 @@ const update = async (id, updates, mode = 'patch') => {
   return task;
 };
 
+const softDelete = async (id) => {
+  const task = await Task.findByPk(id);
+  if (!task) {
+    const error = new Error();
+    error.name = 'TaskNotFoundError';
+    error.status = 404;
+    error.message = 'Task not found';
+    error.details = { id };
+    throw error;
+  }
+  await task.destroy();
+  return task;
+};
+
+const restore = async (id) => {
+  const task = await Task.findByPk(id, { paranoid: false });
+  if (!task) {
+    const error = new Error();
+    error.name = 'TaskNotFoundError';
+    error.status = 404;
+    error.message = 'Task not found';
+    error.details = { id };
+    throw error;
+  }
+
+  if (!task.deletedAt) {
+    const error = new Error();
+    error.name = 'TaskNotDeletedError';
+    error.status = 400;
+    error.message = 'Task is not deleted';
+    error.details = { id };
+    throw error;
+  }
+
+  await task.restore();
+  return task;
+};
+
 module.exports = {
   create,
   list,
   get,
-  update
+  update,
+  softDelete,
+  restore
 };
