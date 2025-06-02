@@ -1,4 +1,4 @@
-const { Task } = require('../../../models');
+const { Task, User } = require('../../../models');
 const { taskWhereFilter } = require('../utils/queries');
 
 const create = async (data) => {
@@ -47,7 +47,7 @@ const create = async (data) => {
     assignee
   });
 
-  return newTask;
+  return await get(newTask.id);
 };
 
 const _validQueryProps = [
@@ -65,7 +65,21 @@ const list = async (query) => {
 
   const where = taskWhereFilter(_validQueryProps, otherQuery.filter, Task.name);
 
-  let findOptions = { where };
+  let findOptions = {
+    where,
+    include: [
+      {
+        model: User,
+        as: 'Reporter',
+        attributes: ['id', 'username', 'email', 'firstName', 'lastName']
+      },
+      {
+        model: User,
+        as: 'Assignee',
+        attributes: ['id', 'username', 'email', 'firstName', 'lastName']
+      }
+    ]
+  };
 
   const tasks = await Task.findAll(findOptions);
   return tasks;
@@ -80,7 +94,24 @@ const get = async (id, options = {}) => {
     error.details = { id };
     throw error;
   }
-  const task = await Task.findByPk(id, options);
+
+  const findOptions = {
+    ...options,
+    include: [
+      {
+        model: User,
+        as: 'Reporter',
+        attributes: ['id', 'username', 'email', 'firstName', 'lastName']
+      },
+      {
+        model: User,
+        as: 'Assignee',
+        attributes: ['id', 'username', 'email', 'firstName', 'lastName']
+      }
+    ]
+  };
+
+  const task = await Task.findByPk(id, findOptions);
   if (!task) {
     const error = new Error();
     error.name = 'TaskNotFoundError';
@@ -156,7 +187,7 @@ const update = async (id, updates, mode = 'patch') => {
   }
 
   await task.update(filteredUpdates);
-  return task;
+  return await get(id);
 };
 
 const softDelete = async (id) => {
