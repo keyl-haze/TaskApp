@@ -60,8 +60,8 @@ const navigationItems = [
     icon: Users
   },
   {
-    title: 'Projects',
-    url: '#',
+    title: 'Tasks',
+    url: '/tasks',
     icon: FileText
   }
 ]
