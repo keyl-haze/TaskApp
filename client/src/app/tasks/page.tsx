@@ -85,6 +85,7 @@ export default function TasksPage() {
   }, [tasks.length, globalFilter])
 
   const handleTaskCreated = () => setRefreshFlag((prev) => prev + 1)
+  // TODO: Implement task updated and deleted handlers
   const handleTaskUpdated = () => setRefreshFlag((prev) => prev + 1)
   const handleTaskDeleted = () => setRefreshFlag((prev) => prev + 1)
 
