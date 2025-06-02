@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Bug, CheckSquare, AlertCircle, User } from 'lucide-react'
+import { Search, Bug, CheckSquare, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -17,6 +17,7 @@ import { type ColumnDef } from '@tanstack/react-table'
 import AuthLayout from '@/app/layouts/authLayout'
 import { type Task } from '@/types/types'
 import { TASK_API } from '@/routes/task'
+import AddTaskDialog from '@/components/custom/pages/tasks/addDialog'
 
 const PAGE_SIZE = 10
 
@@ -41,22 +42,24 @@ export default function TasksPage() {
       const json = await res.json()
       if (json.status === 'success') {
         const tasksData = json.data.map((task: Task) => ({
-        ...task,
-        reporter: {
-          id: task.Reporter?.id,
-          username: task.Reporter?.username,
-          email: task.Reporter?.email,
-          firstName: task.Reporter?.firstName,
-          lastName: task.Reporter?.lastName
-        },
-        assignee: task.Assignee ? {
-          id: task.Assignee.id,
-          username: task.Assignee.username,
-          email: task.Assignee.email,
-          firstName: task.Assignee.firstName,
-          lastName: task.Assignee.lastName
-        } : null
-      }))
+          ...task,
+          reporter: {
+            id: task.Reporter?.id,
+            username: task.Reporter?.username,
+            email: task.Reporter?.email,
+            firstName: task.Reporter?.firstName,
+            lastName: task.Reporter?.lastName
+          },
+          assignee: task.Assignee
+            ? {
+                id: task.Assignee.id,
+                username: task.Assignee.username,
+                email: task.Assignee.email,
+                firstName: task.Assignee.firstName,
+                lastName: task.Assignee.lastName
+              }
+            : null
+        }))
         setTasks(tasksData)
       } else {
         setError(json.message || 'Failed to fetch tasks')
@@ -143,56 +146,77 @@ export default function TasksPage() {
       accessorKey: 'type',
       header: 'Type',
       cell: ({ row }) => {
-      const type = row.original.type
-      const typeConfig = {
-        bug: { icon: Bug, color: 'bg-red-100 text-red-800 border-red-200', label: 'Bug' },
-        feature: { icon: CheckSquare, color: 'bg-blue-100 text-blue-800 border-blue-200', label: 'Feature' },
-        task: { icon: AlertCircle, color: 'bg-gray-100 text-gray-800 border-gray-200', label: 'Task' }
+        const type = row.original.type
+        const typeConfig = {
+          bug: {
+            icon: Bug,
+            color: 'bg-red-100 text-red-800 border-red-200',
+            label: 'Bug'
+          },
+          feature: {
+            icon: CheckSquare,
+            color: 'bg-blue-100 text-blue-800 border-blue-200',
+            label: 'Feature'
+          },
+          task: {
+            icon: AlertCircle,
+            color: 'bg-gray-100 text-gray-800 border-gray-200',
+            label: 'Task'
+          }
+        }
+
+        const config =
+          typeConfig[type as keyof typeof typeConfig] || typeConfig.task
+        const Icon = config.icon
+
+        return (
+          <Badge
+            variant="outline"
+            className={`${config.color} flex items-center gap-1 w-fit`}
+          >
+            <Icon className="h-3 w-3" />
+            {config.label}
+          </Badge>
+        )
       }
-
-      const config = typeConfig[type as keyof typeof typeConfig] || typeConfig.task
-      const Icon = config.icon
-
-      return (
-        <Badge variant="outline" className={`${config.color} flex items-center gap-1 w-fit`}>
-          <Icon className="h-3 w-3" />
-          {config.label}
-        </Badge>
-      )
-    }
     },
     {
       accessorKey: 'priority',
       header: 'Priority',
       cell: ({ row }) => {
-      const priority = row.original.priority
-      const priorityConfig = {
-        low: {
-          color: 'bg-green-100 text-green-800 border-green-300',
-          label: 'Low',
-          dot: 'bg-green-500'
-        },
-        medium: {
-          color: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-          label: 'Medium',
-          dot: 'bg-yellow-500'
-        },
-        high: {
-          color: 'bg-red-100 text-red-800 border-red-300',
-          label: 'High',
-          dot: 'bg-red-500'
+        const priority = row.original.priority
+        const priorityConfig = {
+          low: {
+            color: 'bg-green-100 text-green-800 border-green-300',
+            label: 'Low',
+            dot: 'bg-green-500'
+          },
+          medium: {
+            color: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+            label: 'Medium',
+            dot: 'bg-yellow-500'
+          },
+          high: {
+            color: 'bg-red-100 text-red-800 border-red-300',
+            label: 'High',
+            dot: 'bg-red-500'
+          }
         }
+
+        const config =
+          priorityConfig[priority as keyof typeof priorityConfig] ||
+          priorityConfig.medium
+
+        return (
+          <Badge
+            variant="outline"
+            className={`${config.color} flex items-center gap-1.5 w-fit font-medium`}
+          >
+            <div className={`w-2 h-2 rounded-full ${config.dot}`} />
+            {config.label}
+          </Badge>
+        )
       }
-
-      const config = priorityConfig[priority as keyof typeof priorityConfig] || priorityConfig.medium
-
-      return (
-        <Badge variant="outline" className={`${config.color} flex items-center gap-1.5 w-fit font-medium`}>
-          <div className={`w-2 h-2 rounded-full ${config.dot}`} />
-          {config.label}
-        </Badge>
-      )
-    }
     },
     {
       accessorKey: 'reporter',
@@ -201,11 +225,11 @@ export default function TasksPage() {
         const reporter = row.original.Reporter
         return reporter ? (
           <div className="text-sm">
-            <span className="font-medium">
-              {reporter.username}
-            </span>
+            <span className="font-medium">{reporter.username}</span>
             <br />
-            <span className="text-muted-foreground">{reporter.firstName} {reporter.lastName}</span>
+            <span className="text-muted-foreground">
+              {reporter.firstName} {reporter.lastName}
+            </span>
           </div>
         ) : (
           <div className="text-sm text-muted-foreground">Not assigned</div>
@@ -219,11 +243,11 @@ export default function TasksPage() {
         const assignee = row.original.Assignee
         return assignee ? (
           <div className="text-sm">
-            <span className="font-medium">
-              {assignee.username}
-            </span>
+            <span className="font-medium">{assignee.username}</span>
             <br />
-            <span className="text-muted-foreground">{assignee.firstName} {assignee.lastName}</span>
+            <span className="text-muted-foreground">
+              {assignee.firstName} {assignee.lastName}
+            </span>
           </div>
         ) : (
           <div className="text-sm text-muted-foreground">Unassigned</div>
@@ -267,6 +291,7 @@ export default function TasksPage() {
                 onChange={(e) => setGlobalFilter(e.target.value)}
               />
             </div>
+            <AddTaskDialog onTaskCreated={handleTaskCreated} />
           </div>
 
           {loading && (
