@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Bug, CheckSquare, AlertCircle } from 'lucide-react'
+import { Search, Bug, CheckSquare, AlertCircle, Trash2} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -21,6 +21,7 @@ import AddTaskDialog from '@/components/custom/pages/tasks/addDialog'
 import FilterPopover, {
   FilterValue
 } from '@/components/custom/pages/tasks/filterPopover'
+import EditTaskDialog from '@/components/custom/pages/tasks/editDialog'
 
 const PAGE_SIZE = 10
 
@@ -253,6 +254,25 @@ export default function TasksPage() {
           </div>
         ) : (
           <div className="text-sm text-muted-foreground">Unassigned</div>
+        )
+      }
+    },
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => {
+        const task = row.original
+        return (
+          <div className="flex items-center gap-2">
+            <EditTaskDialog task={task} onTaskUpdated={handleTaskUpdated} />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleTaskDeleted()}
+            >
+              <Trash2 className="h-5 w-5" />
+            </Button>
+          </div>
         )
       }
     }
