@@ -116,6 +116,7 @@ export default function TasksPage() {
           }
           onCheckedChange={toggleSelectAll}
           aria-label="Select all"
+          className='bg-white'
         />
       ),
       cell: ({ row }) => (
@@ -136,9 +137,6 @@ export default function TasksPage() {
         return (
           <div>
             <div className="font-medium">{task.title}</div>
-            <div className="text-sm text-muted-foreground">
-              {task.description}
-            </div>
           </div>
         )
       }
@@ -226,9 +224,7 @@ export default function TasksPage() {
         const reporter = row.original.Reporter
         return reporter ? (
           <div className="text-sm">
-            <span className="font-medium">{reporter.username}</span>
-            <br />
-            <span className="text-muted-foreground">
+            <span>
               {reporter.firstName} {reporter.lastName}
             </span>
           </div>
@@ -244,9 +240,7 @@ export default function TasksPage() {
         const assignee = row.original.Assignee
         return assignee ? (
           <div className="text-sm">
-            <span className="font-medium">{assignee.username}</span>
-            <br />
-            <span className="text-muted-foreground">
+            <span>
               {assignee.firstName} {assignee.lastName}
             </span>
           </div>
@@ -324,6 +318,7 @@ export default function TasksPage() {
               setColumnFilters={setColumnFilters}
               globalFilter={globalFilter}
               setGlobalFilter={setGlobalFilter}
+              headerClassName="bg-gray-100/90 dark:bg-gray-800"
             />
           )}
 

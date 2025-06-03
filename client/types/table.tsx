@@ -13,4 +13,5 @@ export interface GenericTableProps<T> {
   setColumnFilters?: (filters: any) => void
   globalFilter?: string
   setGlobalFilter?: (filter: string) => void
+  headerClassName?: string
 }
