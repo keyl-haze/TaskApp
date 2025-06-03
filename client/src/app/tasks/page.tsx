@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Bug, CheckSquare, AlertCircle, Trash2} from 'lucide-react'
+import { Search, Bug, CheckSquare, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -22,6 +22,7 @@ import FilterPopover, {
   FilterValue
 } from '@/components/custom/pages/tasks/filterPopover'
 import EditTaskDialog from '@/components/custom/pages/tasks/editDialog'
+import DeleteTaskDialog from '@/components/custom/pages/tasks/deleteDialog'
 
 const PAGE_SIZE = 10
 
@@ -93,7 +94,6 @@ export default function TasksPage() {
   }, [tasks.length, globalFilter, filters.type, filters.priority])
 
   const handleTaskCreated = () => setRefreshFlag((prev) => prev + 1)
-  // TODO: Implement task updated and deleted handlers
   const handleTaskUpdated = () => setRefreshFlag((prev) => prev + 1)
   const handleTaskDeleted = () => setRefreshFlag((prev) => prev + 1)
 
@@ -265,13 +265,7 @@ export default function TasksPage() {
         return (
           <div className="flex items-center gap-2">
             <EditTaskDialog task={task} onTaskUpdated={handleTaskUpdated} />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleTaskDeleted()}
-            >
-              <Trash2 className="h-5 w-5" />
-            </Button>
+            <DeleteTaskDialog task={task} onTaskDeleted={handleTaskDeleted} />
           </div>
         )
       }
