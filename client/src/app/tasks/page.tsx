@@ -263,7 +263,7 @@ export default function TasksPage() {
       cell: ({ row }) => {
         const task = row.original
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex justify-items-center">
             <EditTaskDialog task={task} onTaskUpdated={handleTaskUpdated} />
             <DeleteTaskDialog task={task} onTaskDeleted={handleTaskDeleted} />
           </div>
