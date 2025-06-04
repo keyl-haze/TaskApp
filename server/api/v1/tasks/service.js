@@ -134,7 +134,7 @@ const update = async (id, updates, mode = 'patch') => {
     }
   } else {
     for (const field of allowedFields) {
-      if (updates.hasOwnProperty(field) && updates[field] !== null) {
+      if (updates.hasOwnProperty(field)) {
         filteredUpdates[field] = updates[field];
       }
     }

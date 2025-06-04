@@ -92,7 +92,7 @@ export default function EditTaskDialog({ task, onTaskUpdated }: EditTaskDialogPr
         type: task.type || "task",
         priority: task.priority || "medium",
         reporter: task.Reporter?.id?.toString() || "",
-        assignee: task.Assignee?.id?.toString() || "unassigned",
+        assignee: task.Assignee?.id ? task.Assignee.id.toString() : "unassigned",
       })
     }
   }, [task, open])
