@@ -6,7 +6,7 @@ const create = async (userQuery) => {
   const projectNameExists = await Project.findOne({
     where: {
       name
-    },
+    }
   });
   // TODO: More validation if project code or project name already exists
   if (projectNameExists) {
@@ -22,6 +22,11 @@ const create = async (userQuery) => {
   return project;
 };
 
+const getProjectsByOwner = async (ownerId) => {
+  return Project.findAll({ where: { owner: ownerId } });
+};
+
 module.exports = {
-  create
+  create,
+  getProjectsByOwner
 };
