@@ -7,6 +7,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'owner',
         as: 'owner'
       });
+      Project.belongsToMany(models.User, {
+        foreignKey: 'projectId',
+        through: models.ProjectUser.tableName
+      });
     }
   }
   Project.init(
