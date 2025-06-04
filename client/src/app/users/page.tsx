@@ -45,6 +45,7 @@ export default function UsersPage() {
     { id: string; value: string }[]
   >([])
   const [globalFilter, setGlobalFilter] = useState('')
+
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState<FilterValue>({
     status: ['Active'],
@@ -52,11 +53,15 @@ export default function UsersPage() {
   })
 
   // * Fetch users from the API
-  const fetchUsers = async () => {
+  const fetchUsers = async (searchValue = globalFilter) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${USER_API.list}?all=true`)
+      let url = `${USER_API.list}?all=true`
+      if (searchValue.trim()) {
+        url += `&search=${encodeURIComponent(searchValue.trim())}`
+      }
+      const res = await fetch(url)
       const json = await res.json()
       if (json.status === 'success') {
         // * Map the users to the frontend
@@ -84,13 +89,8 @@ export default function UsersPage() {
   }
 
   useEffect(() => {
-    fetchUsers()
+    fetchUsers(globalFilter)
   }, [refreshFlag])
-
-  // * Reset to first page if users change, search, or filters change
-  useEffect(() => {
-    setCurrentPage(1)
-  }, [users.length, globalFilter, filters.role, filters.status])
 
   const handleUserCreated = () => setRefreshFlag((prev) => prev + 1)
   const handleUserUpdated = () => setRefreshFlag((prev) => prev + 1)
@@ -334,7 +334,10 @@ export default function UsersPage() {
                 placeholder="SEARCH..."
                 className="w-full pl-8 focus-visible:ring-0"
                 value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)}
+                onChange={(e) => {
+                  setGlobalFilter(e.target.value)
+                  setRefreshFlag((prev) => prev + 1)
+                }}
               />
             </div>
             <div className="flex gap-2">

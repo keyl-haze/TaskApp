@@ -3,6 +3,32 @@ const { Op, Sequelize } = require('sequelize');
 const userWhereFilter = (validQueryProps, query = {}, modelName = '') => {
   const fields = Object.keys(query);
   let where = {};
+
+  // Add global search support
+  if (query.search && typeof query.search === 'string' && query.search.trim()) {
+    const value = `%${query.search.trim()}%`;
+    where = {
+      [Op.or]: [
+        Sequelize.where(
+          Sequelize.fn(
+            'concat',
+            Sequelize.col('firstName'),
+            ' ',
+            Sequelize.col('lastName')
+          ),
+          { [Op.iLike]: value }
+        ),
+        { email: { [Op.iLike]: value } },
+        { username: { [Op.iLike]: value } },
+        Sequelize.where(
+          Sequelize.cast(Sequelize.col('role'), 'text'),
+          { [Op.iLike]: value }
+        )
+      ]
+    };
+    return where;
+  }
+
   if (fields.length) {
     const whereAnd = [];
     fields.map((fieldName) => {

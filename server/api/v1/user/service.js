@@ -18,7 +18,12 @@ const _validQueryProps = [
 ];
 
 const list = async (query) => {
-  const { deleted, all, ...otherQuery } = query;
+  const { deleted, all, search, ...otherQuery } = query;
+
+  if (search && typeof search === 'string' && search.trim()) {
+    if (!otherQuery.filter) otherQuery.filter = {};
+    otherQuery.filter.search = search.trim();
+  }
 
   const where = userWhereFilter(
     _validQueryProps,
