@@ -13,6 +13,17 @@ const getProjectsByOwner = promiseController(async (req) => {
   };
 });
 
+const assignUserToProject = promiseController(async (req) => {
+  await userService.get(req.params.userId);
+  const projectUser = await service.assignUserToProject(req.params);
+
+  return {
+    status: 200,
+    message: 'ProjectUser created successfully',
+    data: projectUser
+  };
+});
+
 const create = promiseController(async (req) => {
   const project = await service.create(req.body);
 
@@ -24,6 +35,7 @@ const create = promiseController(async (req) => {
 });
 
 module.exports = {
+  assignUserToProject,
   getProjectsByOwner,
   create
 };
