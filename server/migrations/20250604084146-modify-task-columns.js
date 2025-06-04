@@ -3,7 +3,6 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-
     // * Drop constraints
     await queryInterface.removeConstraint('Tasks', 'Tasks_reporter_fkey');
     await queryInterface.removeConstraint('Tasks', 'Tasks_assignee_fkey');
@@ -34,7 +33,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-
     // * Drop constraints
     await queryInterface.removeConstraint('Tasks', 'Tasks_reporter_fkey');
     await queryInterface.removeConstraint('Tasks', 'Tasks_assignee_fkey');
