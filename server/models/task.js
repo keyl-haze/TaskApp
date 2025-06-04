@@ -38,6 +38,14 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: 'medium'
       },
+      status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'to_do',
+        validate: {
+          isIn: [['to_do', 'in_progress', 'done', 'archived']]
+        }
+      },
       reporter: {
         type: DataTypes.INTEGER,
         allowNull: false
