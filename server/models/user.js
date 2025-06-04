@@ -13,8 +13,8 @@ module.exports = (sequelize, DataTypes) => {
         as: 'assignedTasks'
       });
       User.hasMany(models.Project, {
-        foreignKey: 'owner',
-        as: 'owner'
+        foreignKey: 'id',
+        as: 'projects'
       });
       User.belongsToMany(models.Project, {
         foreignKey: 'userId',
