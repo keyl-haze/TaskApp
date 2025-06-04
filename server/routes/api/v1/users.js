@@ -9,5 +9,6 @@ router.put('/:id', controller.update);
 router.patch('/:id/restore', controller.restore);
 router.patch('/:id', controller.update);
 router.delete('/:id', controller.remove);
+router.get('/:id/projects', controller.listUserProjects);
 
 module.exports = router;

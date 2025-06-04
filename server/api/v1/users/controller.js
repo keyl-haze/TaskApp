@@ -62,11 +62,23 @@ const restore = promiseController(async (req) => {
   };
 });
 
+
+const listUserProjects = promiseController(async (req) => {
+  const userProjects = await service.listUserProjects(req.params.id);
+
+  return {
+    status: 200,
+    message: 'Users Projects fetched successfully',
+    data: userProjects
+  };
+});
+
 module.exports = {
   list,
   get,
   create,
   update,
   remove,
-  restore
+  restore,
+  listUserProjects
 };

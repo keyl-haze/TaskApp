@@ -6,7 +6,7 @@ const {
   hashPassword,
   isUsernameValid
 } = require('../utils/account');
-const { User } = require(`${__serverRoot}/models`);
+const { User, Project, ProjectUser } = require(`${__serverRoot}/models`);
 const _validQueryProps = [
   'id',
   'name',
@@ -20,11 +20,7 @@ const _validQueryProps = [
 const list = async (query) => {
   const { deleted, all, ...otherQuery } = query;
 
-  const where = userWhereFilter(
-    _validQueryProps,
-    otherQuery.filter,
-    User.name
-  );
+  const where = userWhereFilter(_validQueryProps, otherQuery.filter, User.name);
 
   let findOptions = { where };
 
@@ -221,11 +217,28 @@ const restore = async (id) => {
   return user;
 };
 
+const listUserProjects = async (userId) => {
+  await get(userId);
+  const userProjects = await Project.findAll({
+    include: [
+      {
+        model: User,
+        through: ProjectUser,
+        where: { id: userId },
+        attributes: []
+      }
+    ]
+  });
+
+  return userProjects;
+};
+
 module.exports = {
   list,
   get,
   create,
   update,
   softDelete,
-  restore
+  restore,
+  listUserProjects
 };
