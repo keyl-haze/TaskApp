@@ -18,6 +18,11 @@ import AuthLayout from '@/app/layouts/authLayout'
 import { type Task } from '@/types/types'
 import { TASK_API } from '@/routes/task'
 import AddTaskDialog from '@/components/custom/pages/tasks/addDialog'
+import FilterPopover, {
+  FilterValue
+} from '@/components/custom/pages/tasks/filterPopover'
+import EditTaskDialog from '@/components/custom/pages/tasks/editDialog'
+import DeleteTaskDialog from '@/components/custom/pages/tasks/deleteDialog'
 
 const PAGE_SIZE = 10
 
@@ -32,6 +37,10 @@ export default function TasksPage() {
   >([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [filters, setFilters] = useState<FilterValue>({
+    type: [],
+    priority: []
+  })
 
   // * Fetch tasks from the API
   const fetchTasks = async () => {
@@ -82,10 +91,9 @@ export default function TasksPage() {
   // * Reset to first page when tasks change or search changes
   useEffect(() => {
     setCurrentPage(1)
-  }, [tasks.length, globalFilter])
+  }, [tasks.length, globalFilter, filters.type, filters.priority])
 
   const handleTaskCreated = () => setRefreshFlag((prev) => prev + 1)
-  // TODO: Implement task updated and deleted handlers
   const handleTaskUpdated = () => setRefreshFlag((prev) => prev + 1)
   const handleTaskDeleted = () => setRefreshFlag((prev) => prev + 1)
 
@@ -116,6 +124,7 @@ export default function TasksPage() {
           }
           onCheckedChange={toggleSelectAll}
           aria-label="Select all"
+          className="bg-white"
         />
       ),
       cell: ({ row }) => (
@@ -136,9 +145,6 @@ export default function TasksPage() {
         return (
           <div>
             <div className="font-medium">{task.title}</div>
-            <div className="text-sm text-muted-foreground">
-              {task.description}
-            </div>
           </div>
         )
       }
@@ -226,9 +232,7 @@ export default function TasksPage() {
         const reporter = row.original.Reporter
         return reporter ? (
           <div className="text-sm">
-            <span className="font-medium">{reporter.username}</span>
-            <br />
-            <span className="text-muted-foreground">
+            <span>
               {reporter.firstName} {reporter.lastName}
             </span>
           </div>
@@ -244,9 +248,7 @@ export default function TasksPage() {
         const assignee = row.original.Assignee
         return assignee ? (
           <div className="text-sm">
-            <span className="font-medium">{assignee.username}</span>
-            <br />
-            <span className="text-muted-foreground">
+            <span>
               {assignee.firstName} {assignee.lastName}
             </span>
           </div>
@@ -254,17 +256,39 @@ export default function TasksPage() {
           <div className="text-sm text-muted-foreground">Unassigned</div>
         )
       }
+    },
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => {
+        const task = row.original
+        return (
+          <div className="flex justify-items-center">
+            <EditTaskDialog task={task} onTaskUpdated={handleTaskUpdated} />
+            <DeleteTaskDialog task={task} onTaskDeleted={handleTaskDeleted} />
+          </div>
+        )
+      }
     }
   ]
 
   // * Search and filter, then paginate
   const filteredTasks = tasks.filter((task) => {
-    return (
+    // Search filter
+    const matchesSearch =
       globalFilter.trim() === '' ||
       Object.values(task).some((value) =>
         String(value).toLowerCase().includes(globalFilter.toLowerCase())
       )
-    )
+
+    // Type filter
+    const typeMatch = !filters.type?.length || filters.type.includes(task.type)
+
+    // Priority filter
+    const priorityMatch =
+      !filters.priority?.length || filters.priority.includes(task.priority)
+
+    return matchesSearch && typeMatch && priorityMatch
   })
 
   const totalPages = Math.ceil(filteredTasks.length / PAGE_SIZE)
@@ -292,7 +316,13 @@ export default function TasksPage() {
                 onChange={(e) => setGlobalFilter(e.target.value)}
               />
             </div>
-            <AddTaskDialog onTaskCreated={handleTaskCreated} />
+            <div className="flex gap-2">
+              <FilterPopover
+                onFilterChange={setFilters}
+                activeFilters={filters}
+              />
+              <AddTaskDialog onTaskCreated={handleTaskCreated} />
+            </div>
           </div>
 
           {loading && (
@@ -324,6 +354,7 @@ export default function TasksPage() {
               setColumnFilters={setColumnFilters}
               globalFilter={globalFilter}
               setGlobalFilter={setGlobalFilter}
+              headerClassName="bg-gray-100/90 dark:bg-gray-800"
             />
           )}
 

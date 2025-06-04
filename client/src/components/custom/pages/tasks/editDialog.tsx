@@ -1,7 +1,9 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -9,97 +11,91 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
-import {
-  FilePlus2,
-  Bug,
-  CheckSquare,
-  AlertCircle,
-  UserRound
-} from 'lucide-react'
-import { TASK_API } from '@/routes/task'
-import { USER_API } from '@/routes/user'
-import {
-  showErrorToast,
-  showSuccessToast
-} from '@/components/custom/utils/errorSonner'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip'
-import type { User } from '@/types/types'
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Pencil, Bug, CheckSquare, AlertCircle, UserRound } from "lucide-react"
+import { TASK_API } from "@/routes/task"
+import { USER_API } from "@/routes/user"
+import { showErrorToast, showSuccessToast } from "@/components/custom/utils/errorSonner"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import type { User, Task } from "@/types/types"
 
-interface AddTaskDialogProps {
-  onTaskCreated?: () => void
+interface EditTaskDialogProps {
+  task: Task
+  onTaskUpdated?: () => void
+  trigger?: React.ReactNode
 }
 
 interface FormData {
   title: string
   description: string
-  type: 'bug' | 'feature' | 'task'
-  priority: 'low' | 'medium' | 'high'
+  type: "bug" | "feature" | "task"
+  priority: "low" | "medium" | "high"
   reporter: string
   assignee: string
 }
 
-const initialFormData: FormData = {
-  title: '',
-  description: '',
-  type: 'task',
-  priority: 'medium',
-  reporter: '',
-  assignee: 'unassigned'
-}
-
 interface TypeOption {
-  value: 'bug' | 'feature' | 'task'
+  value: "bug" | "feature" | "task"
   label: string
   icon: React.ElementType
   color: string
 }
 
 interface PriorityOption {
-  value: 'low' | 'medium' | 'high'
+  value: "low" | "medium" | "high"
   label: string
   color: string
 }
 
 const typeOptions: TypeOption[] = [
-  { value: 'bug', label: 'Bug', icon: Bug, color: 'text-red-600' },
+  { value: "bug", label: "Bug", icon: Bug, color: "text-red-600" },
   {
-    value: 'feature',
-    label: 'Feature',
+    value: "feature",
+    label: "Feature",
     icon: CheckSquare,
-    color: 'text-blue-600'
+    color: "text-blue-600",
   },
-  { value: 'task', label: 'Task', icon: AlertCircle, color: 'text-gray-600' }
+  { value: "task", label: "Task", icon: AlertCircle, color: "text-gray-600" },
 ]
 
 const priorityOptions: PriorityOption[] = [
-  { value: 'low', label: 'Low', color: 'bg-green-500' },
-  { value: 'medium', label: 'Medium', color: 'bg-yellow-500' },
-  { value: 'high', label: 'High', color: 'bg-red-500' }
+  { value: "low", label: "Low", color: "bg-green-500" },
+  { value: "medium", label: "Medium", color: "bg-yellow-500" },
+  { value: "high", label: "High", color: "bg-red-500" },
 ]
 
-export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
-  const [formData, setFormData] = useState<FormData>(initialFormData)
+export default function EditTaskDialog({ task, onTaskUpdated }: EditTaskDialogProps) {
+  const [formData, setFormData] = useState<FormData>({
+    title: "",
+    description: "",
+    type: "task",
+    priority: "medium",
+    reporter: "",
+    assignee: "unassigned",
+  })
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
   const [users, setUsers] = useState<User[]>([])
   const [loadingUsers, setLoadingUsers] = useState(false)
+
+  // Initialize form data when task prop changes or dialog opens
+  useEffect(() => {
+    if (task && open) {
+      setFormData({
+        title: task.title || "",
+        description: task.description || "",
+        type: task.type || "task",
+        priority: task.priority || "medium",
+        reporter: task.Reporter?.id?.toString() || "",
+        assignee: task.Assignee?.id?.toString() || "unassigned",
+      })
+    }
+  }, [task, open])
 
   useEffect(() => {
     if (open) {
@@ -113,22 +109,20 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
       const res = await fetch(USER_API.list)
       const data = await res.json()
 
-      if (data.status === 'success') {
+      if (data.status === "success") {
         setUsers(data.data)
       } else {
-        showErrorToast('Failed to fetch users')
+        showErrorToast("Failed to fetch users")
       }
     } catch (error) {
-      console.error('Fetch users error:', error)
-      showErrorToast('Failed to load users')
+      console.error("Fetch users error:", error)
+      showErrorToast("Failed to load users")
     } finally {
       setLoadingUsers(false)
     }
   }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
@@ -137,16 +131,18 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
+  const [updateMode] = useState<'PATCH' | 'PUT'>('PATCH')
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!formData.title.trim()) {
-      showErrorToast('Title is required')
+      showErrorToast("Title is required")
       return
     }
 
     if (!formData.reporter) {
-      showErrorToast('Reporter is required')
+      showErrorToast("Reporter is required")
       return
     }
 
@@ -154,31 +150,28 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
     try {
       const payload = {
         ...formData,
-        reporter: parseInt(formData.reporter),
-        assignee:
-          formData.assignee === 'unassigned'
-            ? null
-            : parseInt(formData.assignee)
+        reporter: Number.parseInt(formData.reporter),
+        assignee: formData.assignee === "unassigned" ? null : Number.parseInt(formData.assignee),
       }
 
-      const res = await fetch(TASK_API.create, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+      const res = await fetch(TASK_API.update(String(task.id)), {
+        method: updateMode,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       })
 
       const data = await res.json()
 
       if (res.ok) {
-        showSuccessToast('Task created successfully')
-        onTaskCreated?.()
+        showSuccessToast("Task updated successfully")
+        onTaskUpdated?.()
         handleClose()
       } else {
-        showErrorToast(data.message || 'Failed to create task')
+        showErrorToast(data.message || "Failed to update task")
       }
     } catch (error) {
-      console.error('Create task error:', error)
-      showErrorToast('An error occurred while creating the task')
+      console.error("Update task error:", error)
+      showErrorToast("An error occurred while updating the task")
     } finally {
       setLoading(false)
     }
@@ -186,37 +179,31 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
 
   const handleClose = () => {
     setOpen(false)
-    resetForm()
-  }
-
-  const resetForm = () => {
-    setFormData(initialFormData)
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <FilePlus2 className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-            </TooltipTrigger>
-            <TooltipContent>Add New Task</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon" 
+              className="h-8 w-8  text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-950/20 transition-colors">
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent>Edit Task</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader className="space-y-3">
-          <DialogTitle className="text-xl font-semibold">
-            Create New Task
-          </DialogTitle>
+          <DialogTitle className="text-xl font-semibold">Edit Task</DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Fill in the details below to create a new task for your project
+            Update the task details below to modify the existing task
           </DialogDescription>
         </DialogHeader>
 
@@ -258,9 +245,7 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
                 </Label>
                 <Select
                   value={formData.type}
-                  onValueChange={(value) =>
-                    handleSelectChange('type', value as FormData['type'])
-                  }
+                  onValueChange={(value) => handleSelectChange("type", value as FormData["type"])}
                 >
                   <SelectTrigger id="type" className="h-10 w-full">
                     <SelectValue placeholder="Select type" />
@@ -287,12 +272,7 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
                 </Label>
                 <Select
                   value={formData.priority}
-                  onValueChange={(value) =>
-                    handleSelectChange(
-                      'priority',
-                      value as FormData['priority']
-                    )
-                  }
+                  onValueChange={(value) => handleSelectChange("priority", value as FormData["priority"])}
                 >
                   <SelectTrigger id="priority" className="h-10 w-full">
                     <SelectValue placeholder="Select priority" />
@@ -301,9 +281,7 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
                     {priorityOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         <div className="flex items-center gap-2">
-                          <div
-                            className={`w-2 h-2 rounded-full ${option.color}`}
-                          />
+                          <div className={`w-2 h-2 rounded-full ${option.color}`} />
                           {option.label}
                         </div>
                       </SelectItem>
@@ -316,33 +294,22 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="reporter" className="text-sm font-medium">
-                  Reporter
+                  Reporter <span className="text-red-500">*</span>
                 </Label>
                 <Select
                   value={formData.reporter}
-                  onValueChange={(value) =>
-                    handleSelectChange('reporter', value)
-                  }
+                  onValueChange={(value) => handleSelectChange("reporter", value)}
                   required
                   disabled={loadingUsers}
                 >
                   <SelectTrigger id="reporter" className="h-10 w-full">
-                    <SelectValue
-                      placeholder={
-                        loadingUsers ? 'Loading users...' : 'Select reporter'
-                      }
-                    />
+                    <SelectValue placeholder={loadingUsers ? "Loading users..." : "Select reporter"} />
                   </SelectTrigger>
                   <SelectContent className="w-[250px]">
                     {users.map((user) => {
-                      const initials = `${user.firstName?.[0] || ''}${
-                        user.lastName?.[0] || ''
-                      }`.toUpperCase()
+                      const initials = `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
                       return (
-                        <SelectItem
-                          key={`reporter-${user.id}`}
-                          value={user.id.toString()}
-                        >
+                        <SelectItem key={`reporter-${user.id}`} value={user.id.toString()}>
                           <div className="flex items-center gap-2">
                             <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs font-medium">
                               {initials || user.username?.[0]?.toUpperCase()}
@@ -351,9 +318,7 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
                               <span className="font-medium">
                                 {user.firstName} {user.lastName}
                               </span>
-                              <span className="text-muted-foreground ml-1">
-                                ({user.username})
-                              </span>
+                              <span className="text-muted-foreground ml-1">({user.username})</span>
                             </div>
                           </div>
                         </SelectItem>
@@ -369,19 +334,11 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
                 </Label>
                 <Select
                   value={formData.assignee}
-                  onValueChange={(value) =>
-                    handleSelectChange('assignee', value)
-                  }
+                  onValueChange={(value) => handleSelectChange("assignee", value)}
                   disabled={loadingUsers}
                 >
                   <SelectTrigger id="assignee" className="h-10 w-full">
-                    <SelectValue
-                      placeholder={
-                        loadingUsers
-                          ? 'Loading users...'
-                          : 'Select assignee (optional)'
-                      }
-                    />
+                    <SelectValue placeholder={loadingUsers ? "Loading users..." : "Select assignee (optional)"} />
                   </SelectTrigger>
                   <SelectContent className="w-[250px]">
                     <SelectItem value="unassigned">
@@ -389,20 +346,13 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
                         <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
                           <UserRound className="h-3 w-3 text-gray-400" />
                         </div>
-                        <span className="text-muted-foreground">
-                          Unassigned
-                        </span>
+                        <span className="text-muted-foreground">Unassigned</span>
                       </div>
                     </SelectItem>
                     {users.map((user) => {
-                      const initials = `${user.firstName?.[0] || ''}${
-                        user.lastName?.[0] || ''
-                      }`.toUpperCase()
+                      const initials = `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
                       return (
-                        <SelectItem
-                          key={`assignee-${user.id}`}
-                          value={user.id.toString()}
-                        >
+                        <SelectItem key={`assignee-${user.id}`} value={user.id.toString()}>
                           <div className="flex items-center gap-2">
                             <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-green-700 text-xs font-medium">
                               {initials || user.username?.[0]?.toUpperCase()}
@@ -411,9 +361,7 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
                               <span className="font-medium">
                                 {user.firstName} {user.lastName}
                               </span>
-                              <span className="text-muted-foreground ml-1">
-                                ({user.username})
-                              </span>
+                              <span className="text-muted-foreground ml-1">({user.username})</span>
                             </div>
                           </div>
                         </SelectItem>
@@ -426,16 +374,11 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
           </div>
 
           <DialogFooter className="gap-2 pt-4 border-t">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              disabled={loading}
-            >
+            <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>
               Cancel
             </Button>
             <Button type="submit" disabled={loading} className="min-w-[100px]">
-              {loading ? 'Creating...' : 'Create Task'}
+              {loading ? "Updating..." : "Update Task"}
             </Button>
           </DialogFooter>
         </form>
