@@ -1,4 +1,4 @@
-const { Project, ProjectUser } = require(`${__serverRoot}/models`);
+const { Project, ProjectUser, User } = require(`${__serverRoot}/models`);
 
 const create = async (userQuery) => {
   const { name, owner, code } = userQuery;
@@ -39,8 +39,24 @@ const assignUserToProject = async (query) => {
   return ProjectUser.create({ projectId: id, userId });
 };
 
+const listProjectUsers = async (projectId) => {
+  const projectUsers = await User.findAll({
+    include: [
+      {
+        model: Project,
+        through: ProjectUser,
+        where: { id: projectId },
+        attributes: []
+      }
+    ]
+  });
+
+  return projectUsers;
+};
+
 module.exports = {
   assignUserToProject,
+  listProjectUsers,
   create,
   getProjectsByOwner
 };

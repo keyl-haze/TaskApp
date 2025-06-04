@@ -34,8 +34,19 @@ const create = promiseController(async (req) => {
   };
 });
 
+const listProjectUsers = promiseController(async (req) => {
+  const projectUsers = await service.listProjectUsers(req.params.id);
+
+  return {
+    status: 200,
+    message: 'Projects Users fetched successfully',
+    data: projectUsers
+  };
+});
+
 module.exports = {
   assignUserToProject,
   getProjectsByOwner,
+  listProjectUsers,
   create
 };
