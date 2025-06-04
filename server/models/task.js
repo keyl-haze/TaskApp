@@ -39,11 +39,11 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 'medium'
       },
       reporter: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.INTEGER,
         allowNull: false
       },
       assignee: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.INTEGER,
         allowNull: true
       }
     },
