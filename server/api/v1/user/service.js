@@ -1,4 +1,4 @@
-const { userWhereFilter } = require('../utils/queries');
+const { userWhereFilter, buildOrder } = require('../utils/queries');
 const { Op } = require('sequelize');
 const {
   doesEmailExist,
@@ -6,6 +6,7 @@ const {
   hashPassword,
   isUsernameValid
 } = require('../utils/account');
+const { sequelize } = require('../../../models');
 const { User } = require(`${__serverRoot}/models`);
 const _validQueryProps = [
   'id',
@@ -16,6 +17,18 @@ const _validQueryProps = [
   'username',
   'role'
 ];
+const orderTypes = {
+  id: 'STRING',
+  name: 'STRING',
+  firstName: 'STRING',
+  lastName: 'STRING',
+  email: 'STRING',
+  username: 'STRING',
+  role: 'ENUM',
+  deletedAt: 'TIMESTAMP',
+  createdAt: 'TIMESTAMP',
+  updatedAt: 'TIMESTAMP'
+}
 
 const list = async (query) => {
   const { deleted, all, search, ...otherQuery } = query;
@@ -26,8 +39,10 @@ const list = async (query) => {
   }
 
   const where = userWhereFilter(_validQueryProps, otherQuery.filter, User.name);
+  const order = query.order || ['email'];
+  const orderQuery = sequelize.literal(buildOrder({}, order, orderTypes));
 
-  let findOptions = { where };
+  let findOptions = { where, order: orderQuery };
 
   if (all === 'true') {
     // Return all users, including soft-deleted

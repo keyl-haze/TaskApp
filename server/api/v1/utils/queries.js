@@ -1,11 +1,20 @@
 const { Op, Sequelize } = require('sequelize');
 
-const createWhereFilter = (validQueryProps, query = {}, modelType = 'generic') => {
+const createWhereFilter = (
+  validQueryProps,
+  query = {},
+  modelType = 'generic'
+) => {
   const fields = Object.keys(query);
   let where = {};
 
   // Global search support for users only
-  if (modelType === 'user' && query.search && typeof query.search === 'string' && query.search.trim()) {
+  if (
+    modelType === 'user' &&
+    query.search &&
+    typeof query.search === 'string' &&
+    query.search.trim()
+  ) {
     const value = `%${query.search.trim()}%`;
     where = {
       [Op.or]: [
@@ -42,7 +51,7 @@ const createWhereFilter = (validQueryProps, query = {}, modelType = 'generic') =
     fields.forEach((fieldName) => {
       if (validQueryProps.includes(fieldName)) {
         const field = query[fieldName];
-        
+
         if (field.iLike) {
           // Cast enum fields to text for ILIKE
           if (currentEnumFields.includes(fieldName)) {
@@ -146,8 +155,64 @@ const taskWhereFilter = (validQueryProps, query = {}) => {
   return createWhereFilter(validQueryProps, query, 'task');
 };
 
+const buildOrder = (
+  associatedAliases = {},
+  order = '',
+  orderTypes = {},
+  secondOrder = ''
+) => {
+  if (!order) {
+    return '';
+  }
+
+  let newOrder = order;
+  let orderFlow = 'ASC NULLS LAST';
+
+  // Check for descending order (-)
+  if (order && order[0] === '-') {
+    orderFlow = 'DESC NULLS LAST';
+    newOrder = order.substring(1);
+  }
+
+  // Default to lastName if no order specified
+  if (!newOrder) {
+    newOrder = 'lastName';
+  }
+
+  // Check if field has an associated alias (for joined tables)
+  const associatedAlias = associatedAliases[newOrder];
+
+  // Get field type, default to STRING
+  const orderType = orderTypes[newOrder] || 'STRING';
+
+  // Build order clause based on type and alias
+  if (orderType === 'STRING') {
+    // Use lower() for case-insensitive string sorting
+    newOrder = associatedAlias
+      ? `lower("${associatedAlias}"."${newOrder}") ${orderFlow}`
+      : `lower("${newOrder}") ${orderFlow}`;
+  } else {
+    // Direct field sorting for non-string types (numbers, dates, etc.)
+    newOrder = associatedAlias
+      ? `"${associatedAlias}"."${newOrder}" ${orderFlow}`
+      : `"${newOrder}" ${orderFlow}`;
+  }
+
+  // Handle secondary order (recursive)
+  if (secondOrder) {
+    newOrder = `${newOrder}, ${buildOrder(
+      associatedAliases,
+      secondOrder,
+      orderTypes
+    )}`;
+  }
+
+  return newOrder;
+};
+
 module.exports = {
   createWhereFilter,
   userWhereFilter,
-  taskWhereFilter
+  taskWhereFilter,
+  buildOrder
 };

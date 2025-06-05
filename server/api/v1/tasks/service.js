@@ -1,52 +1,5 @@
 const { Task, User } = require('../../../models');
 const { taskWhereFilter } = require('../utils/queries');
-
-const validateStatus = (status) => {
-  const validStatuses = ['to_do', 'in_progress', 'done', 'archived'];
-  if (status && !validStatuses.includes(status)) {
-    const error = new Error();
-    error.name = 'ValidationError';
-    error.status = 400;
-    error.message = 'Invalid task status';
-    error.details = { status, validValues: validStatuses };
-    throw error;
-  }
-};
-
-const create = async (data) => {
-  const { title, description, type, priority, status, reporter, assignee } =
-    data;
-
-  if (!title) {
-    const error = new Error();
-    error.name = 'ValidationError';
-    error.status = 400;
-    error.message = 'Task title is required';
-    throw error;
-  }
-  if (!reporter) {
-    const error = new Error();
-    error.name = 'ValidationError';
-    error.status = 400;
-    error.message = 'Task reporter is required';
-    throw error;
-  }
-
-  validateStatus(status);
-
-  const newTask = await Task.create({
-    title,
-    description,
-    type,
-    priority,
-    status,
-    reporter,
-    assignee
-  });
-
-  return await get(newTask.id);
-};
-
 const _validQueryProps = [
   'id',
   'title',
@@ -57,11 +10,38 @@ const _validQueryProps = [
   'reporter',
   'assignee'
 ];
+const orderTypes = {
+  id: 'STRING',
+  title: 'STRING',
+  description: 'STRING',
+  type: 'ENUM',
+  priority: 'ENUM',
+  status: 'ENUM',
+  reporter: 'STRING',
+  assignee: 'STRING',
+  deletedAt: 'TIMESTAMP',
+  createdAt: 'TIMESTAMP',
+  updatedAt: 'TIMESTAMP'
+}
+
+const associatedAliases = {
+  reporter: 'Reporter',
+  assignee: 'Assignee'
+};
 
 const list = async (query) => {
   const { deleted, all, ...otherQuery } = query;
 
   const where = taskWhereFilter(_validQueryProps, otherQuery.filter, Task.name);
+  let orderQuery;
+  if (query.order) {
+    const orderString = Array.isArray(query.order) ? query.order[0] : query.order;
+    const orderClause = buildOrder(associatedAliases, orderString, orderTypes);
+    orderQuery = orderClause ? Task.sequelize.literal(orderClause) : [['title', 'ASC']];
+  } else {
+    // Default order
+    orderQuery = [['title', 'ASC']];
+  }
 
   let findOptions = {
     where,
@@ -76,7 +56,8 @@ const list = async (query) => {
         as: 'Assignee',
         attributes: ['id', 'username', 'email', 'firstName', 'lastName']
       }
-    ]
+    ],
+    order: orderQuery
   };
 
   if (all || deleted) {
@@ -122,6 +103,52 @@ const get = async (id, options = {}) => {
     throw error;
   }
   return task;
+};
+
+const validateStatus = (status) => {
+  const validStatuses = ['to_do', 'in_progress', 'done', 'archived'];
+  if (status && !validStatuses.includes(status)) {
+    const error = new Error();
+    error.name = 'ValidationError';
+    error.status = 400;
+    error.message = 'Invalid task status';
+    error.details = { status, validValues: validStatuses };
+    throw error;
+  }
+};
+
+const create = async (data) => {
+  const { title, description, type, priority, status, reporter, assignee } =
+    data;
+
+  if (!title) {
+    const error = new Error();
+    error.name = 'ValidationError';
+    error.status = 400;
+    error.message = 'Task title is required';
+    throw error;
+  }
+  if (!reporter) {
+    const error = new Error();
+    error.name = 'ValidationError';
+    error.status = 400;
+    error.message = 'Task reporter is required';
+    throw error;
+  }
+
+  validateStatus(status);
+
+  const newTask = await Task.create({
+    title,
+    description,
+    type,
+    priority,
+    status,
+    reporter,
+    assignee
+  });
+
+  return await get(newTask.id);
 };
 
 const update = async (id, updates, mode = 'patch') => {
