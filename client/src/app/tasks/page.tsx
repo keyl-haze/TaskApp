@@ -12,7 +12,6 @@ import {
   Archive
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -113,7 +112,8 @@ export default function TasksPage() {
       } finally {
         setLoading(false)
       }
-    }, [filters, globalFilter]
+    },
+    [filters, globalFilter]
   )
 
   useEffect(() => {
@@ -153,29 +153,6 @@ export default function TasksPage() {
   }
 
   const columns: ColumnDef<Task>[] = [
-    {
-      id: 'select',
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getFilteredRowModel().rows.length > 0 &&
-            selectedTasks.length === table.getFilteredRowModel().rows.length
-          }
-          onCheckedChange={toggleSelectAll}
-          aria-label="Select all"
-          className="bg-white"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={selectedTasks.includes(row.original.id)}
-          onCheckedChange={() => toggleSelectTask(row.original.id)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false
-    },
     {
       accessorKey: 'title',
       header: 'Title',

@@ -7,7 +7,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { Search } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -53,51 +52,54 @@ export default function UsersPage() {
   })
 
   // * Fetch users from the API
-  const fetchUsers = useCallback(async (searchValue = globalFilter, filterValue = filters) => {
-    setLoading(true)
-    setError(null)
-    try {
-      let url = `${USER_API.list}?all=true`
-      if (searchValue.trim()) {
-        const encoded = encodeURIComponent(searchValue.trim())
-        url +=
-          `&filter[firstName][iLike]=${encoded}` +
-          `&filter[lastName][iLike]=${encoded}` +
-          `&filter[email][iLike]=${encoded}` +
-          `&filter[username][iLike]=${encoded}`
+  const fetchUsers = useCallback(
+    async (searchValue = globalFilter, filterValue = filters) => {
+      setLoading(true)
+      setError(null)
+      try {
+        let url = `${USER_API.list}?all=true`
+        if (searchValue.trim()) {
+          const encoded = encodeURIComponent(searchValue.trim())
+          url +=
+            `&filter[firstName][iLike]=${encoded}` +
+            `&filter[lastName][iLike]=${encoded}` +
+            `&filter[email][iLike]=${encoded}` +
+            `&filter[username][iLike]=${encoded}`
+        }
+        if (filterValue.role && filterValue.role.length > 0) {
+          url += `&filter[role][eq]=${encodeURIComponent(filterValue.role.join(','))}`
+        }
+        if (filterValue.status && filterValue.status.length > 0) {
+          url += `&filter[status][eq]=${encodeURIComponent(filterValue.status.join(','))}`
+        }
+        const res = await fetch(url)
+        const json = await res.json()
+        if (json.status === 'success') {
+          // * Map the users to the frontend
+          const mappedUsers: User[] = json.data.map((users: UserType) => ({
+            ...users,
+            name: `${users.firstName} ${users.lastName}`,
+            initials:
+              `${users.firstName[0] ?? ''}${users.lastName[0] ?? ''}`.toUpperCase(),
+            status: users.deletedAt ? 'Inactive' : 'Active',
+            avatarSrc: undefined
+          }))
+          setUsers(mappedUsers)
+        } else {
+          setError(json.message || 'Failed to fetch users')
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message || 'Failed to fetch users')
+        } else {
+          setError('Failed to fetch users')
+        }
+      } finally {
+        setLoading(false)
       }
-      if (filterValue.role && filterValue.role.length > 0) {
-      url += `&filter[role][eq]=${encodeURIComponent(filterValue.role.join(','))}`
-      }
-      if (filterValue.status && filterValue.status.length > 0) {
-        url += `&filter[status][eq]=${encodeURIComponent(filterValue.status.join(','))}`
-      }
-      const res = await fetch(url)
-      const json = await res.json()
-      if (json.status === 'success') {
-        // * Map the users to the frontend
-        const mappedUsers: User[] = json.data.map((users: UserType) => ({
-          ...users,
-          name: `${users.firstName} ${users.lastName}`,
-          initials:
-            `${users.firstName[0] ?? ''}${users.lastName[0] ?? ''}`.toUpperCase(),
-          status: users.deletedAt ? 'Inactive' : 'Active',
-          avatarSrc: undefined
-        }))
-        setUsers(mappedUsers)
-      } else {
-        setError(json.message || 'Failed to fetch users')
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError(error.message || 'Failed to fetch users')
-      } else {
-        setError('Failed to fetch users')
-      }
-    } finally {
-      setLoading(false)
-    }
-  }, [filters, globalFilter])
+    },
+    [filters, globalFilter]
+  )
 
   useEffect(() => {
     fetchUsers(globalFilter)
@@ -157,29 +159,6 @@ export default function UsersPage() {
 
   // * Columns for the data table
   const columns: ColumnDef<User>[] = [
-    {
-      id: 'select',
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getFilteredRowModel().rows.length > 0 &&
-            selectedUsers.length === table.getFilteredRowModel().rows.length
-          }
-          onCheckedChange={toggleSelectAll}
-          aria-label="Select all"
-          className="bg-white"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={selectedUsers.includes(row.original.id)}
-          onCheckedChange={() => toggleSelectUser(row.original.id)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false
-    },
     {
       accessorKey: 'name',
       header: 'Users',
