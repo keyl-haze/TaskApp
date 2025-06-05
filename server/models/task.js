@@ -46,6 +46,10 @@ module.exports = (sequelize, DataTypes) => {
           isIn: [['to_do', 'in_progress', 'done', 'archived']]
         }
       },
+      originalStatus: {
+        type: DataTypes.ENUM('to_do', 'in_progress', 'done', 'archived'),
+        allowNull: true
+      },
       reporter: {
         type: DataTypes.INTEGER,
         allowNull: false

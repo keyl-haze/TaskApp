@@ -22,6 +22,7 @@ import {
 export type FilterValue = {
   type?: string[]
   priority?: string[]
+  status?: string[]
 }
 
 type FilterPopoverProps = {
@@ -42,6 +43,13 @@ const priorityOptions = [
   { value: 'high', label: 'High' }
 ]
 
+const statusOptions = [
+  { value: 'to_do', label: 'To Do' },
+  { value: 'in_progress', label: 'In Progress' },
+  { value: 'done', label: 'Done' },
+  { value: 'archived', label: 'Archived' }
+]
+
 export default function FilterPopover({
   onFilterChange,
   activeFilters
@@ -55,7 +63,9 @@ export default function FilterPopover({
   useEffect(() => {
     setFilters(activeFilters)
     const count =
-      (activeFilters.type?.length || 0) + (activeFilters.priority?.length || 0)
+      (activeFilters.type?.length || 0) + 
+      (activeFilters.priority?.length || 0) + 
+      (activeFilters.status?.length || 0)
     setActiveFilterCount(count)
   }, [activeFilters])
 
@@ -76,7 +86,7 @@ export default function FilterPopover({
   }
 
   const resetFilters = () => {
-    const emptyFilters: FilterValue = { type: [], priority: [] }
+    const emptyFilters: FilterValue = { type: [], priority: [], status: [] }
     setFilters(emptyFilters)
     onFilterChange(emptyFilters)
   }
@@ -117,7 +127,8 @@ export default function FilterPopover({
             <div className="flex items-center justify-between">
               <h4 className="font-medium">Filter Tasks</h4>
               {(filters.type?.length || 0) > 0 ||
-              (filters.priority?.length || 0) > 0 ? (
+              (filters.priority?.length || 0) > 0 ||
+              (filters.status?.length || 0) > 0 ? (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -165,19 +176,39 @@ export default function FilterPopover({
               </div>
             </div>
 
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <div className="flex flex-wrap gap-2">
+                {statusOptions.map((opt) => (
+                  <label key={opt.value} className="flex items-center gap-2">
+                    <Checkbox
+                      checked={filters.status?.includes(opt.value) || false}
+                      onCheckedChange={() =>
+                        handleCheckboxChange('status', opt.value)
+                      }
+                    />
+                    {opt.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <div className="flex justify-end space-x-2 pt-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
                   setOpen(false)
+                  // If no filters were applied before, reset all
                   if (
                     (!lastAppliedFilters.type ||
                       lastAppliedFilters.type.length === 0) &&
                     (!lastAppliedFilters.priority ||
-                      lastAppliedFilters.priority.length === 0)
+                      lastAppliedFilters.priority.length === 0) &&
+                    (!lastAppliedFilters.status ||
+                      lastAppliedFilters.status.length === 0)
                   ) {
-                    const emptyFilters: FilterValue = { type: [], priority: [] }
+                    const emptyFilters: FilterValue = { type: [], priority: [], status: [] }
                     setFilters(emptyFilters)
                     onFilterChange(emptyFilters)
                   } else {

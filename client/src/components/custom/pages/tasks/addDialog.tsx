@@ -25,8 +25,12 @@ import {
   FilePlus2,
   Bug,
   CheckSquare,
-  AlertCircle,
-  UserRound
+  UserRound,
+  Sparkles,
+  CircleDashed,
+  Loader,
+  CircleCheckBig,
+  Archive
 } from 'lucide-react'
 import { TASK_API } from '@/routes/task'
 import { USER_API } from '@/routes/user'
@@ -51,6 +55,7 @@ interface FormData {
   description: string
   type: 'bug' | 'feature' | 'task'
   priority: 'low' | 'medium' | 'high'
+  status: 'to_do' | 'in_progress' | 'done' | 'archived'
   reporter: string
   assignee: string
 }
@@ -60,6 +65,7 @@ const initialFormData: FormData = {
   description: '',
   type: 'task',
   priority: 'medium',
+  status: 'to_do',
   reporter: '',
   assignee: 'unassigned'
 }
@@ -77,21 +83,55 @@ interface PriorityOption {
   color: string
 }
 
+interface StatusOption {
+  value: 'to_do' | 'in_progress' | 'done' | 'archived'
+  icon?: React.ElementType
+  label: string
+  textColor: string
+}
+
 const typeOptions: TypeOption[] = [
   { value: 'bug', label: 'Bug', icon: Bug, color: 'text-red-600' },
   {
     value: 'feature',
     label: 'Feature',
-    icon: CheckSquare,
-    color: 'text-blue-600'
+    icon: Sparkles,
+    color: 'text-purple-600'
   },
-  { value: 'task', label: 'Task', icon: AlertCircle, color: 'text-gray-600' }
+  { value: 'task', label: 'Task', icon: CheckSquare, color: 'text-blue-600' }
 ]
 
 const priorityOptions: PriorityOption[] = [
   { value: 'low', label: 'Low', color: 'bg-green-500' },
   { value: 'medium', label: 'Medium', color: 'bg-yellow-500' },
   { value: 'high', label: 'High', color: 'bg-red-500' }
+]
+
+const statusOptions: StatusOption[] = [
+  {
+    value: 'to_do',
+    label: 'To Do',
+    icon: CircleDashed,
+    textColor: 'text-slate-600'
+  },
+  {
+    value: 'in_progress',
+    label: 'In Progress',
+    icon: Loader,
+    textColor: 'text-blue-600'
+  },
+  {
+    value: 'done',
+    label: 'Done',
+    icon: CircleCheckBig,
+    textColor: 'text-green-600'
+  },
+  {
+    value: 'archived',
+    label: 'Archived',
+    icon: Archive,
+    textColor: 'text-gray-600'
+  }
 ]
 
 export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
@@ -311,6 +351,37 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div className="space-y-2 w-full">
+              <Label htmlFor="status" className="text-sm font-medium">
+                Status
+              </Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) =>
+                  handleSelectChange('status', value as FormData['status'])
+                }
+              >
+                <SelectTrigger id="status" className="h-10 w-full">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {statusOptions.map((option) => {
+                    const Icon = option.icon
+                    return (
+                      <SelectItem key={option.value} value={option.value}>
+                        <div className="flex items-center gap-2">
+                          {Icon && (
+                            <Icon className={`h-4 w-4 ${option.textColor}`} />
+                          )}
+                          {option.label}
+                        </div>
+                      </SelectItem>
+                    )
+                  })}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

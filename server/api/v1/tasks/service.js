@@ -1,8 +1,20 @@
 const { Task, User } = require('../../../models');
 const { taskWhereFilter } = require('../utils/queries');
 
+const validateStatus = (status) => {
+  const validStatuses = ['to_do', 'in_progress', 'done', 'archived'];
+  if (status && !validStatuses.includes(status)) {
+    const error = new Error();
+    error.name = 'ValidationError';
+    error.status = 400;
+    error.message = 'Invalid task status';
+    error.details = { status, validValues: validStatuses };
+    throw error;
+  }
+}
+
 const create = async (data) => {
-  const { title, description, type, priority, reporter, assignee } = data;
+  const { title, description, type, priority, status, reporter, assignee } = data;
 
   if (!title) {
     const error = new Error();
@@ -19,11 +31,14 @@ const create = async (data) => {
     throw error;
   }
 
+  validateStatus(status);
+
   const newTask = await Task.create({
     title,
     description,
     type,
     priority,
+    status,
     reporter,
     assignee
   });
@@ -37,6 +52,7 @@ const _validQueryProps = [
   'description',
   'type',
   'priority',
+  'status',
   'reporter',
   'assignee'
 ];
@@ -62,6 +78,9 @@ const list = async (query) => {
     ]
   };
 
+  if (all || deleted) {
+    findOptions.paranoid = false;
+  }
   const tasks = await Task.findAll(findOptions);
   return tasks;
 };
@@ -120,9 +139,12 @@ const update = async (id, updates, mode = 'patch') => {
     'description',
     'type',
     'priority',
+    'status',
     'reporter',
     'assignee'
   ];
+
+  validateStatus(updates.status);
 
   let filteredUpdates = {};
 
@@ -154,6 +176,13 @@ const softDelete = async (id) => {
     error.details = { id };
     throw error;
   }
+
+  const originalStatus = task.status !== 'archived' ? task.status : (task.originalStatus || 'to_do');
+  
+  await task.update({ 
+    status: 'archived',
+    originalStatus: originalStatus 
+  });
   await task.destroy();
   return task;
 };
@@ -179,7 +208,14 @@ const restore = async (id) => {
   }
 
   await task.restore();
-  return task;
+
+  const statusToRestore = task.originalStatus || 'to_do';
+  await task.update({ 
+    status: statusToRestore,
+    originalStatus: null // Clear the stored original status after restoration
+  });
+
+  return await get(id);
 };
 
 module.exports = {

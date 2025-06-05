@@ -1,7 +1,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Bug, CheckSquare, AlertCircle } from 'lucide-react'
+import { 
+  Search, 
+  Bug, 
+  CheckSquare, 
+  Sparkles,
+  CircleDashed,
+  Loader,
+  CircleCheckBig,
+  Archive
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -23,6 +32,7 @@ import FilterPopover, {
 } from '@/components/custom/pages/tasks/filterPopover'
 import EditTaskDialog from '@/components/custom/pages/tasks/editDialog'
 import DeleteTaskDialog from '@/components/custom/pages/tasks/deleteDialog'
+import RestoreTaskDialog from '@/components/custom/pages/tasks/restoreDialog'
 
 const PAGE_SIZE = 10
 
@@ -39,7 +49,8 @@ export default function TasksPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState<FilterValue>({
     type: [],
-    priority: []
+    priority: [],
+    status: ['to_do', 'in_progress', 'done']
   })
 
   // * Fetch tasks from the API
@@ -55,12 +66,15 @@ export default function TasksPage() {
           `&filter[description][iLike]=${encoded}` 
         // Add more fields if needed
       }
-      // Add filter params for type and priority
+      // Add filter params for type, priority, and status
       if (filterValue.priority && filterValue.priority.length > 0) {
         url += `&filter[priority][eq]=${encodeURIComponent(filterValue.priority.join(','))}`
       }
       if (filterValue.type && filterValue.type.length > 0) {
         url += `&filter[type][eq]=${encodeURIComponent(filterValue.type.join(','))}`
+      }
+      if (filterValue.status && filterValue.status.length > 0) {
+        url += `&filter[status][eq]=${encodeURIComponent(filterValue.status.join(','))}`
       }
 
       const res = await fetch(url)
@@ -107,11 +121,12 @@ export default function TasksPage() {
   // * Reset to first page when tasks change or search changes
   useEffect(() => {
     setCurrentPage(1)
-  }, [tasks.length, globalFilter, filters.type, filters.priority])
+  }, [tasks.length, globalFilter, filters.type, filters.priority, filters.status])
 
   const handleTaskCreated = () => setRefreshFlag((prev) => prev + 1)
   const handleTaskUpdated = () => setRefreshFlag((prev) => prev + 1)
   const handleTaskDeleted = () => setRefreshFlag((prev) => prev + 1)
+  const handleTaskRestored = () => setRefreshFlag((prev) => prev + 1)
 
   const toggleSelectTask = (taskId: number) => {
     setSelectedTasks((prev) =>
@@ -177,13 +192,13 @@ export default function TasksPage() {
             label: 'Bug'
           },
           feature: {
-            icon: CheckSquare,
-            color: 'bg-blue-100 text-blue-800 border-blue-200',
+            icon: Sparkles,
+            color: 'bg-purple-100 text-purple-800 border-purple-200',
             label: 'Feature'
           },
           task: {
-            icon: AlertCircle,
-            color: 'bg-gray-100 text-gray-800 border-gray-200',
+            icon: CheckSquare,
+            color: 'bg-blue-100 text-blue-800 border-blue-200',
             label: 'Task'
           }
         }
@@ -242,6 +257,53 @@ export default function TasksPage() {
       }
     },
     {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => {
+        const status = row.original.status
+        const statusConfig = {
+          to_do: {
+            icon: CircleDashed,
+            color: 'bg-slate-100 text-slate-800 border-slate-200',
+            label: 'To Do',
+            iconColor: 'text-slate-600'
+          },
+          in_progress: {
+            icon: Loader,
+            color: 'bg-blue-100 text-blue-800 border-blue-200',
+            label: 'In Progress',
+            iconColor: 'text-blue-600'
+          },
+          done: {
+            icon: CircleCheckBig,
+            color: 'bg-green-100 text-green-800 border-green-200',
+            label: 'Done',
+            iconColor: 'text-green-600'
+          },
+          archived: {
+            icon: Archive,
+            color: 'bg-gray-100 text-gray-800 border-gray-200',
+            label: 'Archived',
+            iconColor: 'text-gray-600'
+          }
+        }
+
+        const config =
+          statusConfig[status as keyof typeof statusConfig] || statusConfig.to_do
+        const Icon = config.icon
+
+        return (
+          <Badge
+            variant="outline"
+            className={`${config.color} flex items-center gap-1 w-fit`}
+          >
+            <Icon className={`h-3 w-3 ${config.iconColor}`} />
+            {config.label}
+          </Badge>
+        )
+      }
+    },
+    {
       accessorKey: 'reporter',
       header: 'Reporter',
       cell: ({ row }) => {
@@ -278,10 +340,18 @@ export default function TasksPage() {
       header: 'Actions',
       cell: ({ row }) => {
         const task = row.original
+        const isArchived = task.status === 'archived'
+        
         return (
           <div className="flex justify-items-center">
-            <EditTaskDialog task={task} onTaskUpdated={handleTaskUpdated} />
-            <DeleteTaskDialog task={task} onTaskDeleted={handleTaskDeleted} />
+            {isArchived ? (
+              <RestoreTaskDialog task={task} onTaskRestored={handleTaskRestored} />
+            ) : (
+              <>
+                <EditTaskDialog task={task} onTaskUpdated={handleTaskUpdated} />
+                <DeleteTaskDialog task={task} onTaskDeleted={handleTaskDeleted} />
+              </>
+            )}
           </div>
         )
       }
