@@ -155,12 +155,13 @@ export default function TasksPage() {
   const columns: ColumnDef<Task>[] = [
     {
       accessorKey: 'title',
-      header: 'Title',
+      header: () => <div className="px-3">Title</div>,
       cell: ({ row }) => {
         const task = row.original
         return (
-          <div>
-            <div className="font-medium">{task.title}</div>
+          <div className="py-1 px-3">
+            <div className="font-medium text-foreground leading-relaxed text-sm min-h-[1.5rem] 
+            flex items-center justify-start">{task.title}</div>
           </div>
         )
       }
