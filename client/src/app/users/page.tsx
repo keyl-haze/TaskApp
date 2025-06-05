@@ -53,7 +53,7 @@ export default function UsersPage() {
   })
 
   // * Fetch users from the API
-  const fetchUsers = useCallback(async (searchValue = globalFilter) => {
+  const fetchUsers = useCallback(async (searchValue = globalFilter, filterValue = filters) => {
     setLoading(true)
     setError(null)
     try {
@@ -65,6 +65,12 @@ export default function UsersPage() {
           `&filter[lastName][iLike]=${encoded}` +
           `&filter[email][iLike]=${encoded}` +
           `&filter[username][iLike]=${encoded}`
+      }
+      if (filterValue.role && filterValue.role.length > 0) {
+      url += `&filter[role][eq]=${encodeURIComponent(filterValue.role.join(','))}`
+      }
+      if (filterValue.status && filterValue.status.length > 0) {
+        url += `&filter[status][eq]=${encodeURIComponent(filterValue.status.join(','))}`
       }
       const res = await fetch(url)
       const json = await res.json()
@@ -91,7 +97,7 @@ export default function UsersPage() {
     } finally {
       setLoading(false)
     }
-  }, [globalFilter])
+  }, [filters, globalFilter])
 
   useEffect(() => {
     fetchUsers(globalFilter)
@@ -347,8 +353,11 @@ export default function UsersPage() {
             </div>
             <div className="flex gap-2">
               <FilterPopover
-                onFilterChange={setFilters}
                 activeFilters={filters}
+                onFilterChange={(newFilters) => {
+                  setFilters(newFilters)
+                  fetchUsers(globalFilter, newFilters)
+                }}
               />
               <AddUser onUserCreated={handleUserCreated} />
             </div>
