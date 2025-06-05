@@ -43,7 +43,7 @@ export default function TasksPage() {
   })
 
   // * Fetch tasks from the API
-  const fetchTasks = async (searchValue = globalFilter) => {
+  const fetchTasks = async (searchValue = globalFilter, filterValue = filters) => {
     setLoading(true)
     setError(null)
     try {
@@ -55,6 +55,14 @@ export default function TasksPage() {
           `&filter[description][iLike]=${encoded}` 
         // Add more fields if needed
       }
+      // Add filter params for type and priority
+      if (filterValue.priority && filterValue.priority.length > 0) {
+        url += `&filter[priority][eq]=${encodeURIComponent(filterValue.priority.join(','))}`
+      }
+      if (filterValue.type && filterValue.type.length > 0) {
+        url += `&filter[type][eq]=${encodeURIComponent(filterValue.type.join(','))}`
+      }
+
       const res = await fetch(url)
       const json = await res.json()
       if (json.status === 'success') {
@@ -94,7 +102,7 @@ export default function TasksPage() {
 
   useEffect(() => {
     fetchTasks(globalFilter)
-  }, [refreshFlag, globalFilter])
+  }, [refreshFlag, globalFilter, filters])
 
   // * Reset to first page when tasks change or search changes
   useEffect(() => {
@@ -307,7 +315,10 @@ export default function TasksPage() {
             </div>
             <div className="flex gap-2">
               <FilterPopover
-                onFilterChange={setFilters}
+                onFilterChange={(newFilters) => {
+                  setFilters(newFilters)
+                  fetchTasks(globalFilter, newFilters)
+                }}
                 activeFilters={filters}
               />
               <AddTaskDialog onTaskCreated={handleTaskCreated} />

@@ -156,11 +156,20 @@ const taskWhereFilter = (validQueryProps, query = {}) => {
           });
         } else if (field.eq) {
           const value = field.eq;
-          andFilters.push({
-            [fieldName]: {
-              [Op.eq]: value
-            }
-          });
+          if (typeof value === 'string' && value.includes(',')) {
+            const values = value.split(',').map(v => v.trim());
+            andFilters.push({
+              [fieldName]: {
+                [Op.in]: values
+              }
+            });
+          } else {
+            andFilters.push({
+              [fieldName]: {
+                [Op.eq]: value
+              }
+            });
+          }
         } else if (field.ne) {
           const value = field.ne;
           andFilters.push({
