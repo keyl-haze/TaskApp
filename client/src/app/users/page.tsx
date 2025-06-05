@@ -3,7 +3,7 @@
 import AuthLayout from '@/app/layouts/authLayout'
 import { USER_API } from '@/routes/user'
 import type { User as UserType } from '@/../types/types'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Search } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -53,7 +53,7 @@ export default function UsersPage() {
   })
 
   // * Fetch users from the API
-  const fetchUsers = async (searchValue = globalFilter) => {
+  const fetchUsers = useCallback(async (searchValue = globalFilter) => {
     setLoading(true)
     setError(null)
     try {
@@ -86,11 +86,11 @@ export default function UsersPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [globalFilter])
 
   useEffect(() => {
     fetchUsers(globalFilter)
-  }, [refreshFlag])
+  }, [refreshFlag, fetchUsers, globalFilter])
 
   const handleUserCreated = () => setRefreshFlag((prev) => prev + 1)
   const handleUserUpdated = () => setRefreshFlag((prev) => prev + 1)

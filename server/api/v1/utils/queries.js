@@ -4,7 +4,7 @@ const userWhereFilter = (validQueryProps, query = {}, modelName = '') => {
   const fields = Object.keys(query);
   let where = {};
 
-  // Add global search support
+  // Global search support for users
   if (query.search && typeof query.search === 'string' && query.search.trim()) {
     const value = `%${query.search.trim()}%`;
     where = {
@@ -124,77 +124,94 @@ const userWhereFilter = (validQueryProps, query = {}, modelName = '') => {
 const taskWhereFilter = (validQueryProps, query = {}) => {
   const fields = Object.keys(query);
   let where = {};
+  
   if (fields.length) {
-    const whereAnd = [];
-    fields.map((fieldName) => {
-      if(validQueryProps.includes(fieldName)) {
+    const orFilters = [];
+    const andFilters = [];
+
+    fields.forEach((fieldName) => {
+      if (validQueryProps.includes(fieldName)) {
         const field = query[fieldName];
-        if (field.or) {
+        if (field.iLike) {
+          // Cast enum fields to text for ILIKE
+          if (['type', 'priority'].includes(fieldName)) {
+            orFilters.push(
+              Sequelize.where(
+                Sequelize.cast(Sequelize.col(fieldName), 'text'),
+                { [Op.iLike]: `%${field.iLike}%` }
+              )
+            );
+          } else {
+            orFilters.push({
+              [fieldName]: {
+                [Op.iLike]: `%${field.iLike}%`
+              }
+            });
+          }
+        } else if (field.or) {
           const values = field.or.split(',');
-          whereAnd.push({
+          andFilters.push({
             [fieldName]: {
               [Op.or]: values
             }
           });
         } else if (field.eq) {
           const value = field.eq;
-          whereAnd.push({
+          andFilters.push({
             [fieldName]: {
               [Op.eq]: value
             }
           });
         } else if (field.ne) {
           const value = field.ne;
-          whereAnd.push({
+          andFilters.push({
             [fieldName]: {
               [Op.ne]: value
             }
           });
-        } else if (field.iLike) {
-          const value = field.iLike;
-          whereAnd.push({
-            [fieldName]: {
-              [Op.iLike]: `%${value}%`
-            }
-          });
         } else if (field.in) {
           const values = field.or.split(',');
-          whereAnd.push({
+          andFilters.push({
             [fieldName]: {
               [Op.in]: values
             }
           });
         } else if (field.contains) {
           const values = field.contains.split(',');
-          whereAnd.push({
+          andFilters.push({
             [fieldName]: {
               [Op.contains]: values
             }
           });
         } else if (field.overlap) {
           const values = field.overlap.split(',');
-          whereAnd.push({
+          andFilters.push({
             [fieldName]: {
               [Op.overlap]: values
             }
           });
         } else if (field.between) {
           const values = field.between.split(',');
-          whereAnd.push({
+          andFilters.push({
             [fieldName]: {
               [Op.between]: values
             }
           });
         } else {
-          whereAnd.push({
+          andFilters.push({
             [fieldName]: field
           });
         }
       }
     });
-    where = {
-      [Op.and]: whereAnd
-    };
+
+    if (orFilters.length > 0) {
+      where = andFilters.length > 0
+        ? { [Op.and]: [...andFilters, { [Op.or]: orFilters }] }
+        : { [Op.or]: orFilters };
+    } else if (andFilters.length > 0) {
+      where = { [Op.and]: andFilters };
+    }
   }
   return where;
 }

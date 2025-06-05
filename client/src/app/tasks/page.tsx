@@ -43,11 +43,21 @@ export default function TasksPage() {
   })
 
   // * Fetch tasks from the API
-  const fetchTasks = async () => {
+  const fetchTasks = async (searchValue = globalFilter) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${TASK_API.list}?all=true`)
+      let url = `${TASK_API.list}?all=true`
+      if (searchValue.trim()) {
+        const encoded = encodeURIComponent(searchValue.trim())
+        url +=
+          `&filter[title][iLike]=${encoded}` +
+          `&filter[description][iLike]=${encoded}` +
+          `&filter[type][iLike]=${encoded}` +
+          `&filter[priority][iLike]=${encoded}`
+        // Add more fields if needed
+      }
+      const res = await fetch(url)
       const json = await res.json()
       if (json.status === 'success') {
         const tasksData = json.data.map((task: Task) => ({
@@ -85,8 +95,8 @@ export default function TasksPage() {
   }
 
   useEffect(() => {
-    fetchTasks()
-  }, [refreshFlag])
+    fetchTasks(globalFilter)
+  }, [refreshFlag, globalFilter])
 
   // * Reset to first page when tasks change or search changes
   useEffect(() => {
@@ -272,27 +282,8 @@ export default function TasksPage() {
     }
   ]
 
-  // * Search and filter, then paginate
-  const filteredTasks = tasks.filter((task) => {
-    // Search filter
-    const matchesSearch =
-      globalFilter.trim() === '' ||
-      Object.values(task).some((value) =>
-        String(value).toLowerCase().includes(globalFilter.toLowerCase())
-      )
-
-    // Type filter
-    const typeMatch = !filters.type?.length || filters.type.includes(task.type)
-
-    // Priority filter
-    const priorityMatch =
-      !filters.priority?.length || filters.priority.includes(task.priority)
-
-    return matchesSearch && typeMatch && priorityMatch
-  })
-
-  const totalPages = Math.ceil(filteredTasks.length / PAGE_SIZE)
-  const paginatedTasks = filteredTasks.slice(
+  const totalPages = Math.ceil(tasks.length / PAGE_SIZE)
+  const paginatedTasks = tasks.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   )
@@ -337,13 +328,13 @@ export default function TasksPage() {
             </div>
           )}
 
-          {!loading && !error && filteredTasks.length === 0 && (
+          {!loading && !error && tasks.length === 0 && (
             <div className="flex items-center justify-center">
               <div className="text-gray-500">No tasks found</div>
             </div>
           )}
 
-          {!loading && !error && filteredTasks.length > 0 && (
+          {!loading && !error && tasks.length > 0 && (
             <GenericTable
               data={paginatedTasks}
               columns={columns}
