@@ -28,7 +28,7 @@ const orderTypes = {
   deletedAt: 'TIMESTAMP',
   createdAt: 'TIMESTAMP',
   updatedAt: 'TIMESTAMP'
-}
+};
 
 const list = async (query) => {
   const { deleted, all, search, ...otherQuery } = query;

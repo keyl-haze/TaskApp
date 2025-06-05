@@ -1,5 +1,7 @@
 const { Task, User } = require('../../../models');
-const { taskWhereFilter } = require('../utils/queries');
+const { taskWhereFilter, buildOrder } = require('../utils/queries');
+const { validateStatus, validateTaskData } = require('../utils/tasks');
+
 const _validQueryProps = [
   'id',
   'title',
@@ -22,7 +24,7 @@ const orderTypes = {
   deletedAt: 'TIMESTAMP',
   createdAt: 'TIMESTAMP',
   updatedAt: 'TIMESTAMP'
-}
+};
 
 const associatedAliases = {
   reporter: 'Reporter',
@@ -35,9 +37,13 @@ const list = async (query) => {
   const where = taskWhereFilter(_validQueryProps, otherQuery.filter, Task.name);
   let orderQuery;
   if (query.order) {
-    const orderString = Array.isArray(query.order) ? query.order[0] : query.order;
+    const orderString = Array.isArray(query.order)
+      ? query.order[0]
+      : query.order;
     const orderClause = buildOrder(associatedAliases, orderString, orderTypes);
-    orderQuery = orderClause ? Task.sequelize.literal(orderClause) : [['title', 'ASC']];
+    orderQuery = orderClause
+      ? Task.sequelize.literal(orderClause)
+      : [['title', 'ASC']];
   } else {
     // Default order
     orderQuery = [['title', 'ASC']];
@@ -105,18 +111,6 @@ const get = async (id, options = {}) => {
   return task;
 };
 
-const validateStatus = (status) => {
-  const validStatuses = ['to_do', 'in_progress', 'done', 'archived'];
-  if (status && !validStatuses.includes(status)) {
-    const error = new Error();
-    error.name = 'ValidationError';
-    error.status = 400;
-    error.message = 'Invalid task status';
-    error.details = { status, validValues: validStatuses };
-    throw error;
-  }
-};
-
 const create = async (data) => {
   const { title, description, type, priority, status, reporter, assignee } =
     data;
@@ -136,7 +130,7 @@ const create = async (data) => {
     throw error;
   }
 
-  validateStatus(status);
+  validateStatus(data);
 
   const newTask = await Task.create({
     title,
