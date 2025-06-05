@@ -25,11 +25,7 @@ const list = async (query) => {
     otherQuery.filter.search = search.trim();
   }
 
-  const where = userWhereFilter(
-    _validQueryProps,
-    otherQuery.filter,
-    User.name
-  );
+  const where = userWhereFilter(_validQueryProps, otherQuery.filter, User.name);
 
   let findOptions = { where };
 

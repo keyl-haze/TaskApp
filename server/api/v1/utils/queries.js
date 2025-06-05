@@ -20,10 +20,9 @@ const userWhereFilter = (validQueryProps, query = {}) => {
         ),
         { email: { [Op.iLike]: value } },
         { username: { [Op.iLike]: value } },
-        Sequelize.where(
-          Sequelize.cast(Sequelize.col('role'), 'text'),
-          { [Op.iLike]: value }
-        )
+        Sequelize.where(Sequelize.cast(Sequelize.col('role'), 'text'), {
+          [Op.iLike]: value
+        })
       ]
     };
     return where;
@@ -62,7 +61,7 @@ const userWhereFilter = (validQueryProps, query = {}) => {
         } else if (field.eq) {
           const value = field.eq;
           if (typeof value === 'string' && value.includes(',')) {
-            const values = value.split(',').map(v => v.trim());
+            const values = value.split(',').map((v) => v.trim());
             andFilters.push({
               [fieldName]: {
                 [Op.in]: values
@@ -119,9 +118,10 @@ const userWhereFilter = (validQueryProps, query = {}) => {
     });
 
     if (orFilters.length > 0) {
-      where = andFilters.length > 0
-        ? { [Op.and]: [...andFilters, { [Op.or]: orFilters }] }
-        : { [Op.or]: orFilters };
+      where =
+        andFilters.length > 0
+          ? { [Op.and]: [...andFilters, { [Op.or]: orFilters }] }
+          : { [Op.or]: orFilters };
     } else if (andFilters.length > 0) {
       where = { [Op.and]: andFilters };
     }
@@ -132,7 +132,7 @@ const userWhereFilter = (validQueryProps, query = {}) => {
 const taskWhereFilter = (validQueryProps, query = {}) => {
   const fields = Object.keys(query);
   let where = {};
-  
+
   if (fields.length) {
     const orFilters = [];
     const andFilters = [];
@@ -166,7 +166,7 @@ const taskWhereFilter = (validQueryProps, query = {}) => {
         } else if (field.eq) {
           const value = field.eq;
           if (typeof value === 'string' && value.includes(',')) {
-            const values = value.split(',').map(v => v.trim());
+            const values = value.split(',').map((v) => v.trim());
             andFilters.push({
               [fieldName]: {
                 [Op.in]: values
@@ -223,15 +223,16 @@ const taskWhereFilter = (validQueryProps, query = {}) => {
     });
 
     if (orFilters.length > 0) {
-      where = andFilters.length > 0
-        ? { [Op.and]: [...andFilters, { [Op.or]: orFilters }] }
-        : { [Op.or]: orFilters };
+      where =
+        andFilters.length > 0
+          ? { [Op.and]: [...andFilters, { [Op.or]: orFilters }] }
+          : { [Op.or]: orFilters };
     } else if (andFilters.length > 0) {
       where = { [Op.and]: andFilters };
     }
   }
   return where;
-}
+};
 
 module.exports = {
   userWhereFilter,

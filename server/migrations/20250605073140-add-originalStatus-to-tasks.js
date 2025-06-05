@@ -2,15 +2,15 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     await queryInterface.addColumn('Tasks', 'originalStatus', {
       type: Sequelize.ENUM('to_do', 'in_progress', 'done', 'archived'),
       allowNull: true,
-      after: 'status' 
+      after: 'status'
     });
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     await queryInterface.removeColumn('Tasks', 'originalStatus');
   }
 };

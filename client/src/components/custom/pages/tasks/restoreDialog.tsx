@@ -107,8 +107,8 @@ export default function RestoreTaskDialog({
         <div className="py-4">
           <AlertDialogDescription className="text-sm">
             Are you sure you want to restore{' '}
-            <span className="font-semibold text-foreground">{task.title}</span>
-            &apos;s account?
+            <span className="font-semibold text-foreground">{task.title} </span>
+            as a task?
           </AlertDialogDescription>
           <div className="mt-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 p-3">
             <div className="flex items-start gap-2">

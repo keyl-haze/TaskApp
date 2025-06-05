@@ -11,10 +11,11 @@ const validateStatus = (status) => {
     error.details = { status, validValues: validStatuses };
     throw error;
   }
-}
+};
 
 const create = async (data) => {
-  const { title, description, type, priority, status, reporter, assignee } = data;
+  const { title, description, type, priority, status, reporter, assignee } =
+    data;
 
   if (!title) {
     const error = new Error();
@@ -177,11 +178,12 @@ const softDelete = async (id) => {
     throw error;
   }
 
-  const originalStatus = task.status !== 'archived' ? task.status : (task.originalStatus || 'to_do');
-  
-  await task.update({ 
+  const originalStatus =
+    task.status !== 'archived' ? task.status : task.originalStatus || 'to_do';
+
+  await task.update({
     status: 'archived',
-    originalStatus: originalStatus 
+    originalStatus: originalStatus
   });
   await task.destroy();
   return task;
@@ -210,7 +212,7 @@ const restore = async (id) => {
   await task.restore();
 
   const statusToRestore = task.originalStatus || 'to_do';
-  await task.update({ 
+  await task.update({
     status: statusToRestore,
     originalStatus: null // Clear the stored original status after restoration
   });

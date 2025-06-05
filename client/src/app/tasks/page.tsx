@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { 
-  Search, 
-  Bug, 
-  CheckSquare, 
+import { useState, useEffect, useCallback } from 'react'
+import {
+  Search,
+  Bug,
+  CheckSquare,
   Sparkles,
   CircleDashed,
   Loader,
@@ -54,74 +54,82 @@ export default function TasksPage() {
   })
 
   // * Fetch tasks from the API
-  const fetchTasks = async (searchValue = globalFilter, filterValue = filters) => {
-    setLoading(true)
-    setError(null)
-    try {
-      let url = `${TASK_API.list}?all=true`
-      if (searchValue.trim()) {
-        const encoded = encodeURIComponent(searchValue.trim())
-        url +=
-          `&filter[title][iLike]=${encoded}` +
-          `&filter[description][iLike]=${encoded}` 
-        // Add more fields if needed
-      }
-      // Add filter params for type, priority, and status
-      if (filterValue.priority && filterValue.priority.length > 0) {
-        url += `&filter[priority][eq]=${encodeURIComponent(filterValue.priority.join(','))}`
-      }
-      if (filterValue.type && filterValue.type.length > 0) {
-        url += `&filter[type][eq]=${encodeURIComponent(filterValue.type.join(','))}`
-      }
-      if (filterValue.status && filterValue.status.length > 0) {
-        url += `&filter[status][eq]=${encodeURIComponent(filterValue.status.join(','))}`
-      }
+  const fetchTasks = useCallback(
+    async (searchValue = globalFilter, filterValue = filters) => {
+      setLoading(true)
+      setError(null)
+      try {
+        let url = `${TASK_API.list}?all=true`
+        if (searchValue.trim()) {
+          const encoded = encodeURIComponent(searchValue.trim())
+          url +=
+            `&filter[title][iLike]=${encoded}` +
+            `&filter[description][iLike]=${encoded}`
+          // Add more fields if needed
+        }
+        // Add filter params for type, priority, and status
+        if (filterValue.priority && filterValue.priority.length > 0) {
+          url += `&filter[priority][eq]=${encodeURIComponent(filterValue.priority.join(','))}`
+        }
+        if (filterValue.type && filterValue.type.length > 0) {
+          url += `&filter[type][eq]=${encodeURIComponent(filterValue.type.join(','))}`
+        }
+        if (filterValue.status && filterValue.status.length > 0) {
+          url += `&filter[status][eq]=${encodeURIComponent(filterValue.status.join(','))}`
+        }
 
-      const res = await fetch(url)
-      const json = await res.json()
-      if (json.status === 'success') {
-        const tasksData = json.data.map((task: Task) => ({
-          ...task,
-          reporter: {
-            id: task.Reporter?.id,
-            username: task.Reporter?.username,
-            email: task.Reporter?.email,
-            firstName: task.Reporter?.firstName,
-            lastName: task.Reporter?.lastName
-          },
-          assignee: task.Assignee
-            ? {
-                id: task.Assignee.id,
-                username: task.Assignee.username,
-                email: task.Assignee.email,
-                firstName: task.Assignee.firstName,
-                lastName: task.Assignee.lastName
-              }
-            : null
-        }))
-        setTasks(tasksData)
-      } else {
-        setError(json.message || 'Failed to fetch tasks')
+        const res = await fetch(url)
+        const json = await res.json()
+        if (json.status === 'success') {
+          const tasksData = json.data.map((task: Task) => ({
+            ...task,
+            reporter: {
+              id: task.Reporter?.id,
+              username: task.Reporter?.username,
+              email: task.Reporter?.email,
+              firstName: task.Reporter?.firstName,
+              lastName: task.Reporter?.lastName
+            },
+            assignee: task.Assignee
+              ? {
+                  id: task.Assignee.id,
+                  username: task.Assignee.username,
+                  email: task.Assignee.email,
+                  firstName: task.Assignee.firstName,
+                  lastName: task.Assignee.lastName
+                }
+              : null
+          }))
+          setTasks(tasksData)
+        } else {
+          setError(json.message || 'Failed to fetch tasks')
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message)
+        } else {
+          setError('An unknown error occurred')
+        }
+      } finally {
+        setLoading(false)
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError(error.message)
-      } else {
-        setError('An unknown error occurred')
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [filters, globalFilter]
+  )
 
   useEffect(() => {
     fetchTasks(globalFilter)
-  }, [refreshFlag, globalFilter, filters])
+  }, [refreshFlag, globalFilter, fetchTasks])
 
   // * Reset to first page when tasks change or search changes
   useEffect(() => {
     setCurrentPage(1)
-  }, [tasks.length, globalFilter, filters.type, filters.priority, filters.status])
+  }, [
+    tasks.length,
+    globalFilter,
+    filters.type,
+    filters.priority,
+    filters.status
+  ])
 
   const handleTaskCreated = () => setRefreshFlag((prev) => prev + 1)
   const handleTaskUpdated = () => setRefreshFlag((prev) => prev + 1)
@@ -289,7 +297,8 @@ export default function TasksPage() {
         }
 
         const config =
-          statusConfig[status as keyof typeof statusConfig] || statusConfig.to_do
+          statusConfig[status as keyof typeof statusConfig] ||
+          statusConfig.to_do
         const Icon = config.icon
 
         return (
@@ -341,15 +350,21 @@ export default function TasksPage() {
       cell: ({ row }) => {
         const task = row.original
         const isArchived = task.status === 'archived'
-        
+
         return (
           <div className="flex justify-items-center">
             {isArchived ? (
-              <RestoreTaskDialog task={task} onTaskRestored={handleTaskRestored} />
+              <RestoreTaskDialog
+                task={task}
+                onTaskRestored={handleTaskRestored}
+              />
             ) : (
               <>
                 <EditTaskDialog task={task} onTaskUpdated={handleTaskUpdated} />
-                <DeleteTaskDialog task={task} onTaskDeleted={handleTaskDeleted} />
+                <DeleteTaskDialog
+                  task={task}
+                  onTaskDeleted={handleTaskDeleted}
+                />
               </>
             )}
           </div>
