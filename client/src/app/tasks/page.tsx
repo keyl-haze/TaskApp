@@ -52,9 +52,7 @@ export default function TasksPage() {
         const encoded = encodeURIComponent(searchValue.trim())
         url +=
           `&filter[title][iLike]=${encoded}` +
-          `&filter[description][iLike]=${encoded}` +
-          `&filter[type][iLike]=${encoded}` +
-          `&filter[priority][iLike]=${encoded}`
+          `&filter[description][iLike]=${encoded}` 
         // Add more fields if needed
       }
       const res = await fetch(url)

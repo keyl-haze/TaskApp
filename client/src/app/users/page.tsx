@@ -59,7 +59,12 @@ export default function UsersPage() {
     try {
       let url = `${USER_API.list}?all=true`
       if (searchValue.trim()) {
-        url += `&search=${encodeURIComponent(searchValue.trim())}`
+        const encoded = encodeURIComponent(searchValue.trim())
+        url +=
+          `&filter[firstName][iLike]=${encoded}` +
+          `&filter[lastName][iLike]=${encoded}` +
+          `&filter[email][iLike]=${encoded}` +
+          `&filter[username][iLike]=${encoded}`
       }
       const res = await fetch(url)
       const json = await res.json()
