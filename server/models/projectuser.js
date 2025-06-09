@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       ProjectUser.belongsTo(models.Project, {
-        foreignKey: 'projectid'
+        foreignKey: 'projectId'
       });
       ProjectUser.belongsTo(models.User, {
         foreignKey: 'userId'
@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
             key: 'id'
           }
         },
-        projectid: {
+        projectId: {
           type: DataTypes.INTEGER,
           allowNull: false,
           references: {

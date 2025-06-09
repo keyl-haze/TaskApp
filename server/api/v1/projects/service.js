@@ -1,5 +1,11 @@
 const { Project, ProjectUser, User } = require(`${__serverRoot}/models`);
-const { getByField } = require('../utils/projects');
+const {
+  doesProjectTitleExist,
+  doesProjectCodeExist,
+  doesProjectExist,
+  doesUserExist,
+  isUserAssignedToProject
+} = require('../utils/projects');
 
 const _validQueryProps = [
   'id',
@@ -10,7 +16,7 @@ const _validQueryProps = [
   'start',
   'end',
   'status'
-]
+];
 
 const orderTypes = {
   id: 'STRING',
@@ -24,8 +30,7 @@ const orderTypes = {
   deletedAt: 'TIMESTAMP',
   createdAt: 'TIMESTAMP',
   updatedAt: 'TIMESTAMP'
-}
-
+};
 
 const list = async (query) => {
   const { deleted, all, ...otherQuery } = query;
@@ -70,7 +75,27 @@ const list = async (query) => {
 
   const projects = await Project.findAll(findOptions);
   return projects;
-}
+};
+
+const getByOwner = async (ownerId) => {
+  if (!ownerId) {
+    const error = new Error('Owner ID is required');
+    error.status = 400;
+    throw error;
+  }
+
+  const projects = await Project.findAll({
+    where: { owner: ownerId },
+    include: [
+      {
+        model: User,
+        as: 'Owner',
+        attributes: ['id', 'username', 'email', 'firstName', 'lastName']
+      }
+    ]
+  });
+  return projects;
+};
 
 const create = async (userQuery) => {
   const {
@@ -89,24 +114,24 @@ const create = async (userQuery) => {
     throw error;
   }
 
-  const projectNameExists = await getByField(Project, 'title', title);
+  const projectNameExists = await doesProjectTitleExist(title);
   if (projectNameExists) {
-    const error = new Error('Project name already exists');
-    error.name = 'ProjectNameExistsError';
+    const error = new Error('Project title already exists');
+    error.name = 'ProjectTitleExistsError';
     error.status = 400;
-    error.message = 'Project name already exists';
+    error.message = 'Project title already exists';
     throw error;
   }
-  // Check if project code exists
-  if (code) {
-    const projectCodeExists = await getByField(Project, 'code', code);
-    if (projectCodeExists) {
-      const error = new Error('Project code already exists');
-      error.name = 'ProjectCodeExistsError';
-      error.status = 400;
-      throw error;
-    }
+
+  const projectCodeExists = await doesProjectCodeExist(code);
+  if (projectCodeExists) {
+    const error = new Error('Project code already exists');
+    error.name = 'ProjectCodeExistsError';
+    error.status = 400;
+    error.message = 'Project code already exists';
+    throw error;
   }
+
   const project = await Project.create({
     title,
     owner,
@@ -120,7 +145,45 @@ const create = async (userQuery) => {
   return project;
 };
 
+const assignUserToProject = async (projectId, userId) => {
+  const project = await doesProjectExist(projectId);
+  if (!project) {
+    const error = new Error('Project not found');
+    error.name = 'ProjectNotFoundError';
+    error.status = 404;
+    error.message = 'Project does not exist';
+    throw error;
+  }
+
+  const userExists = await doesUserExist(userId);
+  if (!userExists) {
+    const error = new Error('User not found');
+    error.name = 'UserNotFoundError';
+    error.status = 404;
+    error.message = 'User does not exist';
+    throw error;
+  }
+
+  const userAssigned = await isUserAssignedToProject(projectId, userId);
+  if (userAssigned) {
+    const error = new Error('User already assigned to project');
+    error.name = 'UserAlreadyAssignedError';
+    error.status = 400;
+    error.message = 'User is already assigned to this project';
+    throw error;
+  }
+
+  const projectUser = await ProjectUser.create({
+    projectId,
+    userId
+  });
+
+  return projectUser;
+};
+
 module.exports = {
   create,
-  list
+  list,
+  getByOwner,
+  assignUserToProject
 };

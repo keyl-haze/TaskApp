@@ -19,7 +19,28 @@ const list = promiseController(async (req) => {
   };
 });
 
+const getByOwner = promiseController(async (req) => {
+  const projects = await service.getByOwner(req.params.owner);
+  return {
+    status: 200,
+    message: 'Projects fetched successfully',
+    data: projects
+  };
+});
+
+const assignUserToProject = promiseController(async (req) => {
+  const { projectId, userId } = req.params;
+  const projectUser = await service.assignUserToProject(projectId, userId);
+  return {
+    status: 201,
+    message: 'User assigned to project successfully',
+    data: projectUser
+  };
+});
+
 module.exports = {
   create,
-  list
+  list,
+  getByOwner,
+  assignUserToProject
 };
