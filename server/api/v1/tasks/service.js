@@ -131,6 +131,7 @@ const create = async (data) => {
   }
 
   validateStatus(data);
+  validateTaskData(data);
 
   const newTask = await Task.create({
     title,
@@ -167,6 +168,7 @@ const update = async (id, updates, mode = 'patch') => {
   ];
 
   validateStatus(updates.status);
+  validateTaskData(updates);
 
   let filteredUpdates = {};
 
