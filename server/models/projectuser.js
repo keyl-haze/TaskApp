@@ -16,8 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
-  Project -
-    user.init(
+  ProjectUser.init(
       {
         userId: {
           type: DataTypes.INTEGER,
@@ -38,8 +37,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       {
         sequelize,
-        modelName: 'Project-user'
+        modelName: 'ProjectUser'
       }
     );
-  return Project - user;
+  return ProjectUser;
 };
