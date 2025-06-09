@@ -1,4 +1,4 @@
-const { buildWhereFilter } = require('../utils/queries');
+const { userWhereFilter, buildOrder } = require('../utils/queries');
 const { Op } = require('sequelize');
 const {
   doesEmailExist,
@@ -6,6 +6,7 @@ const {
   hashPassword,
   isUsernameValid
 } = require('../utils/account');
+const { sequelize } = require('../../../models');
 const { User } = require(`${__serverRoot}/models`);
 const _validQueryProps = [
   'id',
@@ -16,17 +17,32 @@ const _validQueryProps = [
   'username',
   'role'
 ];
+const orderTypes = {
+  id: 'STRING',
+  name: 'STRING',
+  firstName: 'STRING',
+  lastName: 'STRING',
+  email: 'STRING',
+  username: 'STRING',
+  role: 'ENUM',
+  deletedAt: 'TIMESTAMP',
+  createdAt: 'TIMESTAMP',
+  updatedAt: 'TIMESTAMP'
+};
 
 const list = async (query) => {
-  const { deleted, all, ...otherQuery } = query;
+  const { deleted, all, search, ...otherQuery } = query;
 
-  const where = buildWhereFilter(
-    _validQueryProps,
-    otherQuery.filter,
-    User.name
-  );
+  if (search && typeof search === 'string' && search.trim()) {
+    if (!otherQuery.filter) otherQuery.filter = {};
+    otherQuery.filter.search = search.trim();
+  }
 
-  let findOptions = { where };
+  const where = userWhereFilter(_validQueryProps, otherQuery.filter, User.name);
+  const order = query.order || ['email'];
+  const orderQuery = sequelize.literal(buildOrder({}, order, orderTypes));
+
+  let findOptions = { where, order: orderQuery };
 
   if (all === 'true') {
     // Return all users, including soft-deleted

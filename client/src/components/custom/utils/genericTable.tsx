@@ -26,7 +26,8 @@ export default function GenericTable<T extends { id: number }>({
   columnFilters,
   setColumnFilters,
   globalFilter,
-  setGlobalFilter
+  setGlobalFilter,
+  headerClassName
 }: GenericTableProps<T>) {
   const table = useReactTable({
     data,
@@ -48,7 +49,7 @@ export default function GenericTable<T extends { id: number }>({
   return (
     <div className="rounded-lg border overflow-x-auto w-full">
       <Table className="min-w-[600px] w-full">
-        <TableHeader>
+        <TableHeader className={headerClassName}>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (

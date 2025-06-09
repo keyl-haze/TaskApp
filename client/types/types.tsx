@@ -8,3 +8,27 @@ export interface User {
   email: string
   deletedAt?: string | null
 }
+
+export interface Task {
+  id: number
+  title: string
+  description: string
+  type: 'bug' | 'feature' | 'task'
+  priority: 'low' | 'medium' | 'high'
+  status: 'to_do' | 'in_progress' | 'done' | 'archived'
+  Reporter: {
+    id: number
+    username: string
+    email: string
+    firstName: string
+    lastName: string
+  }
+  Assignee: {
+    id: number
+    username: string
+    email: string
+    firstName: string
+    lastName: string
+  } | null
+  deletedAt: string | null
+}

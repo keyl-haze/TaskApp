@@ -3,11 +3,10 @@
 import AuthLayout from '@/app/layouts/authLayout'
 import { USER_API } from '@/routes/user'
 import type { User as UserType } from '@/../types/types'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Search } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -45,6 +44,7 @@ export default function UsersPage() {
     { id: string; value: string }[]
   >([])
   const [globalFilter, setGlobalFilter] = useState('')
+
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState<FilterValue>({
     status: ['Active'],
@@ -52,45 +52,58 @@ export default function UsersPage() {
   })
 
   // * Fetch users from the API
-  const fetchUsers = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await fetch(`${USER_API.list}?all=true`)
-      const json = await res.json()
-      if (json.status === 'success') {
-        // * Map the users to the frontend
-        const mappedUsers: User[] = json.data.map((users: UserType) => ({
-          ...users,
-          name: `${users.firstName} ${users.lastName}`,
-          initials:
-            `${users.firstName[0] ?? ''}${users.lastName[0] ?? ''}`.toUpperCase(),
-          status: users.deletedAt ? 'Inactive' : 'Active',
-          avatarSrc: undefined
-        }))
-        setUsers(mappedUsers)
-      } else {
-        setError(json.message || 'Failed to fetch users')
+  const fetchUsers = useCallback(
+    async (searchValue = globalFilter, filterValue = filters) => {
+      setLoading(true)
+      setError(null)
+      try {
+        let url = `${USER_API.list}?all=true`
+        if (searchValue.trim()) {
+          const encoded = encodeURIComponent(searchValue.trim())
+          url +=
+            `&filter[firstName][iLike]=${encoded}` +
+            `&filter[lastName][iLike]=${encoded}` +
+            `&filter[email][iLike]=${encoded}` +
+            `&filter[username][iLike]=${encoded}`
+        }
+        if (filterValue.role && filterValue.role.length > 0) {
+          url += `&filter[role][eq]=${encodeURIComponent(filterValue.role.join(','))}`
+        }
+        if (filterValue.status && filterValue.status.length > 0) {
+          url += `&filter[status][eq]=${encodeURIComponent(filterValue.status.join(','))}`
+        }
+        const res = await fetch(url)
+        const json = await res.json()
+        if (json.status === 'success') {
+          // * Map the users to the frontend
+          const mappedUsers: User[] = json.data.map((users: UserType) => ({
+            ...users,
+            name: `${users.firstName} ${users.lastName}`,
+            initials:
+              `${users.firstName[0] ?? ''}${users.lastName[0] ?? ''}`.toUpperCase(),
+            status: users.deletedAt ? 'Inactive' : 'Active',
+            avatarSrc: undefined
+          }))
+          setUsers(mappedUsers)
+        } else {
+          setError(json.message || 'Failed to fetch users')
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message || 'Failed to fetch users')
+        } else {
+          setError('Failed to fetch users')
+        }
+      } finally {
+        setLoading(false)
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError(error.message || 'Failed to fetch users')
-      } else {
-        setError('Failed to fetch users')
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
+    },
+    [filters, globalFilter]
+  )
 
   useEffect(() => {
-    fetchUsers()
-  }, [refreshFlag])
-
-  // * Reset to first page if users change, search, or filters change
-  useEffect(() => {
-    setCurrentPage(1)
-  }, [users.length, globalFilter, filters.role, filters.status])
+    fetchUsers(globalFilter)
+  }, [refreshFlag, fetchUsers, globalFilter])
 
   const handleUserCreated = () => setRefreshFlag((prev) => prev + 1)
   const handleUserUpdated = () => setRefreshFlag((prev) => prev + 1)
@@ -147,28 +160,6 @@ export default function UsersPage() {
   // * Columns for the data table
   const columns: ColumnDef<User>[] = [
     {
-      id: 'select',
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getFilteredRowModel().rows.length > 0 &&
-            selectedUsers.length === table.getFilteredRowModel().rows.length
-          }
-          onCheckedChange={toggleSelectAll}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={selectedUsers.includes(row.original.id)}
-          onCheckedChange={() => toggleSelectUser(row.original.id)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false
-    },
-    {
       accessorKey: 'name',
       header: 'Users',
       cell: ({ row }) => {
@@ -193,26 +184,40 @@ export default function UsersPage() {
       header: 'Status',
       cell: ({ row }) => {
         const user = row.original
+        const statusConfig = {
+          Active: {
+            variant: 'default' as const,
+            className:
+              'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
+            dotColor: 'bg-emerald-500',
+            icon: '●'
+          },
+          Wait: {
+            variant: 'secondary' as const,
+            className:
+              'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
+            dotColor: 'bg-amber-500',
+            icon: '●'
+          },
+          Inactive: {
+            variant: 'outline' as const,
+            className:
+              'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100',
+            dotColor: 'bg-slate-400',
+            icon: '●'
+          }
+        }
+
+        const config = statusConfig[user.status]
+
         return (
           <Badge
-            variant="outline"
-            className={`rounded-full px-2 py-0.5 text-xs font-normal ${
-              user.status === 'Active'
-                ? 'bg-green-50 text-green-700 border-green-200'
-                : user.status === 'Wait'
-                  ? 'bg-amber-50 text-amber-700 border-amber-200'
-                  : 'bg-gray-100 text-gray-700 border-gray-200'
-            }`}
+            variant={config.variant}
+            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${config.className}`}
           >
-            {user.status === 'Active' && (
-              <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-green-500"></span>
-            )}
-            {user.status === 'Wait' && (
-              <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-            )}
-            {user.status === 'Inactive' && (
-              <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-gray-500"></span>
-            )}
+            <span
+              className={`mr-2 inline-block h-2 w-2 rounded-full ${config.dotColor}`}
+            ></span>
             {user.status}
           </Badge>
         )
@@ -222,13 +227,54 @@ export default function UsersPage() {
       accessorKey: 'role',
       header: 'Role',
       cell: ({ row }) => {
-        const roleMap: Record<string, string> = {
-          super_admin: 'Super Admin',
-          admin: 'Admin',
-          manager: 'Manager',
-          viewer: 'Viewer'
+        const roleConfig: Record<
+          string,
+          {
+            label: string
+            className: string
+            variant: 'default' | 'secondary' | 'outline'
+          }
+        > = {
+          super_admin: {
+            label: 'Super Admin',
+            className:
+              'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100',
+            variant: 'outline'
+          },
+          admin: {
+            label: 'Admin',
+            className:
+              'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
+            variant: 'outline'
+          },
+          manager: {
+            label: 'Manager',
+            className:
+              'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100',
+            variant: 'outline'
+          },
+          viewer: {
+            label: 'Viewer',
+            className:
+              'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100',
+            variant: 'outline'
+          }
         }
-        return roleMap[row.original.role] || row.original.role
+
+        const config = roleConfig[row.original.role] || {
+          label: row.original.role,
+          className: 'bg-gray-50 text-gray-600 border-gray-200',
+          variant: 'outline' as const
+        }
+
+        return (
+          <Badge
+            variant={config.variant}
+            className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${config.className}`}
+          >
+            {config.label}
+          </Badge>
+        )
       }
     },
     {
@@ -278,13 +324,19 @@ export default function UsersPage() {
                 placeholder="SEARCH..."
                 className="w-full pl-8 focus-visible:ring-0"
                 value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)}
+                onChange={(e) => {
+                  setGlobalFilter(e.target.value)
+                  setRefreshFlag((prev) => prev + 1)
+                }}
               />
             </div>
             <div className="flex gap-2">
               <FilterPopover
-                onFilterChange={setFilters}
                 activeFilters={filters}
+                onFilterChange={(newFilters) => {
+                  setFilters(newFilters)
+                  fetchUsers(globalFilter, newFilters)
+                }}
               />
               <AddUser onUserCreated={handleUserCreated} />
             </div>
@@ -323,6 +375,7 @@ export default function UsersPage() {
               setColumnFilters={setColumnFilters}
               globalFilter={globalFilter}
               setGlobalFilter={setGlobalFilter}
+              headerClassName={'bg-gray-100/90 dark:bg-gray-800'}
             />
           )}
 

@@ -1,6 +1,6 @@
-const API_BASE = 'http://localhost:8080/api/v1/users'
+const API_BASE = 'http://localhost:8080/api/v1/tasks'
 
-export const USER_API = {
+export const TASK_API = {
   list: `${API_BASE}`,
   create: `${API_BASE}`,
   get: (id: string) => `${API_BASE}/${id}`,

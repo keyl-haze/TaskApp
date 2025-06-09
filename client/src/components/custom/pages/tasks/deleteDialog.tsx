@@ -1,9 +1,12 @@
 'use client'
 
-import { AlertDialogTrigger } from '@/components/ui/alert-dialog'
-
+import { TASK_API } from '@/routes/task'
+import { Task } from '@/types/types'
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import {
+  showErrorToast,
+  showSuccessToast
+} from '@/components/custom/utils/errorSonner'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,64 +15,60 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle
+  AlertDialogTitle,
+  AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
-import { USER_API } from '@/routes/user'
-import {
-  showErrorToast,
-  showSuccessToast
-} from '@/components/custom/utils/errorSonner'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
-import { Trash2, AlertTriangle } from 'lucide-react'
-import { type User } from '@/types/types'
+import { Button } from '@/components/ui/button'
+import { AlertTriangle, Trash2 } from 'lucide-react'
 
-interface DeleteUserDialogProps {
-  user: User
-  onUserDeleted?: () => void
+interface DeleteTaskDialogProps {
+  task: Task
+  onTaskDeleted?: () => void
 }
 
-export default function DeleteUserDialog({
-  user,
-  onUserDeleted
-}: DeleteUserDialogProps) {
+export default function DeleteTaskDialog({
+  task,
+  onTaskDeleted
+}: DeleteTaskDialogProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const handleDelete = async () => {
-    if (!user) return
+    if (!task) return
 
     setLoading(true)
 
     try {
-      const res = await fetch(USER_API.delete(String(user.id)), {
+      const res = await fetch(TASK_API.delete(String(task.id)), {
         method: 'DELETE'
       })
       const json = await res.json()
 
       if (res.ok) {
-        showSuccessToast('User deleted successfully!')
-        if (onUserDeleted) onUserDeleted()
+        showSuccessToast('Task deleted successfully!')
+        if (onTaskDeleted) onTaskDeleted()
         setOpen(false)
       } else {
-        showErrorToast(json.message || 'Failed to delete user')
+        showErrorToast(json.message || 'Failed to delete task')
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        showErrorToast(err.message || 'Failed to delete user')
+        showErrorToast(err.message || 'Failed to delete task')
       } else {
-        showErrorToast('Failed to delete user')
+        showErrorToast('Failed to delete task')
       }
     } finally {
       setLoading(false)
     }
   }
 
-  const userName = `${user.firstName} ${user.lastName}`.trim()
+  const taskName = `${task.title}`.trim()
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -86,7 +85,7 @@ export default function DeleteUserDialog({
                 <Trash2 className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Remove User</TooltipContent>
+            <TooltipContent>Remove Task</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </AlertDialogTrigger>
@@ -98,7 +97,7 @@ export default function DeleteUserDialog({
             </div>
             <div>
               <AlertDialogTitle className="text-lg font-semibold">
-                Remove User
+                Remove Task
               </AlertDialogTitle>
               <AlertDialogDescription className="text-sm text-muted-foreground">
                 This action cannot be undone easily.
@@ -109,7 +108,7 @@ export default function DeleteUserDialog({
         <div className="py-4">
           <AlertDialogDescription className="text-sm">
             Are you sure you want to remove{' '}
-            <span className="font-semibold text-foreground">{userName}</span>?
+            <span className="font-semibold text-foreground">{taskName}</span>
           </AlertDialogDescription>
           <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 p-3">
             <div className="flex items-start gap-2">
@@ -117,8 +116,7 @@ export default function DeleteUserDialog({
               <div className="text-sm text-amber-800">
                 <p className="font-medium">This will:</p>
                 <ul className="mt-1 list-disc list-inside space-y-1 text-xs">
-                  <li>Soft delete the user (can be restored later)</li>
-                  <li>Revoke their access to the system immediately</li>
+                  <li>Soft delete the task (can be restored later)</li>
                   <li>Preserve their data for potential restoration</li>
                 </ul>
               </div>
