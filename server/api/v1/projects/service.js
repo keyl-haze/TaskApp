@@ -7,6 +7,7 @@ const {
   doesUserExist,
   isUserAssignedToProject
 } = require('../utils/projects');
+const project = require('../../../models/project');
 
 const _validQueryProps = [
   'id',
@@ -101,6 +102,15 @@ const getByOwner = async (ownerId) => {
       }
     ]
   });
+
+  if (!projects || projects.length === 0) {
+    const error = new Error('No projects have been authored by this user');
+    error.name = 'NoProjectsFoundError';
+    error.status = 404;
+    error.message = 'No projects have been authored by this user';
+    throw error;
+  }
+
   return projects;
 };
 
@@ -188,7 +198,7 @@ const assignUserToProject = async (projectId, userId) => {
   return projectUser;
 };
 
-const listProjectsByUser = async (userId) => {
+const listProjectsOfUser = async (userId) => {
   const user = await doesUserExist(userId);
   if (!user) {
     const error = new Error('User not found');
@@ -217,20 +227,55 @@ const listProjectsByUser = async (userId) => {
   });
 
   if (!projects || projects.length === 0) {
-    const error = new Error('No projects found for this user');
+    const error = new Error('No projects found assigned to this user');
     error.name = 'NoProjectsFoundError';
     error.status = 404;
-    error.message = 'No projects found for the specified user';
+    error.message = 'No projects found assigned to this user';
     throw error;
   }
-  
+
   return projects;
 };
+
+const listMembersOfProject = async (projectId) => {
+  const project = await doesProjectExist(projectId);
+  if (!project) {
+    const error = new Error('Project not found');
+    error.name = 'ProjectNotFoundError';
+    error.status = 404;
+    error.message = 'Project does not exist';
+    throw error;
+  }
+
+  const members = await User.findAll({
+    include: [
+      {
+        model: ProjectUser,
+        as: 'ProjectAssignments',
+        where: { projectId },
+        required: true,
+        attributes: ['userId', 'projectId', 'createdAt']
+      }
+    ],
+    order: [['username', 'ASC']]
+  });
+
+  if (!members || members.length === 0) {
+    const error = new Error('No members found for this project');
+    error.name = 'NoMembersFoundError';
+    error.status = 404;
+    error.message = 'No members found for this project';
+    throw error;
+  }
+
+  return members;
+}
 
 module.exports = {
   create,
   list,
   getByOwner,
   assignUserToProject,
-  listProjectsByUser
+  listProjectsOfUser,
+  listMembersOfProject
 };
