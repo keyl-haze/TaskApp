@@ -7,5 +7,7 @@ router.get('/owner/:owner', controller.getByOwner);
 router.post('/:projectId/users/:userId', controller.assignUserToProject);
 router.get('/users/:userId', controller.listProjectsOfUser);
 router.get('/:projectId/members', controller.listMembersOfProject);
+router.put('/:id', controller.update);
+router.patch('/:id', controller.update);
 
 module.exports = router;

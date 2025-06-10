@@ -58,11 +58,23 @@ const listMembersOfProject = promiseController(async (req) => {
   };
 });
 
+const update = promiseController(async (req) => {
+  const mode = req.updateMode || 'patch';
+  const project = await service.update(req.params.id, req.body, mode);
+
+  return {
+    status: 200,
+    message: 'Project updated successfully',
+    data: project
+  };
+});
+
 module.exports = {
   create,
   list,
   getByOwner,
   assignUserToProject,
   listProjectsOfUser,
-  listMembersOfProject
+  listMembersOfProject,
+  update
 };

@@ -7,7 +7,6 @@ const {
   doesUserExist,
   isUserAssignedToProject
 } = require('../utils/projects');
-const project = require('../../../models/project');
 
 const _validQueryProps = [
   'id',
@@ -269,7 +268,70 @@ const listMembersOfProject = async (projectId) => {
   }
 
   return members;
-}
+};
+
+const update = async (id, updates, mode = 'patch') => {
+  const project = await Project.findByPk(id);
+  if (!project) {
+    const error = new Error('Project not found');
+    error.name = 'ProjectNotFoundError';
+    error.status = 404;
+    error.message = 'Project does not exist';
+    error.details = { id };
+    throw error;
+  }
+
+  const allowedFields = [
+    'title',
+    'owner',
+    'code',
+    'description',
+    'start',
+    'end',
+    'status'
+  ];
+
+  // Validate unique title if changed
+  if (updates.title && updates.title !== project.title) {
+    if (await doesProjectTitleExist(updates.title)) {
+      throw new Error('Project title already exists');
+    }
+  }
+  // Validate unique code if changed
+  if (updates.code && updates.code !== project.code) {
+    if (await doesProjectCodeExist(updates.code)) {
+      throw new Error('Project code already exists');
+    }
+  }
+
+  let filteredUpdates = {};
+
+  if (mode === 'PUT') {
+    for (const field of allowedFields) {
+      filteredUpdates[field] = updates.hasOwnProperty(field)
+        ? updates[field]
+        : null;
+    }
+  } else {
+    for (const field of allowedFields) {
+      if (updates.hasOwnProperty(field)) {
+        filteredUpdates[field] = updates[field];
+      }
+    }
+  }
+
+  await project.update(filteredUpdates);
+
+  return await Project.findByPk(id, {
+    include: [
+      {
+        model: User,
+        as: 'Owner',
+        attributes: ['id', 'username', 'email', 'firstName', 'lastName']
+      }
+    ]
+  });
+};
 
 module.exports = {
   create,
@@ -277,5 +339,6 @@ module.exports = {
   getByOwner,
   assignUserToProject,
   listProjectsOfUser,
-  listMembersOfProject
+  listMembersOfProject,
+  update
 };
