@@ -197,6 +197,41 @@ const assignUserToProject = async (projectId, userId) => {
   return projectUser;
 };
 
+const assignMultipleUsersToProject = async (projectId, userIds) => {
+  const project = await doesProjectExist(projectId);
+  if (!project) {
+    const error = new Error('Project not found');
+    error.name = 'ProjectNotFoundError';
+    error.status = 404;
+    error.message = 'Project does not exist';
+    throw error;
+  }
+
+  if (!Array.isArray(userIds) || userIds.length === 0) {
+    const error = new Error('No user IDs provided');
+    error.name = 'InvalidUserIdsError';
+    error.status = 400;
+    throw error;
+  }
+
+  const results = [];
+  for (const userId of userIds) {
+    const userExists = await doesUserExist(userId);
+    if (!userExists) {
+      results.push({userId, status: 'failed', reason: 'User does not exist'});
+      continue;
+    }
+    const alreadyAssigned = await isUserAssignedToProject(projectId, userId);
+    if (alreadyAssigned) {
+      results.push({ userId, status: 'skipped', reason: 'Already assigned' });
+      continue;
+    }
+    await ProjectUser.create({ projectId, userId });
+    results.push({ userId, status: 'assigned' });
+  }
+  return results;
+};
+
 const listProjectsOfUser = async (userId) => {
   const user = await doesUserExist(userId);
   if (!user) {
@@ -338,6 +373,7 @@ module.exports = {
   list,
   getByOwner,
   assignUserToProject,
+  assignMultipleUsersToProject,
   listProjectsOfUser,
   listMembersOfProject,
   update

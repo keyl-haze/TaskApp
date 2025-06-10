@@ -38,6 +38,17 @@ const assignUserToProject = promiseController(async (req) => {
   };
 });
 
+const assignMultipleUsersToProject = promiseController(async (req) => {
+  const { projectId } = req.params;
+  const { userIds } = req.body;
+  const result = await service.assignMultipleUsersToProject(projectId, userIds);
+  return {
+    status: 201,
+    message: 'Users assigned to project successfully',
+    data: result
+  };
+});
+
 const listProjectsOfUser = promiseController(async (req) => {
   const { userId } = req.params;
   const projects = await service.listProjectsByUser(userId);
@@ -74,6 +85,7 @@ module.exports = {
   list,
   getByOwner,
   assignUserToProject,
+  assignMultipleUsersToProject,
   listProjectsOfUser,
   listMembersOfProject,
   update

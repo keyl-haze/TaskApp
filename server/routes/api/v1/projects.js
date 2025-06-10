@@ -5,6 +5,7 @@ router.post('/', controller.create);
 router.get('/', controller.list);
 router.get('/owner/:owner', controller.getByOwner);
 router.post('/:projectId/users/:userId', controller.assignUserToProject);
+router.post('/:projectId/users', controller.assignMultipleUsersToProject);
 router.get('/users/:userId', controller.listProjectsOfUser);
 router.get('/:projectId/members', controller.listMembersOfProject);
 router.put('/:id', controller.update);
