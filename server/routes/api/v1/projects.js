@@ -10,5 +10,6 @@ router.get('/users/:userId', controller.listProjectsOfUser);
 router.get('/:projectId/members', controller.listMembersOfProject);
 router.put('/:id', controller.update);
 router.patch('/:id', controller.update);
+router.delete('/:id', controller.softDelete);
 
 module.exports = router;

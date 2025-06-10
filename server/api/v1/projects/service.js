@@ -218,7 +218,7 @@ const assignMultipleUsersToProject = async (projectId, userIds) => {
   for (const userId of userIds) {
     const userExists = await doesUserExist(userId);
     if (!userExists) {
-      results.push({userId, status: 'failed', reason: 'User does not exist'});
+      results.push({ userId, status: 'failed', reason: 'User does not exist' });
       continue;
     }
     const alreadyAssigned = await isUserAssignedToProject(projectId, userId);
@@ -368,6 +368,37 @@ const update = async (id, updates, mode = 'patch') => {
   });
 };
 
+const softDelete = async (id) => {
+  const project = await doesProjectExist(id);
+  if (!project) {
+    const error = new Error('Project not found');
+    error.name = 'ProjectNotFoundError';
+    error.status = 404;
+    error.message = 'Project does not exist';
+    throw error;
+  }
+
+  if (project.deletedAt) {
+    const error = new Error('Project already moved to trash');
+    error.name = 'ProjectAlreadyDeletedError';
+    error.status = 400;
+    error.message = 'Project has already been moved to trash';
+    throw error;
+  }
+  const originalStatus =
+    project.status !== 'archived'
+      ? project.status
+      : project.originalStatus || 'to_do';
+
+  await project.update({
+    status: 'archived',
+    originalStatus: originalStatus
+  });
+
+  await project.destroy();
+  return project;
+};
+
 module.exports = {
   create,
   list,
@@ -376,5 +407,6 @@ module.exports = {
   assignMultipleUsersToProject,
   listProjectsOfUser,
   listMembersOfProject,
-  update
+  update,
+  softDelete
 };

@@ -80,6 +80,15 @@ const update = promiseController(async (req) => {
   };
 });
 
+const softDelete = promiseController(async (req) => {
+  const { id } = req.params;
+  await service.softDelete(id);
+  return {
+    status: 204,
+    message: 'Project deleted successfully'
+  };
+});
+
 module.exports = {
   create,
   list,
@@ -88,5 +97,6 @@ module.exports = {
   assignMultipleUsersToProject,
   listProjectsOfUser,
   listMembersOfProject,
-  update
+  update,
+  softDelete
 };
