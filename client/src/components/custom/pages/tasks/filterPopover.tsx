@@ -47,7 +47,7 @@ const statusOptions = [
   { value: 'to_do', label: 'To Do' },
   { value: 'in_progress', label: 'In Progress' },
   { value: 'done', label: 'Done' },
-  { value: 'archived', label: 'Archived' }
+  { value: 'archived', label: 'In Trash' }
 ]
 
 export default function FilterPopover({

@@ -1,6 +1,6 @@
 const { Task, User } = require('../../../models');
 const { taskWhereFilter, buildOrder } = require('../utils/queries');
-const { validateStatus, validateTaskData } = require('../utils/tasks');
+const { validateTaskData } = require('../utils/tasks');
 
 const _validQueryProps = [
   'id',
@@ -130,7 +130,6 @@ const create = async (data) => {
     throw error;
   }
 
-  validateStatus(data);
   validateTaskData(data);
 
   const newTask = await Task.create({
@@ -167,7 +166,6 @@ const update = async (id, updates, mode = 'patch') => {
     'assignee'
   ];
 
-  validateStatus(updates.status);
   validateTaskData(updates);
 
   let filteredUpdates = {};

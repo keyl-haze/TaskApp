@@ -29,8 +29,7 @@ import {
   Sparkles,
   CircleDashed,
   Loader,
-  CircleCheckBig,
-  Archive
+  CircleCheckBig
 } from 'lucide-react'
 import { TASK_API } from '@/routes/task'
 import { USER_API } from '@/routes/user'
@@ -55,7 +54,7 @@ interface FormData {
   description: string
   type: 'bug' | 'feature' | 'task'
   priority: 'low' | 'medium' | 'high'
-  status: 'to_do' | 'in_progress' | 'done' | 'archived'
+  status: 'to_do' | 'in_progress' | 'done'
   reporter: string
   assignee: string
 }
@@ -84,7 +83,7 @@ interface PriorityOption {
 }
 
 interface StatusOption {
-  value: 'to_do' | 'in_progress' | 'done' | 'archived'
+  value: 'to_do' | 'in_progress' | 'done'
   icon?: React.ElementType
   label: string
   textColor: string
@@ -125,12 +124,6 @@ const statusOptions: StatusOption[] = [
     label: 'Done',
     icon: CircleCheckBig,
     textColor: 'text-green-600'
-  },
-  {
-    value: 'archived',
-    label: 'Archived',
-    icon: Archive,
-    textColor: 'text-gray-600'
   }
 ]
 

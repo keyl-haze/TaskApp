@@ -85,7 +85,7 @@ export default function DeleteTaskDialog({
                 <Trash2 className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Remove Task</TooltipContent>
+            <TooltipContent>Trash</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </AlertDialogTrigger>
@@ -97,7 +97,7 @@ export default function DeleteTaskDialog({
             </div>
             <div>
               <AlertDialogTitle className="text-lg font-semibold">
-                Remove Task
+                Move Task to Trash
               </AlertDialogTitle>
               <AlertDialogDescription className="text-sm text-muted-foreground">
                 This action cannot be undone easily.
@@ -107,8 +107,9 @@ export default function DeleteTaskDialog({
         </AlertDialogHeader>
         <div className="py-4">
           <AlertDialogDescription className="text-sm">
-            Are you sure you want to remove{' '}
+            Are you sure you want to move{' '}
             <span className="font-semibold text-foreground">{taskName}</span>
+            {' '}to the trash?
           </AlertDialogDescription>
           <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 p-3">
             <div className="flex items-start gap-2">
