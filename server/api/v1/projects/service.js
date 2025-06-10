@@ -181,9 +181,34 @@ const assignUserToProject = async (projectId, userId) => {
   return projectUser;
 };
 
+const listProjectsByUser = async (userId) => {
+  const user = await doesUserExist(userId);
+  if (!user) {
+    const error = new Error('User not found');
+    error.name = 'UserNotFoundError';
+    error.status = 404;
+    error.message = 'User does not exist';
+    throw error;
+  }
+
+  const projects = await Project.findAll({
+    include: [
+      {
+        model: ProjectUser,
+        where: { userId },
+        required: true
+      }
+    ],
+    order: [['title', 'ASC']]
+  });
+
+  return projects;
+}
+
 module.exports = {
   create,
   list,
   getByOwner,
-  assignUserToProject
+  assignUserToProject,
+  listProjectsByUser,
 };
