@@ -1,4 +1,5 @@
 const { Project, ProjectUser, User } = require(`${__serverRoot}/models`);
+const { buildOrder} = require('../utils/queries');
 const {
   doesProjectTitleExist,
   doesProjectCodeExist,
@@ -32,6 +33,11 @@ const orderTypes = {
   updatedAt: 'TIMESTAMP'
 };
 
+const associatedAliases = {
+  owner: 'Owner',
+  projectUsers: 'ProjectUsers'
+};
+
 const list = async (query) => {
   const { deleted, all, ...otherQuery } = query;
 
@@ -47,8 +53,9 @@ const list = async (query) => {
     const orderString = Array.isArray(query.order)
       ? query.order[0]
       : query.order;
-    orderQuery = orderString
-      ? Project.sequelize.literal(orderString, orderTypes)
+    const orderClause = buildOrder(associatedAliases, orderString, orderTypes);
+    orderQuery = orderClause
+      ? Project.sequelize.literal(orderClause)
       : [['title', 'ASC']];
   } else {
     // Default order
@@ -60,9 +67,10 @@ const list = async (query) => {
     include: [
       {
         model: User,
-        as: 'Owner',
+        as: associatedAliases.owner,
         attributes: ['id', 'username', 'email', 'firstName', 'lastName']
-      }
+      },
+      
     ],
     order: orderQuery
   };
