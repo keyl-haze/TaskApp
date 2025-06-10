@@ -1,5 +1,5 @@
 const { Project, ProjectUser, User } = require(`${__serverRoot}/models`);
-const { buildOrder} = require('../utils/queries');
+const { buildOrder } = require('../utils/queries');
 const {
   doesProjectTitleExist,
   doesProjectCodeExist,
@@ -69,8 +69,7 @@ const list = async (query) => {
         model: User,
         as: associatedAliases.owner,
         attributes: ['id', 'username', 'email', 'firstName', 'lastName']
-      },
-      
+      }
     ],
     order: orderQuery
   };
@@ -202,21 +201,36 @@ const listProjectsByUser = async (userId) => {
   const projects = await Project.findAll({
     include: [
       {
+        model: User,
+        as: 'Owner',
+        attributes: ['id', 'username', 'email', 'firstName', 'lastName']
+      },
+      {
         model: ProjectUser,
+        as: 'ProjectAssignments',
         where: { userId },
-        required: true
+        required: true,
+        attributes: ['userId', 'projectId', 'createdAt']
       }
     ],
     order: [['title', 'ASC']]
   });
 
+  if (!projects || projects.length === 0) {
+    const error = new Error('No projects found for this user');
+    error.name = 'NoProjectsFoundError';
+    error.status = 404;
+    error.message = 'No projects found for the specified user';
+    throw error;
+  }
+  
   return projects;
-}
+};
 
 module.exports = {
   create,
   list,
   getByOwner,
   assignUserToProject,
-  listProjectsByUser,
+  listProjectsByUser
 };

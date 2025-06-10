@@ -14,11 +14,13 @@ module.exports = (sequelize, DataTypes) => {
       });
       Project.belongsToMany(models.User, {
         foreignKey: 'projectId',
-        through: models.ProjectUser.tableName
+        through: models.ProjectUser,
+        otherKey: 'userId',
+        as: 'Members'
       });
       Project.hasMany(models.ProjectUser, {
         foreignKey: 'projectId',
-        as: 'ProjectUsers'
+        as: 'ProjectAssignments'
       });
     }
   }
