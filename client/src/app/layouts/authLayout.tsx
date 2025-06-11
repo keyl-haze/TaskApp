@@ -9,7 +9,7 @@ import {
   Mail,
   Bell,
   ListChecks,
-  FolderKanban
+  Rocket
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -68,7 +68,7 @@ const navigationItems = [
   {
     title: 'Projects',
     url: '/projects',
-    icon: FolderKanban
+    icon: Rocket
   }
 ]
 

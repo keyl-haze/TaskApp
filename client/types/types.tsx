@@ -32,3 +32,38 @@ export interface Task {
   } | null
   deletedAt: string | null
 }
+
+export interface Project {
+  id: number
+  code: string
+  title: string
+  description: string | null
+  owner: number
+  start: string | null
+  end: string | null
+  status: 'to_do' | 'in_progress' | 'done' | 'archived'
+  originalStatus: 'to_do' | 'in_progress' | 'done' | 'archived' | null
+  createdAt: string
+  updatedAt: string
+  deletedAt: string | null
+  Owner: {
+    id: number
+    username: string
+    email: string
+    firstName: string
+    lastName: string
+  }
+  Members?: {
+    id: number
+    username: string
+    email: string
+    firstName: string
+    lastName: string
+  }[]
+  ProjectAssignments?: {
+    userId: number
+    projectId: number
+    createdAt: string
+    updatedAt: string
+  }[]
+}
