@@ -266,6 +266,43 @@ const removeUserFromProject = async (projectId, userId) => {
   await assignment.destroy();
   return { projectId, userId, status: 'removed' };
 }
+const removeMultipleUsersFromProject = async (projectId, userIds) => {
+  const project = await doesProjectExist(projectId);
+  if (!project) {
+    const error = new Error('Project not found');
+    error.name = 'ProjectNotFoundError';
+    error.status = 404;
+    error.message = 'Project does not exist';
+    throw error;
+  }
+
+  if (!Array.isArray(userIds) || userIds.length === 0) {
+    const error = new Error('No user IDs provided');
+    error.name = 'InvalidUserIdsError';
+    error.status = 400;
+    throw error;
+  }
+
+  const results = [];
+  for (const userId of userIds) {
+    const userExists = await doesUserExist(userId);
+    if (!userExists) {
+      results.push({ userId, status: 'failed', reason: 'User does not exist' });
+      continue;
+    }
+    const assignment = await ProjectUser.findOne({
+      where: { projectId, userId }
+    });
+    if (!assignment) {
+      results.push({ userId, status: 'skipped', reason: 'Not assigned' });
+      continue;
+    }
+    await assignment.destroy();
+    results.push({ userId, status: 'removed' });
+  }
+
+  return results;
+}
 
 const listProjectsOfUser = async (userId) => {
   const user = await doesUserExist(userId);
@@ -441,6 +478,7 @@ module.exports = {
   assignUserToProject,
   assignMultipleUsersToProject,
   removeUserFromProject,
+  removeMultipleUsersFromProject,
   listProjectsOfUser,
   listMembersOfProject,
   update,
