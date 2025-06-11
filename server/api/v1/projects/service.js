@@ -232,6 +232,41 @@ const assignMultipleUsersToProject = async (projectId, userIds) => {
   return results;
 };
 
+const removeUserFromProject = async (projectId, userId) => {
+  const projecct = await doesProjectExist(projectId);
+  if (!projecct) {
+    const error = new Error('Project not found');
+    error.name = 'ProjectNotFoundError';
+    error.status = 404;
+    error.message = 'Project does not exist';
+    throw error;
+  }
+
+  const userExists = await doesUserExist(userId);
+  if (!userExists) {
+    const error = new Error('User not found');
+    error.name = 'UserNotFoundError';
+    error.status = 404;
+    error.message = 'User does not exist';
+    throw error;
+  }
+
+  const assignment = await ProjectUser.findOne({
+    where: { projectId, userId }
+  });
+
+  if (!assignment) {
+    const error = new Error('User not assigned to this project');
+    error.name = 'UserNotAssignedError';
+    error.status = 404;
+    error.message = 'User is not assigned to this project';
+    throw error;
+  }
+
+  await assignment.destroy();
+  return { projectId, userId, status: 'removed' };
+}
+
 const listProjectsOfUser = async (userId) => {
   const user = await doesUserExist(userId);
   if (!user) {
@@ -405,6 +440,7 @@ module.exports = {
   getByOwner,
   assignUserToProject,
   assignMultipleUsersToProject,
+  removeUserFromProject,
   listProjectsOfUser,
   listMembersOfProject,
   update,

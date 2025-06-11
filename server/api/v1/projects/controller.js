@@ -49,9 +49,19 @@ const assignMultipleUsersToProject = promiseController(async (req) => {
   };
 });
 
+const removeUserFromProject = promiseController(async (req) => {
+  const { projectId, userId } = req.params;
+  const result = await service.removeUserFromProject(projectId, userId);
+  return {
+    status: 200,
+    message: 'User removed from project successfully',
+    data: result
+  };
+});
+
 const listProjectsOfUser = promiseController(async (req) => {
   const { userId } = req.params;
-  const projects = await service.listProjectsByUser(userId);
+  const projects = await service.listProjectsOfUser(userId);
   return {
     status: 200,
     message: 'Projects fetched successfully',
@@ -95,6 +105,7 @@ module.exports = {
   getByOwner,
   assignUserToProject,
   assignMultipleUsersToProject,
+  removeUserFromProject,
   listProjectsOfUser,
   listMembersOfProject,
   update,
