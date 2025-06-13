@@ -441,7 +441,7 @@ const update = async (id, updates, mode = 'patch') => {
 };
 
 const softDelete = async (id) => {
-  const project = await doesProjectExist(id);
+  const project = await Project.findByPk(id);
   if (!project) {
     const error = new Error('Project not found');
     error.name = 'ProjectNotFoundError';

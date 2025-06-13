@@ -26,6 +26,7 @@ import { PROJECT_API } from '@/routes/project'
 import { type Project } from '@/types/types'
 import AddProjectDialog from '@/components/custom/pages/projects/addDialog'
 import EditProjectDialog from '@/components/custom/pages/projects/editDialog'
+import DeleteProjectDialog from '@/components/custom/pages/projects/deleteDialog'
 
 const PAGE_SIZE = 10
 
@@ -262,6 +263,10 @@ export default function ProjectsPage() {
             <EditProjectDialog
               project={project}
               onProjectUpdated={handleProjectCreated}
+            />
+            <DeleteProjectDialog
+              project={project}
+              onProjectDeleted={handleProjectCreated}
             />
           </div>
         )
