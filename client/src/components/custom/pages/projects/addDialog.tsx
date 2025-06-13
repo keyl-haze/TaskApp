@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { Calendar } from 'lucide-react'
+import { Calendar, PackagePlus } from 'lucide-react'
 import { format } from 'date-fns'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import {
@@ -39,6 +39,8 @@ import { cn } from '@/lib/utils'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { USER_API } from '@/routes/user'
 import { CircleDashed, Loader, CircleCheckBig } from 'lucide-react'
+import { TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Tooltip } from '@radix-ui/react-tooltip'
 
 interface AddProjectDialogProps {
   onProjectCreated?: () => void
@@ -189,10 +191,18 @@ export default function AddProjectDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" className="gap-2">
-          <span className="hidden sm:inline">Add Project</span>
-          <span className="sm:hidden">+</span>
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <PackagePlus className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent>Add New Project</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[550px] max-h-[85vh]">
         <DialogHeader>
@@ -299,7 +309,6 @@ export default function AddProjectDialog({
                           formData.start ? new Date(formData.start) : undefined
                         }
                         onSelect={(date) => handleDateChange('start', date)}
-                        initialFocus
                       />
                     </PopoverContent>
                   </Popover>
@@ -328,7 +337,6 @@ export default function AddProjectDialog({
                           formData.end ? new Date(formData.end) : undefined
                         }
                         onSelect={(date) => handleDateChange('end', date)}
-                        initialFocus
                       />
                     </PopoverContent>
                   </Popover>

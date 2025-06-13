@@ -8,7 +8,7 @@ import {
   CircleCheckBig,
   Archive,
   Calendar,
-  Box
+  Package
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -124,7 +124,7 @@ export default function ProjectsPage() {
               variant="secondary"
               className="bg-blue-50 text-blue-900 border-blue-200 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-100 dark:border-blue-800 dark:hover:bg-blue-900 gap-2"
             >
-              <Box className="h-3 w-3 text-purple-600 dark:text-purple-400" />
+              <Package className="h-3 w-3 text-purple-600 dark:text-purple-400" />
               <span>{project.code}</span>
             </Badge>
           </div>
