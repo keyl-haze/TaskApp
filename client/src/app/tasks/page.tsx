@@ -131,11 +131,8 @@ export default function TasksPage() {
     filters.status
   ])
 
-  const handleTaskCreated = () => setRefreshFlag((prev) => prev + 1)
-  const handleTaskUpdated = () => setRefreshFlag((prev) => prev + 1)
-  const handleTaskDeleted = () => setRefreshFlag((prev) => prev + 1)
-  const handleTaskRestored = () => setRefreshFlag((prev) => prev + 1)
-
+  const handleTaskChange = () => setRefreshFlag((prev) => prev + 1)
+  
   const toggleSelectTask = (taskId: number) => {
     setSelectedTasks((prev) =>
       prev.includes(taskId)
@@ -338,14 +335,14 @@ export default function TasksPage() {
             {isArchived ? (
               <RestoreTaskDialog
                 task={task}
-                onTaskRestored={handleTaskRestored}
+                onTaskRestored={handleTaskChange}
               />
             ) : (
               <>
-                <EditTaskDialog task={task} onTaskUpdated={handleTaskUpdated} />
+                <EditTaskDialog task={task} onTaskUpdated={handleTaskChange} />
                 <DeleteTaskDialog
                   task={task}
-                  onTaskDeleted={handleTaskDeleted}
+                  onTaskDeleted={handleTaskChange}
                 />
               </>
             )}
@@ -388,7 +385,7 @@ export default function TasksPage() {
                 }}
                 activeFilters={filters}
               />
-              <AddTaskDialog onTaskCreated={handleTaskCreated} />
+              <AddTaskDialog onTaskCreated={handleTaskChange} />
             </div>
           </div>
 

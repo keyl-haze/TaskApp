@@ -7,7 +7,6 @@ import {
   Loader,
   CircleCheckBig,
   Archive,
-  Calendar,
   Package
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -106,11 +105,7 @@ export default function ProjectsPage() {
     setCurrentPage(1)
   }, [projects.length, globalFilter])
 
-  const handleProjectCreated = () => setRefreshFlag((prev) => prev + 1)
-  const handleProjectUpdated = () => setRefreshFlag((prev) => prev + 1)
-  const handleProjectDeleted = () => setRefreshFlag((prev) => prev + 1)
-  const handleProjectRestored = () => setRefreshFlag((prev) => prev + 1)
-
+  const handleProjectChange = () => setRefreshFlag((prev) => prev + 1)
 
   const toggleSelectProject = (projectId: number) => {
     setSelectedProjects((prev) =>
@@ -230,48 +225,6 @@ export default function ProjectsPage() {
       }
     },
     {
-      accessorKey: 'dates',
-      header: 'Timeline',
-      cell: ({ row }) => {
-        const project = row.original
-        const startDate = project.start
-          ? new Date(project.start).toLocaleDateString()
-          : null
-        const endDate = project.end
-          ? new Date(project.end).toLocaleDateString()
-          : null
-
-        return (
-          <div className="text-sm">
-            {startDate || endDate ? (
-              <div className="flex items-center gap-1">
-                <Calendar className="h-3 w-3 text-muted-foreground" />
-                <span className="text-xs">
-                  {startDate && endDate
-                    ? `${startDate} - ${endDate}`
-                    : startDate
-                      ? `Start: ${startDate}`
-                      : endDate
-                        ? `End: ${endDate}`
-                        : ''}
-                </span>
-              </div>
-            ) : (
-              <div className="text-xs text-muted-foreground">No dates set</div>
-            )}
-          </div>
-        )
-      }
-    },
-    {
-      accessorKey: 'createdAt',
-      header: 'Created',
-      cell: ({ row }) => {
-        const createdAt = new Date(row.original.createdAt).toLocaleDateString()
-        return <div className="text-sm text-muted-foreground">{createdAt}</div>
-      }
-    },
-    {
       accessorKey: 'actions',
       header: 'Actions',
       cell: ({ row }) => {
@@ -282,17 +235,17 @@ export default function ProjectsPage() {
             {isArchived ? (
               <RestoreProjectDialog
                 project={project}
-                onProjectRestored={handleProjectRestored}
+                onProjectRestored={handleProjectChange}
               />
             ) : (
               <>
                 <EditProjectDialog
                   project={project}
-                  onProjectUpdated={handleProjectUpdated}
+                  onProjectUpdated={handleProjectChange}
                 />
                 <DeleteProjectDialog
                   project={project}
-                  onProjectDeleted={handleProjectDeleted}
+                  onProjectDeleted={handleProjectChange}
                 />
               </>
             )}
@@ -347,7 +300,7 @@ export default function ProjectsPage() {
                 }}
                 activeFilters={filters}
               />
-              <AddProjectDialog onProjectCreated={handleProjectCreated} />
+              <AddProjectDialog onProjectCreated={handleProjectChange} />
             </div>
           </div>
 
