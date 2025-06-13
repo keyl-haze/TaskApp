@@ -265,7 +265,7 @@ const removeUserFromProject = async (projectId, userId) => {
 
   await assignment.destroy();
   return { projectId, userId, status: 'removed' };
-}
+};
 const removeMultipleUsersFromProject = async (projectId, userIds) => {
   const project = await doesProjectExist(projectId);
   if (!project) {
@@ -302,7 +302,7 @@ const removeMultipleUsersFromProject = async (projectId, userIds) => {
   }
 
   return results;
-}
+};
 
 const listProjectsOfUser = async (userId) => {
   const user = await doesUserExist(userId);

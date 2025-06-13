@@ -108,8 +108,8 @@ export default function DeleteTaskDialog({
         <div className="py-4">
           <AlertDialogDescription className="text-sm">
             Are you sure you want to move{' '}
-            <span className="font-semibold text-foreground">{taskName}</span>
-            {' '}to the trash?
+            <span className="font-semibold text-foreground">{taskName}</span> to
+            the trash?
           </AlertDialogDescription>
           <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 p-3">
             <div className="flex items-start gap-2">

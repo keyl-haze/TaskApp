@@ -17,28 +17,28 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   ProjectUser.init(
-      {
-        userId: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          references: {
-            model: 'Users',
-            key: 'id'
-          }
-        },
-        projectId: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          references: {
-            model: 'Projects',
-            key: 'id'
-          }
+    {
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'id'
         }
       },
-      {
-        sequelize,
-        modelName: 'ProjectUser'
+      projectId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Projects',
+          key: 'id'
+        }
       }
-    );
+    },
+    {
+      sequelize,
+      modelName: 'ProjectUser'
+    }
+  );
   return ProjectUser;
 };

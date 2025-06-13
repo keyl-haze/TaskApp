@@ -63,8 +63,8 @@ export default function FilterPopover({
   useEffect(() => {
     setFilters(activeFilters)
     const count =
-      (activeFilters.type?.length || 0) + 
-      (activeFilters.priority?.length || 0) + 
+      (activeFilters.type?.length || 0) +
+      (activeFilters.priority?.length || 0) +
       (activeFilters.status?.length || 0)
     setActiveFilterCount(count)
   }, [activeFilters])
@@ -208,7 +208,11 @@ export default function FilterPopover({
                     (!lastAppliedFilters.status ||
                       lastAppliedFilters.status.length === 0)
                   ) {
-                    const emptyFilters: FilterValue = { type: [], priority: [], status: [] }
+                    const emptyFilters: FilterValue = {
+                      type: [],
+                      priority: [],
+                      status: []
+                    }
                     setFilters(emptyFilters)
                     onFilterChange(emptyFilters)
                   } else {

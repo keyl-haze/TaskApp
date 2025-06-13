@@ -102,7 +102,10 @@ const softDelete = promiseController(async (req) => {
 const removeMultipleUsersFromProject = promiseController(async (req) => {
   const { projectId } = req.params;
   const { userIds } = req.body;
-  const result = await service.removeMultipleUsersFromProject(projectId, userIds);
+  const result = await service.removeMultipleUsersFromProject(
+    projectId,
+    userIds
+  );
   return {
     status: 200,
     message: 'Users removed from project successfully',

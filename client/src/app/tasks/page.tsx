@@ -160,8 +160,12 @@ export default function TasksPage() {
         const task = row.original
         return (
           <div className="py-1 px-3">
-            <div className="font-medium text-foreground leading-relaxed text-sm min-h-[1.5rem] 
-            flex items-center justify-start">{task.title}</div>
+            <div
+              className="font-medium text-foreground leading-relaxed text-sm min-h-[1.5rem] 
+            flex items-center justify-start"
+            >
+              {task.title}
+            </div>
           </div>
         )
       }

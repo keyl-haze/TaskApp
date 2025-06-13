@@ -261,7 +261,8 @@ export default function ProjectsPage() {
           <div className="flex items-center gap-2">
             <EditProjectDialog
               project={project}
-              onProjectUpdated={handleProjectCreated} />
+              onProjectUpdated={handleProjectCreated}
+            />
           </div>
         )
       }

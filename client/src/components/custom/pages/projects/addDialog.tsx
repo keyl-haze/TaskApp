@@ -39,7 +39,11 @@ import { cn } from '@/lib/utils'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { USER_API } from '@/routes/user'
 import { CircleDashed, Loader, CircleCheckBig } from 'lucide-react'
-import { TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import {
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
 import { Tooltip } from '@radix-ui/react-tooltip'
 
 interface AddProjectDialogProps {

@@ -64,7 +64,6 @@ const doesProjectExist = async (projectId) => {
   return !!project;
 };
 
-
 /**
  * @param { integer } projectId
  * @param { integer } userId
@@ -79,10 +78,9 @@ const isUserAssignedToProject = async (projectId, userId) => {
       projectId,
       userId
     }
-  })
+  });
   return !!project;
 };
-
 
 module.exports = {
   getByField,
