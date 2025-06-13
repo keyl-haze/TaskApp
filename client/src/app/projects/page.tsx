@@ -42,7 +42,8 @@ export default function ProjectsPage() {
   const [columnFilters, setColumnFilters] = useState<
     { id: string; value: string }[]
   >([])
-  const [filters, setFilters] = useState<FilterValue>({ status: [] })
+  const [filters, setFilters] = useState<FilterValue>({ 
+    status: ['to_do', 'in_progress', 'done'] })
   const [globalFilter, setGlobalFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
 
