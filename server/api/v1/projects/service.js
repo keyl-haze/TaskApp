@@ -1,5 +1,5 @@
 const { Project, ProjectUser, User } = require(`${__serverRoot}/models`);
-const { buildOrder } = require('../utils/queries');
+const { createWhereFilter, buildOrder } = require('../utils/queries');
 const {
   doesProjectTitleExist,
   doesProjectCodeExist,
@@ -41,13 +41,7 @@ const associatedAliases = {
 const list = async (query) => {
   const { deleted, all, ...otherQuery } = query;
 
-  const where = {};
-  // Build where filter from valid query properties
-  _validQueryProps.forEach((prop) => {
-    if (otherQuery[prop] !== undefined) {
-      where[prop] = otherQuery[prop];
-    }
-  });
+  const where = createWhereFilter(_validQueryProps, otherQuery.filter, 'project');
 
   let orderQuery;
   if (query.order) {
@@ -74,10 +68,9 @@ const list = async (query) => {
     order: orderQuery
   };
 
-  if (deleted === 'true' || deleted === true) {
+  // This will include soft-deleted if all or deleted is set
+  if (all || deleted) {
     findOptions.paranoid = false;
-  } else if (!all) {
-    findOptions.paranoid = true;
   }
 
   const projects = await Project.findAll(findOptions);
