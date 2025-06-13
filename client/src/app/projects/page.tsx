@@ -24,6 +24,7 @@ import { type ColumnDef } from '@tanstack/react-table'
 import AuthLayout from '@/app/layouts/authLayout'
 import { PROJECT_API } from '@/routes/project'
 import { type Project } from '@/types/types'
+import AddProjectDialog from '@/components/custom/pages/projects/addDialog'
 
 const PAGE_SIZE = 10
 
@@ -32,6 +33,7 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [refreshFlag, setRefreshFlag] = useState(0)
   const [columnFilters, setColumnFilters] = useState<
     { id: string; value: string }[]
   >([])
@@ -85,12 +87,14 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     fetchProjects(globalFilter)
-  }, [globalFilter, fetchProjects])
+  }, [refreshFlag, globalFilter, fetchProjects])
 
   // * Reset to first page when projects change or search changes
   useEffect(() => {
     setCurrentPage(1)
   }, [projects.length, globalFilter])
+
+  const handleProjectCreated = () => setRefreshFlag((prev) => prev + 1)
 
   const toggleSelectProject = (projectId: number) => {
     setSelectedProjects((prev) =>
@@ -290,6 +294,7 @@ export default function ProjectsPage() {
             </div>
             <div className="flex gap-2">
               {/* Add filter popover and add project dialog here */}
+              <AddProjectDialog onProjectCreated={handleProjectCreated} />
             </div>
           </div>
 
