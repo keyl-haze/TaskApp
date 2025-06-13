@@ -25,6 +25,7 @@ import AuthLayout from '@/app/layouts/authLayout'
 import { PROJECT_API } from '@/routes/project'
 import { type Project } from '@/types/types'
 import AddProjectDialog from '@/components/custom/pages/projects/addDialog'
+import EditProjectDialog from '@/components/custom/pages/projects/editDialog'
 
 const PAGE_SIZE = 10
 
@@ -253,7 +254,17 @@ export default function ProjectsPage() {
     },
     {
       accessorKey: 'actions',
-      header: 'Actions'
+      header: 'Actions',
+      cell: ({ row }) => {
+        const project = row.original
+        return (
+          <div className="flex items-center gap-2">
+            <EditProjectDialog
+              project={project}
+              onProjectUpdated={handleProjectCreated} />
+          </div>
+        )
+      }
     }
   ]
 
