@@ -30,8 +30,10 @@ import DeleteProjectDialog from '@/components/custom/pages/projects/deleteDialog
 import FilterPopover, {
   FilterValue
 } from '@/components/custom/pages/projects/filterPopover'
+import RestoreProjectDialog from '@/components/custom/pages/projects/restoreDialog'
 
 const PAGE_SIZE = 10
+
 
 export default function ProjectsPage() {
   const [selectedProjects, setSelectedProjects] = useState<number[]>([])
@@ -42,8 +44,7 @@ export default function ProjectsPage() {
   const [columnFilters, setColumnFilters] = useState<
     { id: string; value: string }[]
   >([])
-  const [filters, setFilters] = useState<FilterValue>({ 
-    status: ['to_do', 'in_progress', 'done'] })
+  const [filters, setFilters] = useState<FilterValue>({ status: ['to_do', 'in_progress', 'done'] })
   const [globalFilter, setGlobalFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -106,6 +107,10 @@ export default function ProjectsPage() {
   }, [projects.length, globalFilter])
 
   const handleProjectCreated = () => setRefreshFlag((prev) => prev + 1)
+  const handleProjectUpdated = () => setRefreshFlag((prev) => prev + 1)
+  const handleProjectDeleted = () => setRefreshFlag((prev) => prev + 1)
+  const handleProjectRestored = () => setRefreshFlag((prev) => prev + 1)
+
 
   const toggleSelectProject = (projectId: number) => {
     setSelectedProjects((prev) =>
@@ -187,7 +192,7 @@ export default function ProjectsPage() {
           archived: {
             icon: Archive,
             color: 'bg-gray-100 text-gray-800 border-gray-200',
-            label: 'In Trash',
+            label: 'Archived',
             iconColor: 'text-gray-600'
           }
         }
@@ -271,16 +276,26 @@ export default function ProjectsPage() {
       header: 'Actions',
       cell: ({ row }) => {
         const project = row.original
+        const isArchived = project.status === 'archived'
         return (
           <div className="flex items-center gap-2">
-            <EditProjectDialog
-              project={project}
-              onProjectUpdated={handleProjectCreated}
-            />
-            <DeleteProjectDialog
-              project={project}
-              onProjectDeleted={handleProjectCreated}
-            />
+            {isArchived ? (
+              <RestoreProjectDialog
+                project={project}
+                onProjectRestored={handleProjectRestored}
+              />
+            ) : (
+              <>
+                <EditProjectDialog
+                  project={project}
+                  onProjectUpdated={handleProjectUpdated}
+                />
+                <DeleteProjectDialog
+                  project={project}
+                  onProjectDeleted={handleProjectDeleted}
+                />
+              </>
+            )}
           </div>
         )
       }
