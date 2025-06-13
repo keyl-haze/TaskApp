@@ -27,6 +27,7 @@ import { type Project } from '@/types/types'
 import AddProjectDialog from '@/components/custom/pages/projects/addDialog'
 import EditProjectDialog from '@/components/custom/pages/projects/editDialog'
 import DeleteProjectDialog from '@/components/custom/pages/projects/deleteDialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const PAGE_SIZE = 10
 
@@ -41,6 +42,7 @@ export default function ProjectsPage() {
   >([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [statusFilter, setStatusFilter] = useState<string | null>(null)
 
   // * Fetch projects from the API
   const fetchProjects = useCallback(
@@ -149,7 +151,41 @@ export default function ProjectsPage() {
     },
     {
       accessorKey: 'status',
-      header: 'Status',
+      header: () => (
+        <div className="flex flex-col gap-2 min-w-[140px]">
+          <span className="font-medium">Status</span>
+          <Select
+            value={statusFilter ?? "all"}
+            onValueChange={(value) => setStatusFilter(value === "all" ? null : value)}
+          >
+            <SelectTrigger className="w-[140px] h-8 text-xs bg-background border-muted-foreground/20 focus:ring-1 focus:ring-primary/30">
+              <SelectValue placeholder="All Statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-slate-400"></div>
+                All Statuses
+              </SelectItem>
+              <SelectItem value="to_do" className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-slate-500"></div>
+                To Do
+              </SelectItem>
+              <SelectItem value="in_progress" className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                In Progress
+              </SelectItem>
+              <SelectItem value="done" className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                Done
+              </SelectItem>
+              <SelectItem value="archived" className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-gray-500"></div>
+                Archived
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      ),
       cell: ({ row }) => {
         const status = row.original.status
         const statusConfig = {
@@ -276,12 +312,13 @@ export default function ProjectsPage() {
 
   // * Search and filter, then paginate
   const filteredProjects = projects.filter((project) => {
-    return (
+    const matchesStatus = !statusFilter || project.status === statusFilter
+    const matchesGlobal =
       globalFilter.trim() === '' ||
       Object.values(project).some((value) =>
         String(value).toLowerCase().includes(globalFilter.toLowerCase())
       )
-    )
+    return matchesStatus && matchesGlobal
   })
 
   const totalPages = Math.ceil(filteredProjects.length / PAGE_SIZE)
