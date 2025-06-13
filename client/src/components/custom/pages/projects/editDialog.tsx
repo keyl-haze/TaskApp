@@ -23,7 +23,6 @@ import {
 } from '@/components/ui/select'
 import {
   Calendar,
-  Archive,
   CircleDashed,
   Loader,
   CircleCheckBig,
@@ -106,12 +105,6 @@ const statusOptions: StatusOption[] = [
     label: 'Done',
     icon: CircleCheckBig,
     textColor: 'text-green-600'
-  },
-  {
-    value: 'archived',
-    label: 'Archived',
-    icon: Archive,
-    textColor: 'text-gray-600'
   }
 ]
 
