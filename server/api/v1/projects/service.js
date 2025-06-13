@@ -42,11 +42,12 @@ const list = async (query) => {
   const { deleted, all, ...otherQuery } = query;
 
   const where = {};
-  for (const prop of _validQueryProps) {
+  // Build where filter from valid query properties
+  _validQueryProps.forEach((prop) => {
     if (otherQuery[prop] !== undefined) {
       where[prop] = otherQuery[prop];
     }
-  }
+  });
 
   let orderQuery;
   if (query.order) {
@@ -58,7 +59,6 @@ const list = async (query) => {
       ? Project.sequelize.literal(orderClause)
       : [['title', 'ASC']];
   } else {
-    // Default order
     orderQuery = [['title', 'ASC']];
   }
 
@@ -74,7 +74,7 @@ const list = async (query) => {
     order: orderQuery
   };
 
-  if (deleted) {
+  if (deleted === 'true' || deleted === true) {
     findOptions.paranoid = false;
   } else if (!all) {
     findOptions.paranoid = true;
@@ -84,14 +84,14 @@ const list = async (query) => {
   return projects;
 };
 
-const getByOwner = async (ownerId) => {
+const getByOwner = async (ownerId, query = {}) => {
   if (!ownerId) {
     const error = new Error('Owner ID is required');
     error.status = 400;
     throw error;
   }
 
-  const projects = await Project.findAll({
+  let findOptions = {
     where: { owner: ownerId },
     include: [
       {
@@ -100,13 +100,20 @@ const getByOwner = async (ownerId) => {
         attributes: ['id', 'username', 'email', 'firstName', 'lastName']
       }
     ]
-  });
+  };
+
+  // Apply the same paranoid logic for getByOwner. For example, if query.deleted is set:
+  if (query.deleted === 'true' || query.deleted === true) {
+    findOptions.paranoid = false;
+  } else {
+    findOptions.paranoid = true;
+  }
+
+  const projects = await Project.findAll(findOptions);
 
   if (!projects || projects.length === 0) {
     const error = new Error('No projects have been authored by this user');
-    error.name = 'NoProjectsFoundError';
     error.status = 404;
-    error.message = 'No projects have been authored by this user';
     throw error;
   }
 

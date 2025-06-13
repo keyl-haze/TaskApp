@@ -64,7 +64,7 @@ export default function TasksPage() {
           url +=
             `&filter[title][iLike]=${encoded}` +
             `&filter[description][iLike]=${encoded}`
-          // Add more fields if needed
+
         }
         // Add filter params for type, priority, and status
         if (filterValue.priority && filterValue.priority.length > 0) {

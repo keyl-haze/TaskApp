@@ -25,7 +25,7 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
-import { AlertTriangle, Trash2, Package } from 'lucide-react'
+import { AlertTriangle, Trash2 } from 'lucide-react'
 
 interface DeleteProjectDialogProps {
   project: Project
@@ -112,10 +112,8 @@ export default function DeleteProjectDialog({
         <div className="py-4">
           <AlertDialogDescription className="text-sm">
             Are you sure you want to move{' '}
-            <span className="font-semibold text-foreground">
-              <Package className="inline h-4 w-4 text-purple-600 mb-0.5" /> {projectName} 
-              </span> {' '}
-              to the trash?
+            <span className="font-semibold text-foreground">{projectName}</span>{' '}
+            to the trash?
           </AlertDialogDescription>
           <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 p-3">
             <div className="flex items-start gap-2">

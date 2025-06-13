@@ -27,7 +27,9 @@ import { type Project } from '@/types/types'
 import AddProjectDialog from '@/components/custom/pages/projects/addDialog'
 import EditProjectDialog from '@/components/custom/pages/projects/editDialog'
 import DeleteProjectDialog from '@/components/custom/pages/projects/deleteDialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import FilterPopover, {
+  FilterValue
+} from '@/components/custom/pages/projects/filterPopover'
 
 const PAGE_SIZE = 10
 
@@ -40,13 +42,13 @@ export default function ProjectsPage() {
   const [columnFilters, setColumnFilters] = useState<
     { id: string; value: string }[]
   >([])
+  const [filters, setFilters] = useState<FilterValue>({ status: [] })
   const [globalFilter, setGlobalFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const [statusFilter, setStatusFilter] = useState<string | null>(null)
 
   // * Fetch projects from the API
   const fetchProjects = useCallback(
-    async (searchValue = globalFilter) => {
+    async (searchValue = globalFilter, filterValue = filters) => {
       setLoading(true)
       setError(null)
       try {
@@ -57,6 +59,10 @@ export default function ProjectsPage() {
             `&filter[title][iLike]=${encoded}` +
             `&filter[description][iLike]=${encoded}` +
             `&filter[code][iLike]=${encoded}`
+        }
+
+        if (filterValue.status?.length && filterValue.status.length > 0) {
+          url += `&filter[status][eq]=${encodeURIComponent(filterValue.status.join(','))}`
         }
 
         const res = await fetch(url)
@@ -86,7 +92,7 @@ export default function ProjectsPage() {
         setLoading(false)
       }
     },
-    [globalFilter]
+    [filters, globalFilter]
   )
 
   useEffect(() => {
@@ -154,36 +160,6 @@ export default function ProjectsPage() {
       header: () => (
         <div className="flex flex-col gap-2 min-w-[140px]">
           <span className="font-medium">Status</span>
-          <Select
-            value={statusFilter ?? "all"}
-            onValueChange={(value) => setStatusFilter(value === "all" ? null : value)}
-          >
-            <SelectTrigger className="w-[140px] h-8 text-xs bg-background border-muted-foreground/20 focus:ring-1 focus:ring-primary/30">
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-slate-400"></div>
-                All Statuses
-              </SelectItem>
-              <SelectItem value="to_do" className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-slate-500"></div>
-                To Do
-              </SelectItem>
-              <SelectItem value="in_progress" className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                In Progress
-              </SelectItem>
-              <SelectItem value="done" className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                Done
-              </SelectItem>
-              <SelectItem value="archived" className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-gray-500"></div>
-                Archived
-              </SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       ),
       cell: ({ row }) => {
@@ -210,7 +186,7 @@ export default function ProjectsPage() {
           archived: {
             icon: Archive,
             color: 'bg-gray-100 text-gray-800 border-gray-200',
-            label: 'Archived',
+            label: 'In Trash',
             iconColor: 'text-gray-600'
           }
         }
@@ -312,7 +288,8 @@ export default function ProjectsPage() {
 
   // * Search and filter, then paginate
   const filteredProjects = projects.filter((project) => {
-    const matchesStatus = !statusFilter || project.status === statusFilter
+    const matchesStatus =
+      !filters.status || filters.status.length === 0 || filters.status.includes(project.status)
     const matchesGlobal =
       globalFilter.trim() === '' ||
       Object.values(project).some((value) =>
@@ -347,7 +324,13 @@ export default function ProjectsPage() {
               />
             </div>
             <div className="flex gap-2">
-              {/* Add filter popover and add project dialog here */}
+              <FilterPopover 
+                onFilterChange={(newFilters) => {
+                  setFilters(newFilters)
+                  fetchProjects(globalFilter)
+                }}
+                activeFilters={filters}
+              />
               <AddProjectDialog onProjectCreated={handleProjectCreated} />
             </div>
           </div>
