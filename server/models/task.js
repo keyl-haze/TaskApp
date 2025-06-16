@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'assignee',
         as: 'Assignee'
       });
+      Task.belongsTo(models.Project, {
+        foreignKey: 'project',
+        as: 'Project'
+      });
     }
   }
   Task.init(
@@ -55,6 +59,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       },
       assignee: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+      },
+      project: {
         type: DataTypes.INTEGER,
         allowNull: true
       }
