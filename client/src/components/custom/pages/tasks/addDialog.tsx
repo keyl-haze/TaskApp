@@ -170,7 +170,6 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
         }
       } catch (error) {
         console.error('Fetch projects error:', error)
-        // Optionally handle error
       } finally {
         setLoadingProjects(false)
       }
