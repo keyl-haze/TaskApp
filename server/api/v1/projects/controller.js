@@ -19,6 +19,21 @@ const list = promiseController(async (req) => {
   };
 });
 
+const get = promiseController(async (req) => {
+  const project = await service.get(req.params.id);
+  if (!project) {
+    return {
+      status: 404,
+      message: 'Project not found'
+    };
+  }
+  return {
+    status: 200,
+    message: 'Project fetched successfully',
+    data: project
+  };
+});
+
 const getByOwner = promiseController(async (req) => {
   const projects = await service.getByOwner(req.params.owner);
   return {
@@ -116,6 +131,7 @@ const removeMultipleUsersFromProject = promiseController(async (req) => {
 module.exports = {
   create,
   list,
+  get,
   getByOwner,
   assignUserToProject,
   assignMultipleUsersToProject,

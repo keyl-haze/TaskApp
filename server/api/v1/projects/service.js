@@ -1,4 +1,4 @@
-const { Project, ProjectUser, User } = require(`${__serverRoot}/models`);
+const { Project, ProjectUser, User, Task } = require(`${__serverRoot}/models`);
 const { createWhereFilter, buildOrder } = require('../utils/queries');
 const {
   doesProjectTitleExist,
@@ -35,7 +35,8 @@ const orderTypes = {
 
 const associatedAliases = {
   owner: 'Owner',
-  projectUsers: 'ProjectUsers'
+  projectUsers: 'ProjectUsers',
+  tasks: 'Tasks'
 };
 
 const list = async (query) => {
@@ -63,6 +64,12 @@ const list = async (query) => {
         model: User,
         as: associatedAliases.owner,
         attributes: ['id', 'username', 'email', 'firstName', 'lastName']
+      },
+      {
+        model: Tasks,
+        as: associatedAliases.tasks,
+        attributes: ['id', 'title', 'description', 'status'],
+        required: false // Include tasks even if there are none
       }
     ],
     order: orderQuery
@@ -76,6 +83,44 @@ const list = async (query) => {
   const projects = await Project.findAll(findOptions);
   return projects;
 };
+
+const get = async (id, query = {}) => {
+  const project = await doesProjectExist(id);
+  if (!project) {
+    const error = new Error('Project not found');
+    error.name = 'ProjectNotFoundError';
+    error.status = 404;
+    error.message = 'Project does not exist';
+    throw error;
+  }
+
+  let findOptions = {
+    where: { id },
+    include: [
+      {
+        model: User,
+        as: 'Owner',
+        attributes: ['id', 'username', 'email', 'firstName', 'lastName']
+      },
+      {
+        model: Task,
+        as: 'Tasks',
+        attributes: ['id', 'title', 'description', 'status'],
+        required: false // Include tasks even if there are none
+      }
+    ]
+  };
+
+  // Apply the same paranoid logic for get. For example, if query.deleted is set:
+  if (query.deleted === 'true' || query.deleted === true) {
+    findOptions.paranoid = false;
+  } else {
+    findOptions.paranoid = true;
+  }
+
+  const result = await Project.findOne(findOptions);
+  return result;
+}
 
 const getByOwner = async (ownerId, query = {}) => {
   if (!ownerId) {
@@ -91,6 +136,12 @@ const getByOwner = async (ownerId, query = {}) => {
         model: User,
         as: 'Owner',
         attributes: ['id', 'username', 'email', 'firstName', 'lastName']
+      },
+      {
+        model: Task,
+        as: 'Tasks',
+        attributes: ['id', 'title', 'description', 'status'],
+        required: false // Include tasks even if there are none
       }
     ]
   };
@@ -474,6 +525,7 @@ const softDelete = async (id) => {
 module.exports = {
   create,
   list,
+  get,
   getByOwner,
   assignUserToProject,
   assignMultipleUsersToProject,
