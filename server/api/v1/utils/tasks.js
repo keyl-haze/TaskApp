@@ -10,8 +10,8 @@ const validateTaskData = (data, isNewTask = true) => {
   const { title, reporter, status } = data;
   const validStatuses = ['to_do', 'in_progress', 'done', 'archived'];
 
-  if (!title) createError('Task title is required');
-  if (!reporter) createError('Task reporter is required');
+  if (isNewTask && !title) createError('Task title is required');
+  if (isNewTask && !reporter) createError('Task reporter is required');
 
   if (status) {
     if (!validStatuses.includes(status)) {

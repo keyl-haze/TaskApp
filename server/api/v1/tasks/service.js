@@ -1,4 +1,4 @@
-const { Task, User } = require('../../../models');
+const { Task, User, Project } = require('../../../models');
 const { taskWhereFilter, buildOrder } = require('../utils/queries');
 const { validateTaskData } = require('../utils/tasks');
 
@@ -19,6 +19,7 @@ const orderTypes = {
   type: 'ENUM',
   priority: 'ENUM',
   status: 'ENUM',
+  project: 'STRING',
   reporter: 'STRING',
   assignee: 'STRING',
   deletedAt: 'TIMESTAMP',
@@ -61,6 +62,12 @@ const list = async (query) => {
         model: User,
         as: 'Assignee',
         attributes: ['id', 'username', 'email', 'firstName', 'lastName']
+      },
+      {
+        model: Project,
+        as: 'Project',
+        attributes: ['id', 'title', 'description'],
+        required: false // Allow tasks without a project
       }
     ],
     order: orderQuery
@@ -95,6 +102,12 @@ const get = async (id, options = {}) => {
         model: User,
         as: 'Assignee',
         attributes: ['id', 'username', 'email', 'firstName', 'lastName']
+      },
+      {
+        model: Project,
+        as: 'Project',
+        attributes: ['id', 'title', 'description'],
+        required: false // Allow tasks without a project
       }
     ]
   };
@@ -112,7 +125,7 @@ const get = async (id, options = {}) => {
 };
 
 const create = async (data) => {
-  const { title, description, type, priority, status, reporter, assignee } =
+  const { title, description, type, priority, status, project, reporter, assignee } =
     data;
 
   if (!title) {
@@ -130,7 +143,7 @@ const create = async (data) => {
     throw error;
   }
 
-  validateTaskData(data);
+  validateTaskData(data, true);
 
   const newTask = await Task.create({
     title,
@@ -138,6 +151,7 @@ const create = async (data) => {
     type,
     priority,
     status,
+    project,
     reporter,
     assignee
   });
@@ -162,11 +176,12 @@ const update = async (id, updates, mode = 'patch') => {
     'type',
     'priority',
     'status',
+    'project',
     'reporter',
     'assignee'
   ];
 
-  validateTaskData(updates);
+  validateTaskData(updates, false);
 
   let filteredUpdates = {};
 
