@@ -16,6 +16,10 @@ export interface Task {
   type: 'bug' | 'feature' | 'task'
   priority: 'low' | 'medium' | 'high'
   status: 'to_do' | 'in_progress' | 'done' | 'archived'
+  Project: {
+    id: number
+    title: string
+  }
   Reporter: {
     id: number
     username: string

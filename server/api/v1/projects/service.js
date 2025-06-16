@@ -66,7 +66,7 @@ const list = async (query) => {
         attributes: ['id', 'username', 'email', 'firstName', 'lastName']
       },
       {
-        model: Tasks,
+        model: Task,
         as: associatedAliases.tasks,
         attributes: ['id', 'title', 'description', 'status'],
         required: false // Include tasks even if there are none
