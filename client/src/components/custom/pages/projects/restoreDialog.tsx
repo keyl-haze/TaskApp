@@ -4,9 +4,25 @@ import { PROJECT_API } from '@/routes/project'
 import { Project as ProjectType } from '@/types/types'
 import { showErrorToast, showSuccessToast } from '../../utils/errorSonner'
 import { useState } from 'react'
-import { AlertDialogHeader, AlertDialogFooter } from '@/components/ui/alert-dialog'
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction } from '@radix-ui/react-alert-dialog'
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@radix-ui/react-tooltip'
+import {
+  AlertDialogHeader,
+  AlertDialogFooter
+} from '@/components/ui/alert-dialog'
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction
+} from '@/components/ui/alert-dialog'
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent
+} from '@radix-ui/react-tooltip'
 import { RotateCcw, UserCheck, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -90,7 +106,9 @@ export default function RestoreProjectDialog({
         <div className="py-4">
           <AlertDialogDescription className="text-sm">
             Are you sure you want to restore{' '}
-            <span className="font-semibold text-foreground">{project.title} </span>
+            <span className="font-semibold text-foreground">
+              {project.title}{' '}
+            </span>
             as a Project?
           </AlertDialogDescription>
           <div className="mt-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 p-3">
