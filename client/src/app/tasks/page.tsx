@@ -9,7 +9,8 @@ import {
   CircleDashed,
   Loader,
   CircleCheckBig,
-  Archive
+  Archive,
+  Package
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -308,18 +309,18 @@ export default function TasksPage() {
       }
     },
     {
-      accessorKey: 'assignee',
-      header: 'Assignee',
+      accessorKey: 'project',
+      header: 'Project',
       cell: ({ row }) => {
-        const assignee = row.original.Assignee
-        return assignee ? (
+        const project = row.original.Project
+        return project ? (
           <div className="text-sm">
-            <span>
-              {assignee.firstName} {assignee.lastName}
+            <span className="inline-flex items-center gap-1"> 
+              <Package className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />{project.title} 
             </span>
           </div>
         ) : (
-          <div className="text-sm text-muted-foreground">Unassigned</div>
+          <div className="text-sm text-muted-foreground">No Project</div>
         )
       }
     },
