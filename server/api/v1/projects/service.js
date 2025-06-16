@@ -522,6 +522,33 @@ const softDelete = async (id) => {
   return project;
 };
 
+const restore = async (id) => {
+  const project = await Project.findByPk(id, { paranoid: false });
+  if (!project) {
+    const error = new Error('Project not found');
+    error.name = 'ProjectNotFoundError';
+    error.status = 404;
+    error.message = 'Project does not exist';
+    throw error;
+  }
+
+  if (!project.deletedAt) {
+    const error = new Error('Project is not deleted');
+    error.name = 'ProjectNotDeletedError';
+    error.status = 400;
+    error.message = 'Project is not deleted';
+    throw error;
+  }
+
+  await project.restore();
+
+  const statusToRestore = project.originalStatus || 'to_do';
+  await project.update({
+    status: statusToRestore,
+    originalStatus: null // Clear originalStatus after restore
+  });
+}
+
 module.exports = {
   create,
   list,
@@ -534,5 +561,6 @@ module.exports = {
   listProjectsOfUser,
   listMembersOfProject,
   update,
-  softDelete
+  softDelete,
+  restore
 };

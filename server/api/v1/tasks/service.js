@@ -231,7 +231,7 @@ const restore = async (id) => {
     const error = new Error();
     error.name = 'TaskNotFoundError';
     error.status = 404;
-    error.message = 'Task not found';
+    error.message = 'Task does not exist';
     error.details = { id };
     throw error;
   }

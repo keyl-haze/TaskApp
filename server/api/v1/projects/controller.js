@@ -128,6 +128,16 @@ const removeMultipleUsersFromProject = promiseController(async (req) => {
   };
 });
 
+const restore = promiseController(async (req) => {
+  const { id } = req.params;
+  const project = await service.restore(id);
+  return {
+    status: 200,
+    message: 'Project restored successfully',
+    data: project
+  };
+});
+
 module.exports = {
   create,
   list,
@@ -140,5 +150,6 @@ module.exports = {
   listMembersOfProject,
   update,
   softDelete,
-  removeMultipleUsersFromProject
+  removeMultipleUsersFromProject,
+  restore
 };
