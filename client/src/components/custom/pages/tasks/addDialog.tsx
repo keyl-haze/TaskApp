@@ -30,7 +30,7 @@ import {
   CircleDashed,
   Loader,
   CircleCheckBig,
-  Archive
+  Package
 } from 'lucide-react'
 import { TASK_API } from '@/routes/task'
 import { USER_API } from '@/routes/user'
@@ -45,6 +45,7 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 import type { User } from '@/types/types'
+import { PROJECT_API } from '@/routes/project'
 
 interface AddTaskDialogProps {
   onTaskCreated?: () => void
@@ -55,9 +56,10 @@ interface FormData {
   description: string
   type: 'bug' | 'feature' | 'task'
   priority: 'low' | 'medium' | 'high'
-  status: 'to_do' | 'in_progress' | 'done' | 'archived'
+  status: 'to_do' | 'in_progress' | 'done'
   reporter: string
   assignee: string
+  project?: number
 }
 
 const initialFormData: FormData = {
@@ -84,10 +86,15 @@ interface PriorityOption {
 }
 
 interface StatusOption {
-  value: 'to_do' | 'in_progress' | 'done' | 'archived'
+  value: 'to_do' | 'in_progress' | 'done'
   icon?: React.ElementType
   label: string
   textColor: string
+}
+
+interface ProjectOption {
+  id: number
+  title: string
 }
 
 const typeOptions: TypeOption[] = [
@@ -125,12 +132,6 @@ const statusOptions: StatusOption[] = [
     label: 'Done',
     icon: CircleCheckBig,
     textColor: 'text-green-600'
-  },
-  {
-    value: 'archived',
-    label: 'Archived',
-    icon: Archive,
-    textColor: 'text-gray-600'
   }
 ]
 
@@ -140,12 +141,41 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
   const [open, setOpen] = useState(false)
   const [users, setUsers] = useState<User[]>([])
   const [loadingUsers, setLoadingUsers] = useState(false)
+  const [projects, setProjects] = useState<ProjectOption[]>([])
+  const [loadingProjects, setLoadingProjects] = useState(false)
 
   useEffect(() => {
     if (open) {
       fetchUsers()
     }
   }, [open])
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setLoadingProjects(true)
+      try {
+        const res = await fetch(`${PROJECT_API.list}?all=true`)
+        const data = await res.json()
+        if (data.status === 'success' && Array.isArray(data.data)) {
+          setProjects(
+            data.data
+              .filter((p: { id?: unknown; title?: unknown }) =>
+                typeof p.id === 'number' && typeof p.title === 'string'
+              )
+              .map((p: { id: number; title: string }) => ({
+                id: p.id,
+                title: p.title
+              }))
+          )
+        }
+      } catch (error) {
+        console.error('Fetch projects error:', error)
+      } finally {
+        setLoadingProjects(false)
+      }
+    }
+    fetchProjects()
+  }, [])
 
   const fetchUsers = async () => {
     setLoadingUsers(true)
@@ -494,6 +524,34 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
                 </Select>
               </div>
             </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="project" className="text-sm font-medium">
+                Assign to Project
+              </Label>
+              <Select
+                value={formData.project ? String(formData.project) : "none"}
+                onValueChange={value => setFormData(prev => ({ ...prev, project: value ? Number(value) : undefined }))}
+                disabled={loadingProjects}
+              >
+                <SelectTrigger className="h-10 w-full">
+                  <SelectValue placeholder={loadingProjects ? "Loading projects..." : "Select a project"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground">Select Project</span>
+                    </div>
+                  </SelectItem>
+                  {projects.map(project => (
+                    <SelectItem key={project.id} value={String(project.id)}>
+                      <Package className="h-3 w-3 text-purple-600 dark:text-purple-400" />
+                      {project.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>  
           </div>
 
           <DialogFooter className="gap-2 pt-4 border-t">

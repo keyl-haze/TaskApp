@@ -7,7 +7,7 @@ const {
   isUsernameValid
 } = require('../utils/account');
 const { sequelize } = require('../../../models');
-const { User } = require(`${__serverRoot}/models`);
+const { User, Project, ProjectUser } = require(`${__serverRoot}/models`);
 const _validQueryProps = [
   'id',
   'name',
@@ -237,11 +237,27 @@ const restore = async (id) => {
   return user;
 };
 
+const listUserProjects = async (userId) => {
+  await get(userId);
+  const userProjects = await Project.findAll({
+    include: [
+      {
+        model: User,
+        through: ProjectUser,
+        where: { id: userId },
+        attributes: []
+      }
+    ]
+  });
+  return userProjects;
+};
+
 module.exports = {
   list,
   get,
   create,
   update,
   softDelete,
-  restore
+  restore,
+  listUserProjects
 };

@@ -12,6 +12,18 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'assignee',
         as: 'assignedTasks'
       });
+      User.hasMany(models.Project, {
+        foreignKey: 'owner',
+        as: 'ownedProjects'
+      });
+      User.belongsToMany(models.Project, {
+        foreignKey: 'userId',
+        through: models.ProjectUser.tableName
+      });
+      User.hasMany(models.ProjectUser, {
+        foreignKey: 'userId',
+        as: 'ProjectAssignments'
+      });
     }
   }
   User.init(

@@ -3,9 +3,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import {
   Search,
-  Bug,
-  CheckSquare,
-  Sparkles,
   CircleDashed,
   Loader,
   CircleCheckBig,
@@ -24,85 +21,67 @@ import {
 import GenericTable from '@/components/custom/utils/genericTable'
 import { type ColumnDef } from '@tanstack/react-table'
 import AuthLayout from '@/app/layouts/authLayout'
-import { type Task } from '@/types/types'
-import { TASK_API } from '@/routes/task'
-import AddTaskDialog from '@/components/custom/pages/tasks/addDialog'
+import { PROJECT_API } from '@/routes/project'
+import { type Project } from '@/types/types'
+import AddProjectDialog from '@/components/custom/pages/projects/addDialog'
+import EditProjectDialog from '@/components/custom/pages/projects/editDialog'
+import DeleteProjectDialog from '@/components/custom/pages/projects/deleteDialog'
 import FilterPopover, {
   FilterValue
-} from '@/components/custom/pages/tasks/filterPopover'
-import EditTaskDialog from '@/components/custom/pages/tasks/editDialog'
-import DeleteTaskDialog from '@/components/custom/pages/tasks/deleteDialog'
-import RestoreTaskDialog from '@/components/custom/pages/tasks/restoreDialog'
+} from '@/components/custom/pages/projects/filterPopover'
+import RestoreProjectDialog from '@/components/custom/pages/projects/restoreDialog'
 
 const PAGE_SIZE = 10
 
-export default function TasksPage() {
-  const [selectedTasks, setSelectedTasks] = useState<number[]>([])
-  const [tasks, setTasks] = useState<Task[]>([])
+
+export default function ProjectsPage() {
+  const [selectedProjects, setSelectedProjects] = useState<number[]>([])
+  const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [refreshFlag, setRefreshFlag] = useState(0)
   const [columnFilters, setColumnFilters] = useState<
     { id: string; value: string }[]
   >([])
+  const [filters, setFilters] = useState<FilterValue>({ status: ['to_do', 'in_progress', 'done'] })
   const [globalFilter, setGlobalFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const [filters, setFilters] = useState<FilterValue>({
-    type: [],
-    priority: [],
-    status: ['to_do', 'in_progress', 'done']
-  })
 
-  // * Fetch tasks from the API
-  const fetchTasks = useCallback(
+  // * Fetch projects from the API
+  const fetchProjects = useCallback(
     async (searchValue = globalFilter, filterValue = filters) => {
       setLoading(true)
       setError(null)
       try {
-        let url = `${TASK_API.list}?all=true`
+        let url = `${PROJECT_API.list}?all=true`
         if (searchValue.trim()) {
           const encoded = encodeURIComponent(searchValue.trim())
           url +=
             `&filter[title][iLike]=${encoded}` +
-            `&filter[description][iLike]=${encoded}`
+            `&filter[description][iLike]=${encoded}` +
+            `&filter[code][iLike]=${encoded}`
+        }
 
-        }
-        // Add filter params for type, priority, and status
-        if (filterValue.priority && filterValue.priority.length > 0) {
-          url += `&filter[priority][eq]=${encodeURIComponent(filterValue.priority.join(','))}`
-        }
-        if (filterValue.type && filterValue.type.length > 0) {
-          url += `&filter[type][eq]=${encodeURIComponent(filterValue.type.join(','))}`
-        }
-        if (filterValue.status && filterValue.status.length > 0) {
+        if (filterValue.status?.length && filterValue.status.length > 0) {
           url += `&filter[status][eq]=${encodeURIComponent(filterValue.status.join(','))}`
         }
 
         const res = await fetch(url)
         const json = await res.json()
         if (json.status === 'success') {
-          const tasksData = json.data.map((task: Task) => ({
-            ...task,
-            reporter: {
-              id: task.Reporter?.id,
-              username: task.Reporter?.username,
-              email: task.Reporter?.email,
-              firstName: task.Reporter?.firstName,
-              lastName: task.Reporter?.lastName
-            },
-            assignee: task.Assignee
-              ? {
-                  id: task.Assignee.id,
-                  username: task.Assignee.username,
-                  email: task.Assignee.email,
-                  firstName: task.Assignee.firstName,
-                  lastName: task.Assignee.lastName
-                }
-              : null
+          const projectsData = json.data.map((project: Project) => ({
+            ...project,
+            Owner: {
+              id: project.Owner?.id,
+              username: project.Owner?.username,
+              email: project.Owner?.email,
+              firstName: project.Owner?.firstName,
+              lastName: project.Owner?.lastName
+            }
           }))
-          setTasks(tasksData)
+          setProjects(projectsData)
         } else {
-          setError(json.message || 'Failed to fetch tasks')
+          setError(json.message || 'Failed to fetch projects')
         }
       } catch (error: unknown) {
         if (error instanceof Error) {
@@ -118,135 +97,72 @@ export default function TasksPage() {
   )
 
   useEffect(() => {
-    fetchTasks(globalFilter)
-  }, [refreshFlag, globalFilter, fetchTasks])
+    fetchProjects(globalFilter)
+  }, [refreshFlag, globalFilter, fetchProjects])
 
-  // * Reset to first page when tasks change or search changes
+  // * Reset to first page when projects change or search changes
   useEffect(() => {
     setCurrentPage(1)
-  }, [
-    tasks.length,
-    globalFilter,
-    filters.type,
-    filters.priority,
-    filters.status
-  ])
+  }, [projects.length, globalFilter])
 
-  const handleTaskChange = () => setRefreshFlag((prev) => prev + 1)
-  
-  const toggleSelectTask = (taskId: number) => {
-    setSelectedTasks((prev) =>
-      prev.includes(taskId)
-        ? prev.filter((id) => id !== taskId)
-        : [...prev, taskId]
+  const handleProjectChange = () => setRefreshFlag((prev) => prev + 1)
+
+  const toggleSelectProject = (projectId: number) => {
+    setSelectedProjects((prev) =>
+      prev.includes(projectId)
+        ? prev.filter((id) => id !== projectId)
+        : [...prev, projectId]
     )
   }
 
   const toggleSelectAll = () => {
-    if (selectedTasks.length === paginatedTasks.length) {
-      setSelectedTasks([])
+    if (selectedProjects.length === paginatedProjects.length) {
+      setSelectedProjects([])
     } else {
-      setSelectedTasks(paginatedTasks.map((task) => task.id))
+      setSelectedProjects(paginatedProjects.map((project) => project.id))
     }
   }
 
-  const columns: ColumnDef<Task>[] = [
+  const columns: ColumnDef<Project>[] = [
+    {
+      accessorKey: 'code',
+      header: () => <div className="px-3 font-semibold">Code</div>,
+      cell: ({ row }) => {
+        const project = row.original
+        return (
+          <div className="py-2 px-3">
+            <Badge
+              variant="secondary"
+              className="bg-blue-50 text-blue-900 border-blue-200 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-100 dark:border-blue-800 dark:hover:bg-blue-900 gap-2"
+            >
+              <Package className="h-3 w-3 text-purple-600 dark:text-purple-400" />
+              <span>{project.code}</span>
+            </Badge>
+          </div>
+        )
+      }
+    },
     {
       accessorKey: 'title',
       header: () => <div className="px-3">Title</div>,
       cell: ({ row }) => {
-        const task = row.original
+        const project = row.original
         return (
           <div className="py-1 px-3">
-            <div
-              className="font-medium text-foreground leading-relaxed text-sm min-h-[1.5rem] 
-            flex items-center justify-start"
-            >
-              {task.title}
+            <div className="font-medium text-foreground leading-relaxed text-sm min-h-[1.5rem] flex items-center justify-start">
+              {project.title}
             </div>
           </div>
         )
       }
     },
     {
-      accessorKey: 'type',
-      header: 'Type',
-      cell: ({ row }) => {
-        const type = row.original.type
-        const typeConfig = {
-          bug: {
-            icon: Bug,
-            color: 'bg-red-100 text-red-800 border-red-200',
-            label: 'Bug'
-          },
-          feature: {
-            icon: Sparkles,
-            color: 'bg-purple-100 text-purple-800 border-purple-200',
-            label: 'Feature'
-          },
-          task: {
-            icon: CheckSquare,
-            color: 'bg-blue-100 text-blue-800 border-blue-200',
-            label: 'Task'
-          }
-        }
-
-        const config =
-          typeConfig[type as keyof typeof typeConfig] || typeConfig.task
-        const Icon = config.icon
-
-        return (
-          <Badge
-            variant="outline"
-            className={`${config.color} flex items-center gap-1 w-fit`}
-          >
-            <Icon className="h-3 w-3" />
-            {config.label}
-          </Badge>
-        )
-      }
-    },
-    {
-      accessorKey: 'priority',
-      header: 'Priority',
-      cell: ({ row }) => {
-        const priority = row.original.priority
-        const priorityConfig = {
-          low: {
-            color: 'bg-green-100 text-green-800 border-green-300',
-            label: 'Low',
-            dot: 'bg-green-500'
-          },
-          medium: {
-            color: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-            label: 'Medium',
-            dot: 'bg-yellow-500'
-          },
-          high: {
-            color: 'bg-red-100 text-red-800 border-red-300',
-            label: 'High',
-            dot: 'bg-red-500'
-          }
-        }
-
-        const config =
-          priorityConfig[priority as keyof typeof priorityConfig] ||
-          priorityConfig.medium
-
-        return (
-          <Badge
-            variant="outline"
-            className={`${config.color} flex items-center gap-1.5 w-fit font-medium`}
-          >
-            <div className={`w-2 h-2 rounded-full ${config.dot}`} />
-            {config.label}
-          </Badge>
-        )
-      }
-    },
-    {
       accessorKey: 'status',
-      header: 'Status',
+      header: () => (
+        <div className="flex flex-col gap-2 min-w-[140px]">
+          <span className="font-medium">Status</span>
+        </div>
+      ),
       cell: ({ row }) => {
         const status = row.original.status
         const statusConfig = {
@@ -293,57 +209,43 @@ export default function TasksPage() {
       }
     },
     {
-      accessorKey: 'reporter',
-      header: 'Reporter',
+      accessorKey: 'Owner',
+      header: 'Owner',
       cell: ({ row }) => {
-        const reporter = row.original.Reporter
-        return reporter ? (
+        const owner = row.original.Owner
+        return owner ? (
           <div className="text-sm">
             <span>
-              {reporter.firstName} {reporter.lastName}
+              {owner.firstName} {owner.lastName}
             </span>
           </div>
         ) : (
-          <div className="text-sm text-muted-foreground">Not assigned</div>
+          <div className="text-sm text-muted-foreground">No owner</div>
         )
       }
     },
     {
-      accessorKey: 'project',
-      header: 'Project',
-      cell: ({ row }) => {
-        const project = row.original.Project
-        return project ? (
-          <div className="text-sm">
-            <span className="inline-flex items-center gap-1"> 
-              <Package className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />{project.title} 
-            </span>
-          </div>
-        ) : (
-          <div className="text-sm text-muted-foreground">No Project</div>
-        )
-      }
-    },
-    {
-      id: 'actions',
+      accessorKey: 'actions',
       header: 'Actions',
       cell: ({ row }) => {
-        const task = row.original
-        const isArchived = task.status === 'archived'
-
+        const project = row.original
+        const isArchived = project.status === 'archived'
         return (
-          <div className="flex justify-items-center">
+          <div className="flex items-center gap-2">
             {isArchived ? (
-              <RestoreTaskDialog
-                task={task}
-                onTaskRestored={handleTaskChange}
+              <RestoreProjectDialog
+                project={project}
+                onProjectRestored={handleProjectChange}
               />
             ) : (
               <>
-                <EditTaskDialog task={task} onTaskUpdated={handleTaskChange} />
-                <DeleteTaskDialog
-                  task={task}
-                  onTaskDeleted={handleTaskChange}
+                <EditProjectDialog
+                  project={project}
+                  onProjectUpdated={handleProjectChange}
+                />
+                <DeleteProjectDialog
+                  project={project}
+                  onProjectDeleted={handleProjectChange}
                 />
               </>
             )}
@@ -353,8 +255,20 @@ export default function TasksPage() {
     }
   ]
 
-  const totalPages = Math.ceil(tasks.length / PAGE_SIZE)
-  const paginatedTasks = tasks.slice(
+  // * Search and filter, then paginate
+  const filteredProjects = projects.filter((project) => {
+    const matchesStatus =
+      !filters.status || filters.status.length === 0 || filters.status.includes(project.status)
+    const matchesGlobal =
+      globalFilter.trim() === '' ||
+      Object.values(project).some((value) =>
+        String(value).toLowerCase().includes(globalFilter.toLowerCase())
+      )
+    return matchesStatus && matchesGlobal
+  })
+
+  const totalPages = Math.ceil(filteredProjects.length / PAGE_SIZE)
+  const paginatedProjects = filteredProjects.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   )
@@ -364,7 +278,7 @@ export default function TasksPage() {
   }
 
   return (
-    <AuthLayout header="Tasks">
+    <AuthLayout header="Projects">
       <div className="min-h-screen bg-background">
         <main className="p-4 md:p-6">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -372,27 +286,27 @@ export default function TasksPage() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="SEARCH..."
+                placeholder="SEARCH PROJECTS..."
                 className="w-full pl-8 focus-visible:ring-0"
                 value={globalFilter}
                 onChange={(e) => setGlobalFilter(e.target.value)}
               />
             </div>
             <div className="flex gap-2">
-              <FilterPopover
+              <FilterPopover 
                 onFilterChange={(newFilters) => {
                   setFilters(newFilters)
-                  fetchTasks(globalFilter, newFilters)
+                  fetchProjects(globalFilter)
                 }}
                 activeFilters={filters}
               />
-              <AddTaskDialog onTaskCreated={handleTaskChange} />
+              <AddProjectDialog onProjectCreated={handleProjectChange} />
             </div>
           </div>
 
           {loading && (
             <div className="flex items-center justify-center">
-              <div className="loader">Loading tasks...</div>
+              <div className="loader">Loading projects...</div>
             </div>
           )}
 
@@ -402,18 +316,18 @@ export default function TasksPage() {
             </div>
           )}
 
-          {!loading && !error && tasks.length === 0 && (
+          {!loading && !error && projects.length === 0 && (
             <div className="flex items-center justify-center">
-              <div className="text-gray-500">No tasks found</div>
+              <div className="text-gray-500">No projects found</div>
             </div>
           )}
 
-          {!loading && !error && tasks.length > 0 && (
+          {!loading && !error && projects.length > 0 && (
             <GenericTable
-              data={paginatedTasks}
+              data={paginatedProjects}
               columns={columns}
-              selectedRows={selectedTasks}
-              onToggleSelectRow={toggleSelectTask}
+              selectedRows={selectedProjects}
+              onToggleSelectRow={toggleSelectProject}
               onToggleSelectAll={toggleSelectAll}
               columnFilters={columnFilters}
               setColumnFilters={setColumnFilters}

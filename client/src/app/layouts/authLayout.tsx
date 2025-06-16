@@ -6,9 +6,10 @@ import {
   Settings,
   Home,
   Users,
-  FileText,
   Mail,
-  Bell
+  Bell,
+  ListChecks,
+  Rocket
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -62,7 +63,12 @@ const navigationItems = [
   {
     title: 'Tasks',
     url: '/tasks',
-    icon: FileText
+    icon: ListChecks
+  },
+  {
+    title: 'Projects',
+    url: '/projects',
+    icon: Rocket
   }
 ]
 

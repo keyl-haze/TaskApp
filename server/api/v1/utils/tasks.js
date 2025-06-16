@@ -1,38 +1,32 @@
-const validateStatus = (status) => {
-  const validStatuses = ['to_do', 'in_progress', 'done', 'archived'];
-  if (status && !validStatuses.includes(status)) {
-    const error = new Error();
-    error.name = 'ValidationError';
-    error.status = 400;
-    error.message = 'Invalid task status';
-    error.details = { status, validValues: validStatuses };
-    throw error;
-  }
+const createError = (message, details = null) => {
+  const error = new Error(message);
+  error.name = 'ValidationError';
+  error.status = 400;
+  if (details) error.details = details;
+  throw error;
 };
 
-const validateTaskData = (data) => {
+const validateTaskData = (data, isNewTask = true) => {
   const { title, reporter, status } = data;
+  const validStatuses = ['to_do', 'in_progress', 'done', 'archived'];
 
-  if (!title) {
-    const error = new Error();
-    error.name = 'ValidationError';
-    error.status = 400;
-    error.message = 'Task title is required';
-    throw error;
+  if (isNewTask && !title) createError('Task title is required');
+  if (isNewTask && !reporter) createError('Task reporter is required');
+
+  if (status) {
+    if (!validStatuses.includes(status)) {
+      createError('Invalid task status', {
+        status,
+        validValues: validStatuses
+      });
+    }
+
+    if (isNewTask && status === 'archived') {
+      createError('New tasks cannot be created with status "archived"');
+    }
   }
-
-  if (!reporter) {
-    const error = new Error();
-    error.name = 'ValidationError';
-    error.status = 400;
-    error.message = 'Task reporter is required';
-    throw error;
-  }
-
-  validateStatus(status);
 };
 
 module.exports = {
-  validateStatus,
   validateTaskData
 };

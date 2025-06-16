@@ -105,9 +105,7 @@ export default function UsersPage() {
     fetchUsers(globalFilter)
   }, [refreshFlag, fetchUsers, globalFilter])
 
-  const handleUserCreated = () => setRefreshFlag((prev) => prev + 1)
-  const handleUserUpdated = () => setRefreshFlag((prev) => prev + 1)
-  const handleUserDeleted = () => setRefreshFlag((prev) => prev + 1)
+  const handleUserChange = () => setRefreshFlag((prev) => prev + 1)
 
   // * Search and filter, then paginate
   const filteredUsers = users.filter((user) => {
@@ -291,14 +289,14 @@ export default function UsersPage() {
             {user.status === 'Inactive' ? (
               <RestoreUserDialog
                 user={user}
-                onUserRestored={handleUserUpdated}
+                onUserRestored={handleUserChange}
               />
             ) : (
               <>
-                <EditUserDialog user={user} onUserUpdated={handleUserUpdated} />
+                <EditUserDialog user={user} onUserUpdated={handleUserChange} />
                 <DeleteUserDialog
                   user={user}
-                  onUserDeleted={handleUserDeleted}
+                  onUserDeleted={handleUserChange}
                 />
               </>
             )}
@@ -338,7 +336,7 @@ export default function UsersPage() {
                   fetchUsers(globalFilter, newFilters)
                 }}
               />
-              <AddUser onUserCreated={handleUserCreated} />
+              <AddUser onUserCreated={handleUserChange} />
             </div>
           </div>
 

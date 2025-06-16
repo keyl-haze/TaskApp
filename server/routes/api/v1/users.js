@@ -1,6 +1,6 @@
 const express = require('express');
 const router = new express.Router();
-const controller = require(`${__serverRoot}/api/v1/user/controller`);
+const controller = require(`${__serverRoot}/api/v1/users/controller`);
 router.get('/', controller.list);
 router.get('/:id', controller.get);
 router.post('/', controller.create);

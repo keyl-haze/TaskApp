@@ -1,27 +1,24 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Filter } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger
 } from '@/components/ui/popover'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Separator } from '@/components/ui/separator'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
+import { Filter } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
 export type FilterValue = {
-  type?: string[]
-  priority?: string[]
   status?: string[]
 }
 
@@ -30,18 +27,6 @@ type FilterPopoverProps = {
   onFilterChange: (filters: FilterValue) => void
   activeFilters: FilterValue
 }
-
-const typeOptions = [
-  { value: 'bug', label: 'Bug' },
-  { value: 'feature', label: 'Feature' },
-  { value: 'task', label: 'Task' }
-]
-
-const priorityOptions = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' }
-]
 
 const statusOptions = [
   { value: 'to_do', label: 'To Do' },
@@ -62,10 +47,7 @@ export default function FilterPopover({
 
   useEffect(() => {
     setFilters(activeFilters)
-    const count =
-      (activeFilters.type?.length || 0) +
-      (activeFilters.priority?.length || 0) +
-      (activeFilters.status?.length || 0)
+    const count = activeFilters.status?.length || 0
     setActiveFilterCount(count)
   }, [activeFilters])
 
@@ -86,7 +68,7 @@ export default function FilterPopover({
   }
 
   const resetFilters = () => {
-    const emptyFilters: FilterValue = { type: [], priority: [], status: [] }
+    const emptyFilters: FilterValue = { status: [] }
     setFilters(emptyFilters)
     onFilterChange(emptyFilters)
   }
@@ -117,7 +99,7 @@ export default function FilterPopover({
               </PopoverTrigger>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Filter Tasks</p>
+              <p>Filter Projects</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -125,55 +107,17 @@ export default function FilterPopover({
         <PopoverContent className="w-80">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h4 className="font-medium">Filter Tasks</h4>
-              {(filters.type?.length || 0) > 0 ||
-              (filters.priority?.length || 0) > 0 ||
-              (filters.status?.length || 0) > 0 ? (
+              <h4 className="font-medium">Filter Projects</h4>
+              {(filters.status?.length || 0) > 0 && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={resetFilters}
-                  className="h-8 px-2 text font-normal"
+                  className="h-8 px-2 font-normal"
                 >
                   Reset all
                 </Button>
-              ) : null}
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <Label>Type</Label>
-              <div className="flex flex-wrap gap-2">
-                {typeOptions.map((opt) => (
-                  <label key={opt.value} className="flex items-center gap-2">
-                    <Checkbox
-                      checked={filters.type?.includes(opt.value) || false}
-                      onCheckedChange={() =>
-                        handleCheckboxChange('type', opt.value)
-                      }
-                    />
-                    {opt.label}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Priority</Label>
-              <div className="flex flex-wrap gap-2">
-                {priorityOptions.map((opt) => (
-                  <label key={opt.value} className="flex items-center gap-2">
-                    <Checkbox
-                      checked={filters.priority?.includes(opt.value) || false}
-                      onCheckedChange={() =>
-                        handleCheckboxChange('priority', opt.value)
-                      }
-                    />
-                    {opt.label}
-                  </label>
-                ))}
-              </div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -187,7 +131,7 @@ export default function FilterPopover({
                         handleCheckboxChange('status', opt.value)
                       }
                     />
-                    {opt.label}
+                    <span>{opt.label}</span>
                   </label>
                 ))}
               </div>
@@ -199,20 +143,11 @@ export default function FilterPopover({
                 size="sm"
                 onClick={() => {
                   setOpen(false)
-                  // If no filters were applied before, reset all
                   if (
-                    (!lastAppliedFilters.type ||
-                      lastAppliedFilters.type.length === 0) &&
-                    (!lastAppliedFilters.priority ||
-                      lastAppliedFilters.priority.length === 0) &&
-                    (!lastAppliedFilters.status ||
-                      lastAppliedFilters.status.length === 0)
+                    !lastAppliedFilters.status ||
+                    lastAppliedFilters.status.length === 0
                   ) {
-                    const emptyFilters: FilterValue = {
-                      type: [],
-                      priority: [],
-                      status: []
-                    }
+                    const emptyFilters: FilterValue = { status: [] }
                     setFilters(emptyFilters)
                     onFilterChange(emptyFilters)
                   } else {

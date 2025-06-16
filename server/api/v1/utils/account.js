@@ -22,7 +22,6 @@ const comparePassword = async (password, hashedPassword) => {
 };
 
 /**
- *
  * @param {string} email
  * @returns {Promise<boolean>} - Returns true if email exists for another user, false  if otherwise
  */

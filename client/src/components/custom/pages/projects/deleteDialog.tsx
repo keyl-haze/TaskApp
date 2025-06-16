@@ -1,7 +1,7 @@
 'use client'
 
-import { TASK_API } from '@/routes/task'
-import { Task } from '@/types/types'
+import { PROJECT_API } from '@/routes/project'
+import { Project } from '@/types/types'
 import { useState } from 'react'
 import {
   showErrorToast,
@@ -27,48 +27,52 @@ import {
 import { Button } from '@/components/ui/button'
 import { AlertTriangle, Trash2 } from 'lucide-react'
 
-interface DeleteTaskDialogProps {
-  task: Task
-  onTaskDeleted?: () => void
+interface DeleteProjectDialogProps {
+  project: Project
+  onProjectDeleted?: () => void
 }
 
-export default function DeleteTaskDialog({
-  task,
-  onTaskDeleted
-}: DeleteTaskDialogProps) {
+export default function DeleteProjectDialog({
+  project,
+  onProjectDeleted
+}: DeleteProjectDialogProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const handleDelete = async () => {
-    if (!task) return
+    if (!project) return
 
     setLoading(true)
 
     try {
-      const res = await fetch(TASK_API.delete(String(task.id)), {
+      const res = await fetch(PROJECT_API.delete(String(project.id)), {
         method: 'DELETE'
       })
-      const json = await res.json()
-
+      // Soft delete returns 204 No Content, so don't try to parse JSON if no content
       if (res.ok) {
-        showSuccessToast('Task deleted successfully!')
-        if (onTaskDeleted) onTaskDeleted()
+        showSuccessToast('Project moved to trash!')
+        if (onProjectDeleted) onProjectDeleted()
         setOpen(false)
       } else {
-        showErrorToast(json.message || 'Failed to delete task')
+        let msg = 'Failed to delete project'
+        try {
+          const json = await res.json()
+          msg = json.message || msg
+        } catch {}
+        showErrorToast(msg)
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        showErrorToast(err.message || 'Failed to delete task')
+        showErrorToast(err.message || 'Failed to delete project')
       } else {
-        showErrorToast('Failed to delete task')
+        showErrorToast('Failed to delete project')
       }
     } finally {
       setLoading(false)
     }
   }
 
-  const taskName = `${task.title}`.trim()
+  const projectName = `${project.title}`.trim()
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -97,7 +101,7 @@ export default function DeleteTaskDialog({
             </div>
             <div>
               <AlertDialogTitle className="text-lg font-semibold">
-                Move Task to Trash
+                Move Project to Trash
               </AlertDialogTitle>
               <AlertDialogDescription className="text-sm text-muted-foreground">
                 This action cannot be undone easily.
@@ -108,8 +112,8 @@ export default function DeleteTaskDialog({
         <div className="py-4">
           <AlertDialogDescription className="text-sm">
             Are you sure you want to move{' '}
-            <span className="font-semibold text-foreground">{taskName}</span> to
-            the trash?
+            <span className="font-semibold text-foreground">{projectName}</span>{' '}
+            to the trash?
           </AlertDialogDescription>
           <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 p-3">
             <div className="flex items-start gap-2">
@@ -117,8 +121,8 @@ export default function DeleteTaskDialog({
               <div className="text-sm text-amber-800">
                 <p className="font-medium">This will:</p>
                 <ul className="mt-1 list-disc list-inside space-y-1 text-xs">
-                  <li>Soft delete the task (can be restored later)</li>
-                  <li>Preserve their data for potential restoration</li>
+                  <li>Soft delete the project (can be restored later)</li>
+                  <li>Preserve its data for potential restoration</li>
                 </ul>
               </div>
             </div>
