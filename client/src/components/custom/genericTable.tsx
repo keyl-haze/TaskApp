@@ -62,7 +62,16 @@ export default function GenericTable<T extends { id: number }>({
                 className="cursor-pointer"
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell
+                    key={cell.id}
+
+                    // * For cell actions
+                    onClick={
+                      cell.column.id === 'actions'
+                        ? (e) => e.stopPropagation()
+                        : undefined
+                    }
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}

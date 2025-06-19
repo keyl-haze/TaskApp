@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import AddUser from '@/components/custom/pages/users/addDialog'
 import GenericTable from '@/components/custom/genericTable'
-import Pagination from '@/components/custom/utils/pagination'
+import Pagination from '@/components/custom/pagination'
 import { type ColumnDef } from '@tanstack/react-table'
 import FilterPopover, {
   FilterValue

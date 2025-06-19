@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import GenericTable from '@/components/custom/genericTable'
-import Pagination from '@/components/custom/utils/pagination'
+import Pagination from '@/components/custom/pagination'
 import { type ColumnDef } from '@tanstack/react-table'
 import AuthLayout from '@/app/layouts/authLayout'
 import { PROJECT_API } from '@/routes/api/v1/project'
