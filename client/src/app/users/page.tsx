@@ -2,21 +2,15 @@
 
 import AuthLayout from '@/app/layouts/authLayout'
 import { USER_API } from '@/routes/api/v1/user'
-import type { User as UserType } from '@/../types/types'
+import type { User as UserType } from '@/types/entities'
 import { useState, useEffect, useCallback } from 'react'
 import { Search } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink
-} from '@/components/ui/pagination'
 import AddUser from '@/components/custom/pages/users/addDialog'
-import GenericTable from '@/components/custom/utils/genericTable'
+import GenericTable from '@/components/custom/genericTable'
+import Pagination from '@/components/custom/utils/pagination'
 import { type ColumnDef } from '@tanstack/react-table'
 import FilterPopover, {
   FilterValue
@@ -40,9 +34,6 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [refreshFlag, setRefreshFlag] = useState(0)
-  const [columnFilters, setColumnFilters] = useState<
-    { id: string; value: string }[]
-  >([])
   const [globalFilter, setGlobalFilter] = useState('')
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -145,14 +136,6 @@ export default function UsersPage() {
         ? prev.filter((id) => id !== userId)
         : [...prev, userId]
     )
-  }
-
-  const toggleSelectAll = () => {
-    if (selectedUsers.length === paginatedUsers.length) {
-      setSelectedUsers([])
-    } else {
-      setSelectedUsers(paginatedUsers.map((user) => user.id))
-    }
   }
 
   // * Columns for the data table
@@ -368,54 +351,16 @@ export default function UsersPage() {
               columns={columns}
               selectedRows={selectedUsers}
               onToggleSelectRow={toggleSelectUser}
-              onToggleSelectAll={toggleSelectAll}
-              columnFilters={columnFilters}
-              setColumnFilters={setColumnFilters}
-              globalFilter={globalFilter}
-              setGlobalFilter={setGlobalFilter}
               headerClassName={'bg-gray-100/90 dark:bg-gray-800'}
             />
           )}
 
-          {/* Pagination */}
           {totalPages > 1 && (
-            <Pagination className="mt-4">
-              <PaginationContent>
-                <PaginationItem>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={currentPage === 1}
-                    onClick={() => handlePageChange(currentPage - 1)}
-                  >
-                    {/* Renders < */}
-                    &lt;
-                  </Button>
-                </PaginationItem>
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <PaginationItem key={i + 1}>
-                    <PaginationLink
-                      isActive={currentPage === i + 1}
-                      onClick={() => handlePageChange(i + 1)}
-                      className="cursor-pointer"
-                    >
-                      {(i + 1).toString().padStart(2, '0')}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={currentPage === totalPages}
-                    onClick={() => handlePageChange(currentPage + 1)}
-                  >
-                    {/* Renders > */}
-                    &gt;
-                  </Button>
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
           )}
         </main>
       </div>

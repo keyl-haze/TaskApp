@@ -12,19 +12,13 @@ import {
   Archive,
   Package
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink
-} from '@/components/ui/pagination'
-import GenericTable from '@/components/custom/utils/genericTable'
+import GenericTable from '@/components/custom/genericTable'
+import Pagination from '@/components/custom/utils/pagination'
 import { type ColumnDef } from '@tanstack/react-table'
 import AuthLayout from '@/app/layouts/authLayout'
-import { type Task } from '@/types/types'
+import { type Task } from '@/types/entities'
 import { TASK_API } from '@/routes/api/v1/task'
 import AddTaskDialog from '@/components/custom/pages/tasks/addDialog'
 import FilterPopover, {
@@ -42,9 +36,6 @@ export default function TasksPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [refreshFlag, setRefreshFlag] = useState(0)
-  const [columnFilters, setColumnFilters] = useState<
-    { id: string; value: string }[]
-  >([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState<FilterValue>({
@@ -139,14 +130,6 @@ export default function TasksPage() {
         ? prev.filter((id) => id !== taskId)
         : [...prev, taskId]
     )
-  }
-
-  const toggleSelectAll = () => {
-    if (selectedTasks.length === paginatedTasks.length) {
-      setSelectedTasks([])
-    } else {
-      setSelectedTasks(paginatedTasks.map((task) => task.id))
-    }
   }
 
   const columns: ColumnDef<Task>[] = [
@@ -414,51 +397,16 @@ export default function TasksPage() {
               columns={columns}
               selectedRows={selectedTasks}
               onToggleSelectRow={toggleSelectTask}
-              onToggleSelectAll={toggleSelectAll}
-              columnFilters={columnFilters}
-              setColumnFilters={setColumnFilters}
-              globalFilter={globalFilter}
-              setGlobalFilter={setGlobalFilter}
               headerClassName="bg-gray-100/90 dark:bg-gray-800"
             />
           )}
 
           {totalPages > 1 && (
-            <Pagination className="mt-4">
-              <PaginationContent>
-                <PaginationItem>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={currentPage === 1}
-                    onClick={() => handlePageChange(currentPage - 1)}
-                  >
-                    &lt;
-                  </Button>
-                </PaginationItem>
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <PaginationItem key={i + 1}>
-                    <PaginationLink
-                      isActive={currentPage === i + 1}
-                      onClick={() => handlePageChange(i + 1)}
-                      className="cursor-pointer"
-                    >
-                      {(i + 1).toString().padStart(2, '0')}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={currentPage === totalPages}
-                    onClick={() => handlePageChange(currentPage + 1)}
-                  >
-                    &gt;
-                  </Button>
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
           )}
         </main>
       </div>

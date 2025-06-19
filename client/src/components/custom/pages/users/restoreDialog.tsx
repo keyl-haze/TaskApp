@@ -25,7 +25,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
-import type { User as UserType } from '@/types/types'
+import type { User as UserType } from '@/types/entities'
 
 interface RestoreUserDialogProps {
   user: UserType & { name: string; initials: string }

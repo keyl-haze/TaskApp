@@ -44,7 +44,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
-import type { User } from '@/types/types'
+import type { User } from '@/types/entities'
 import { PROJECT_API } from '@/routes/api/v1/project'
 
 interface AddTaskDialogProps {

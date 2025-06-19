@@ -47,7 +47,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
-import type { User, Task } from '@/types/types'
+import type { User, Task } from '@/types/entities'
 
 interface EditTaskDialogProps {
   task: Task

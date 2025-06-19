@@ -1,7 +1,7 @@
 'use client'
 
 import { TASK_API } from '@/routes/api/v1/task'
-import { Task } from '@/types/types'
+import { Task } from '@/types/entities'
 import { useState } from 'react'
 import {
   showErrorToast,

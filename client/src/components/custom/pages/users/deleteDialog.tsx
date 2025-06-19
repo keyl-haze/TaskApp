@@ -26,7 +26,7 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 import { Trash2, AlertTriangle } from 'lucide-react'
-import { type User } from '@/types/types'
+import { type User } from '@/types/entities'
 
 interface DeleteUserDialogProps {
   user: User

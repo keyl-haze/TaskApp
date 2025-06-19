@@ -1,6 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import {
   Table,
   TableBody,
@@ -8,47 +5,27 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '@/components/ui/table'
-import {
-  flexRender,
-  useReactTable,
-  getCoreRowModel,
-  getFilteredRowModel
-} from '@tanstack/react-table'
-import type { GenericTableProps } from '@/types/table'
+} from '@/components/ui/table';
+import { flexRender, useReactTable, getCoreRowModel } from '@tanstack/react-table';
+import type { GenericTableProps } from '@/types/table';
 
 export default function GenericTable<T extends { id: number }>({
   data,
   columns,
   selectedRows = [],
   onToggleSelectRow,
-  onToggleSelectAll,
-  columnFilters,
-  setColumnFilters,
-  globalFilter,
-  setGlobalFilter,
   headerClassName
 }: GenericTableProps<T>) {
   const table = useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      globalFilter,
-      columnFilters
-    },
-    onColumnFiltersChange: setColumnFilters,
-    globalFilterFn: (row, columnId, filterValue) => {
-      return Object.values(row.original).some((value) =>
-        String(value).toLowerCase().includes(String(filterValue).toLowerCase())
-      )
-    }
-  })
+    getCoreRowModel: getCoreRowModel()
+  });
 
   return (
     <div className="rounded-lg border overflow-x-auto w-full">
       <Table className="min-w-[600px] w-full">
+        {/* Render Table Header */}
         <TableHeader className={headerClassName}>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
@@ -56,25 +33,24 @@ export default function GenericTable<T extends { id: number }>({
                 <TableHead key={header.id}>
                   {header.isPlaceholder
                     ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                    : flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>
               ))}
             </TableRow>
           ))}
         </TableHeader>
+
+        {/* Render Table Body */}
         <TableBody>
           {table.getRowModel().rows.length > 0 ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
                 data-state={
-                  selectedRows.includes(row.original.id)
-                    ? 'selected'
-                    : undefined
+                  selectedRows.includes(row.original.id) ? 'selected' : undefined
                 }
+                onClick={() => onToggleSelectRow?.(row.original.id)}
+                className="cursor-pointer"
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
@@ -93,5 +69,5 @@ export default function GenericTable<T extends { id: number }>({
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }

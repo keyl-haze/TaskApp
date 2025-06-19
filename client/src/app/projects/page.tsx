@@ -9,20 +9,14 @@ import {
   Archive,
   Package
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink
-} from '@/components/ui/pagination'
-import GenericTable from '@/components/custom/utils/genericTable'
+import GenericTable from '@/components/custom/genericTable'
+import Pagination from '@/components/custom/utils/pagination'
 import { type ColumnDef } from '@tanstack/react-table'
 import AuthLayout from '@/app/layouts/authLayout'
 import { PROJECT_API } from '@/routes/api/v1/project'
-import { type Project } from '@/types/types'
+import { type Project } from '@/types/entities'
 import AddProjectDialog from '@/components/custom/pages/projects/addDialog'
 import EditProjectDialog from '@/components/custom/pages/projects/editDialog'
 import DeleteProjectDialog from '@/components/custom/pages/projects/deleteDialog'
@@ -39,9 +33,6 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [refreshFlag, setRefreshFlag] = useState(0)
-  const [columnFilters, setColumnFilters] = useState<
-    { id: string; value: string }[]
-  >([])
   const [filters, setFilters] = useState<FilterValue>({
     status: ['to_do', 'in_progress', 'done']
   })
@@ -114,14 +105,6 @@ export default function ProjectsPage() {
         ? prev.filter((id) => id !== projectId)
         : [...prev, projectId]
     )
-  }
-
-  const toggleSelectAll = () => {
-    if (selectedProjects.length === paginatedProjects.length) {
-      setSelectedProjects([])
-    } else {
-      setSelectedProjects(paginatedProjects.map((project) => project.id))
-    }
   }
 
   const columns: ColumnDef<Project>[] = [
@@ -331,51 +314,16 @@ export default function ProjectsPage() {
               columns={columns}
               selectedRows={selectedProjects}
               onToggleSelectRow={toggleSelectProject}
-              onToggleSelectAll={toggleSelectAll}
-              columnFilters={columnFilters}
-              setColumnFilters={setColumnFilters}
-              globalFilter={globalFilter}
-              setGlobalFilter={setGlobalFilter}
               headerClassName="bg-gray-100/90 dark:bg-gray-800"
             />
           )}
 
           {totalPages > 1 && (
-            <Pagination className="mt-4">
-              <PaginationContent>
-                <PaginationItem>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={currentPage === 1}
-                    onClick={() => handlePageChange(currentPage - 1)}
-                  >
-                    &lt;
-                  </Button>
-                </PaginationItem>
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <PaginationItem key={i + 1}>
-                    <PaginationLink
-                      isActive={currentPage === i + 1}
-                      onClick={() => handlePageChange(i + 1)}
-                      className="cursor-pointer"
-                    >
-                      {(i + 1).toString().padStart(2, '0')}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={currentPage === totalPages}
-                    onClick={() => handlePageChange(currentPage + 1)}
-                  >
-                    &gt;
-                  </Button>
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <Pagination 
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
           )}
         </main>
       </div>

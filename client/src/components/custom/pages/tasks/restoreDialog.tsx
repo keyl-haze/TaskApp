@@ -1,6 +1,6 @@
 'use client'
 
-import { Task as TaskType } from '@/types/types'
+import { Task as TaskType } from '@/types/entities'
 import { TASK_API } from '@/routes/api/v1/task'
 import {
   showErrorToast,
