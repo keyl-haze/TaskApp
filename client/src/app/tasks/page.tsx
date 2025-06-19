@@ -65,7 +65,6 @@ export default function TasksPage() {
           url +=
             `&filter[title][iLike]=${encoded}` +
             `&filter[description][iLike]=${encoded}`
-
         }
         // Add filter params for type, priority, and status
         if (filterValue.priority && filterValue.priority.length > 0) {
@@ -133,7 +132,7 @@ export default function TasksPage() {
   ])
 
   const handleTaskChange = () => setRefreshFlag((prev) => prev + 1)
-  
+
   const toggleSelectTask = (taskId: number) => {
     setSelectedTasks((prev) =>
       prev.includes(taskId)
@@ -315,8 +314,9 @@ export default function TasksPage() {
         const project = row.original.Project
         return project ? (
           <div className="text-sm">
-            <span className="inline-flex items-center gap-1"> 
-              <Package className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />{project.title} 
+            <span className="inline-flex items-center gap-1">
+              <Package className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+              {project.title}
             </span>
           </div>
         ) : (

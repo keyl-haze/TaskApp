@@ -159,8 +159,9 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
         if (data.status === 'success' && Array.isArray(data.data)) {
           setProjects(
             data.data
-              .filter((p: { id?: unknown; title?: unknown }) =>
-                typeof p.id === 'number' && typeof p.title === 'string'
+              .filter(
+                (p: { id?: unknown; title?: unknown }) =>
+                  typeof p.id === 'number' && typeof p.title === 'string'
               )
               .map((p: { id: number; title: string }) => ({
                 id: p.id,
@@ -524,26 +525,39 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
                 </Select>
               </div>
             </div>
-            
+
             <div className="grid gap-2">
               <Label htmlFor="project" className="text-sm font-medium">
                 Assign to Project
               </Label>
               <Select
-                value={formData.project ? String(formData.project) : "none"}
-                onValueChange={value => setFormData(prev => ({ ...prev, project: value ? Number(value) : undefined }))}
+                value={formData.project ? String(formData.project) : 'none'}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    project: value ? Number(value) : undefined
+                  }))
+                }
                 disabled={loadingProjects}
               >
                 <SelectTrigger className="h-10 w-full">
-                  <SelectValue placeholder={loadingProjects ? "Loading projects..." : "Select a project"} />
+                  <SelectValue
+                    placeholder={
+                      loadingProjects
+                        ? 'Loading projects...'
+                        : 'Select a project'
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">
                     <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">Select Project</span>
+                      <span className="text-muted-foreground">
+                        Select Project
+                      </span>
                     </div>
                   </SelectItem>
-                  {projects.map(project => (
+                  {projects.map((project) => (
                     <SelectItem key={project.id} value={String(project.id)}>
                       <Package className="h-3 w-3 text-purple-600 dark:text-purple-400" />
                       {project.title}
@@ -551,7 +565,7 @@ export default function AddTaskDialog({ onTaskCreated }: AddTaskDialogProps) {
                   ))}
                 </SelectContent>
               </Select>
-            </div>  
+            </div>
           </div>
 
           <DialogFooter className="gap-2 pt-4 border-t">

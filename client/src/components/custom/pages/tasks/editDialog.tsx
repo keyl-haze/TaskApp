@@ -160,7 +160,9 @@ export default function EditTaskDialog({
         priority: task.priority || 'medium',
         status: task.status || 'to_do',
         reporter: task.Reporter?.id?.toString() || '',
-        assignee: task.Assignee?.id ? task.Assignee.id.toString() : 'unassigned',
+        assignee: task.Assignee?.id
+          ? task.Assignee.id.toString()
+          : 'unassigned',
         project: task.Project ? task.Project.id : undefined
       })
     }
@@ -173,31 +175,32 @@ export default function EditTaskDialog({
   }, [open])
 
   useEffect(() => {
-  const fetchProjects = async () => {
-    setLoadingProjects(true)
-    try {
-      const res = await fetch(`${PROJECT_API.list}?all=true`)
-      const data = await res.json()
-      if (data.status === 'success' && Array.isArray(data.data)) {
-        setProjects(
-          data.data
-            .filter((p: { id?: unknown; title?: unknown }) =>
-              typeof p.id === 'number' && typeof p.title === 'string'
-            )
-            .map((p: { id: number; title: string }) => ({
-              id: p.id,
-              title: p.title
-            }))
-        )
+    const fetchProjects = async () => {
+      setLoadingProjects(true)
+      try {
+        const res = await fetch(`${PROJECT_API.list}?all=true`)
+        const data = await res.json()
+        if (data.status === 'success' && Array.isArray(data.data)) {
+          setProjects(
+            data.data
+              .filter(
+                (p: { id?: unknown; title?: unknown }) =>
+                  typeof p.id === 'number' && typeof p.title === 'string'
+              )
+              .map((p: { id: number; title: string }) => ({
+                id: p.id,
+                title: p.title
+              }))
+          )
+        }
+      } catch (error) {
+        console.error('Fetch projects error:', error)
+      } finally {
+        setLoadingProjects(false)
       }
-    } catch (error) {
-      console.error('Fetch projects error:', error)
-    } finally {
-      setLoadingProjects(false)
     }
-  }
-  fetchProjects()
-}, [])
+    fetchProjects()
+  }, [])
 
   const fetchUsers = async () => {
     setLoadingUsers(true)
@@ -549,23 +552,29 @@ export default function EditTaskDialog({
                 Assign to Project
               </Label>
               <Select
-                value={formData.project ? String(formData.project) : "none"}
-                onValueChange={value =>
-                  setFormData(prev => ({
+                value={formData.project ? String(formData.project) : 'none'}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
                     ...prev,
-                    project: value === "none" ? undefined : Number(value)
+                    project: value === 'none' ? undefined : Number(value)
                   }))
                 }
                 disabled={loadingProjects}
               >
                 <SelectTrigger className="h-10 w-full">
-                  <SelectValue placeholder={loadingProjects ? "Loading projects..." : "Select Project"} />
+                  <SelectValue
+                    placeholder={
+                      loadingProjects ? 'Loading projects...' : 'Select Project'
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">
-                    <span className="text-muted-foreground">Select Project</span>
+                    <span className="text-muted-foreground">
+                      Select Project
+                    </span>
                   </SelectItem>
-                  {projects.map(project => (
+                  {projects.map((project) => (
                     <SelectItem key={project.id} value={String(project.id)}>
                       <Package className="h-3 w-3 text-purple-600 dark:text-purple-400" />
                       {project.title}

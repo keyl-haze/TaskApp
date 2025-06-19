@@ -33,7 +33,6 @@ import RestoreProjectDialog from '@/components/custom/pages/projects/restoreDial
 
 const PAGE_SIZE = 10
 
-
 export default function ProjectsPage() {
   const [selectedProjects, setSelectedProjects] = useState<number[]>([])
   const [projects, setProjects] = useState<Project[]>([])
@@ -43,7 +42,9 @@ export default function ProjectsPage() {
   const [columnFilters, setColumnFilters] = useState<
     { id: string; value: string }[]
   >([])
-  const [filters, setFilters] = useState<FilterValue>({ status: ['to_do', 'in_progress', 'done'] })
+  const [filters, setFilters] = useState<FilterValue>({
+    status: ['to_do', 'in_progress', 'done']
+  })
   const [globalFilter, setGlobalFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -258,7 +259,9 @@ export default function ProjectsPage() {
   // * Search and filter, then paginate
   const filteredProjects = projects.filter((project) => {
     const matchesStatus =
-      !filters.status || filters.status.length === 0 || filters.status.includes(project.status)
+      !filters.status ||
+      filters.status.length === 0 ||
+      filters.status.includes(project.status)
     const matchesGlobal =
       globalFilter.trim() === '' ||
       Object.values(project).some((value) =>
@@ -293,7 +296,7 @@ export default function ProjectsPage() {
               />
             </div>
             <div className="flex gap-2">
-              <FilterPopover 
+              <FilterPopover
                 onFilterChange={(newFilters) => {
                   setFilters(newFilters)
                   fetchProjects(globalFilter)

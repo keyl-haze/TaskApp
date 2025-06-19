@@ -1,7 +1,7 @@
-import API_V1_BASE from '@/routes/api/base';
-import { API_ROUTES } from '@/types/api';
+import API_V1_BASE from '@/routes/api/base'
+import { API_ROUTES } from '@/types/api'
 
-const TASK_BASE = `${API_V1_BASE}/tasks`;
+const TASK_BASE = `${API_V1_BASE}/tasks`
 export const TASK_API: API_ROUTES = {
   list: `${TASK_BASE}`,
   create: `${TASK_BASE}`,
