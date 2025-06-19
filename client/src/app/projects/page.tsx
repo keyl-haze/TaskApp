@@ -3,10 +3,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import {
   Search,
-  CircleDashed,
-  Loader,
-  CircleCheckBig,
-  Archive,
   Package
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -24,6 +20,7 @@ import FilterPopover, {
   FilterValue
 } from '@/components/custom/pages/projects/filterPopover'
 import RestoreProjectDialog from '@/components/custom/pages/projects/restoreDialog'
+import { StatusBadge } from '@/components/custom/const/status'
 
 const PAGE_SIZE = 10
 
@@ -147,50 +144,7 @@ export default function ProjectsPage() {
           <span className="font-medium">Status</span>
         </div>
       ),
-      cell: ({ row }) => {
-        const status = row.original.status
-        const statusConfig = {
-          to_do: {
-            icon: CircleDashed,
-            color: 'bg-slate-100 text-slate-800 border-slate-200',
-            label: 'To Do',
-            iconColor: 'text-slate-600'
-          },
-          in_progress: {
-            icon: Loader,
-            color: 'bg-blue-100 text-blue-800 border-blue-200',
-            label: 'In Progress',
-            iconColor: 'text-blue-600'
-          },
-          done: {
-            icon: CircleCheckBig,
-            color: 'bg-green-100 text-green-800 border-green-200',
-            label: 'Done',
-            iconColor: 'text-green-600'
-          },
-          archived: {
-            icon: Archive,
-            color: 'bg-gray-100 text-gray-800 border-gray-200',
-            label: 'Archived',
-            iconColor: 'text-gray-600'
-          }
-        }
-
-        const config =
-          statusConfig[status as keyof typeof statusConfig] ||
-          statusConfig.to_do
-        const Icon = config.icon
-
-        return (
-          <Badge
-            variant="outline"
-            className={`${config.color} flex items-center gap-1 w-fit`}
-          >
-            <Icon className={`h-3 w-3 ${config.iconColor}`} />
-            {config.label}
-          </Badge>
-        )
-      }
+      cell: ({ row }) => <StatusBadge status={row.original.status} />
     },
     {
       accessorKey: 'Owner',
