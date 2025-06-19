@@ -1,6 +1,6 @@
 'use client'
 
-import { PROJECT_API } from '@/routes/project'
+import { PROJECT_API } from '@/routes/api/v1/project'
 import { Project } from '@/types/types'
 import { useState } from 'react'
 import {

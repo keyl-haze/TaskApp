@@ -32,8 +32,8 @@ import {
   CircleCheckBig,
   Package
 } from 'lucide-react'
-import { TASK_API } from '@/routes/task'
-import { USER_API } from '@/routes/user'
+import { TASK_API } from '@/routes/api/v1/task'
+import { USER_API } from '@/routes/api/v1/user'
 import {
   showErrorToast,
   showSuccessToast
@@ -45,7 +45,7 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 import type { User } from '@/types/types'
-import { PROJECT_API } from '@/routes/project'
+import { PROJECT_API } from '@/routes/api/v1/project'
 
 interface AddTaskDialogProps {
   onTaskCreated?: () => void

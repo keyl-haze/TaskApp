@@ -34,9 +34,9 @@ import {
   CircleCheckBig,
   Package
 } from 'lucide-react'
-import { TASK_API } from '@/routes/task'
-import { USER_API } from '@/routes/user'
-import { PROJECT_API } from '@/routes/project'
+import { TASK_API } from '@/routes/api/v1/task'
+import { USER_API } from '@/routes/api/v1/user'
+import { PROJECT_API } from '@/routes/api/v1/project'
 import {
   showErrorToast,
   showSuccessToast

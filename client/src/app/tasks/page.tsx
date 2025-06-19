@@ -25,7 +25,7 @@ import GenericTable from '@/components/custom/utils/genericTable'
 import { type ColumnDef } from '@tanstack/react-table'
 import AuthLayout from '@/app/layouts/authLayout'
 import { type Task } from '@/types/types'
-import { TASK_API } from '@/routes/task'
+import { TASK_API } from '@/routes/api/v1/task'
 import AddTaskDialog from '@/components/custom/pages/tasks/addDialog'
 import FilterPopover, {
   FilterValue

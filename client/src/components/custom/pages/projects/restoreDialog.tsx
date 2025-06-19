@@ -1,6 +1,6 @@
 'use client'
 
-import { PROJECT_API } from '@/routes/project'
+import { PROJECT_API } from '@/routes/api/v1/project'
 import { Project as ProjectType } from '@/types/types'
 import { showErrorToast, showSuccessToast } from '../../utils/errorSonner'
 import { useState } from 'react'

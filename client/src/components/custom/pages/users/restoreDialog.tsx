@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
-import { USER_API } from '@/routes/user'
+import { USER_API } from '@/routes/api/v1/user'
 import {
   showErrorToast,
   showSuccessToast

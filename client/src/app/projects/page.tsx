@@ -21,7 +21,7 @@ import {
 import GenericTable from '@/components/custom/utils/genericTable'
 import { type ColumnDef } from '@tanstack/react-table'
 import AuthLayout from '@/app/layouts/authLayout'
-import { PROJECT_API } from '@/routes/project'
+import { PROJECT_API } from '@/routes/api/v1/project'
 import { type Project } from '@/types/types'
 import AddProjectDialog from '@/components/custom/pages/projects/addDialog'
 import EditProjectDialog from '@/components/custom/pages/projects/editDialog'

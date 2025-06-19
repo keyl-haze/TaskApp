@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { PROJECT_API } from '@/routes/project'
+import { PROJECT_API } from '@/routes/api/v1/project'
 import {
   showErrorToast,
   showSuccessToast
@@ -37,7 +37,7 @@ import {
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { USER_API } from '@/routes/user'
+import { USER_API } from '@/routes/api/v1/user'
 import { CircleDashed, Loader, CircleCheckBig } from 'lucide-react'
 import {
   TooltipContent,

@@ -1,7 +1,7 @@
 'use client'
 
 import { Task as TaskType } from '@/types/types'
-import { TASK_API } from '@/routes/task'
+import { TASK_API } from '@/routes/api/v1/task'
 import {
   showErrorToast,
   showSuccessToast

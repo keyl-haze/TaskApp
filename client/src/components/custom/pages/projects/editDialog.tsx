@@ -28,8 +28,8 @@ import {
   CircleCheckBig,
   Pencil
 } from 'lucide-react'
-import { PROJECT_API } from '@/routes/project'
-import { USER_API } from '@/routes/user'
+import { PROJECT_API } from '@/routes/api/v1/project'
+import { USER_API } from '@/routes/api/v1/user'
 import {
   showErrorToast,
   showSuccessToast
