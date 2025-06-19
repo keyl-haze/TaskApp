@@ -1,7 +1,11 @@
-import { Button } from '@/components/ui/button';
-import { PaginationProps } from '@/types/table';
+import { Button } from '@/components/ui/button'
+import { PaginationProps } from '@/types/table'
 
-export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+export default function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange
+}: PaginationProps) {
   return (
     <div className="mt-4">
       <div className="flex items-center justify-center gap-2">
@@ -22,7 +26,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
             variant="ghost"
             className={`px-3 py-1 rounded ${
               currentPage === i + 1
-                ? 'bg-gray-300/50 text-gray-800 hover:bg-gray-400'
+                ? 'bg-gray-300/50 text-gray-800 hover:bg-gray-300'
                 : 'bg-gray-200/50 text-gray-800 hover:bg-gray-200'
             }`}
             onClick={() => onPageChange(i + 1)}
@@ -42,5 +46,5 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         </Button>
       </div>
     </div>
-  );
+  )
 }

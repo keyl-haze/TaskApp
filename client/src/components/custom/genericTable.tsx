@@ -5,9 +5,13 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '@/components/ui/table';
-import { flexRender, useReactTable, getCoreRowModel } from '@tanstack/react-table';
-import type { GenericTableProps } from '@/types/table';
+} from '@/components/ui/table'
+import {
+  flexRender,
+  useReactTable,
+  getCoreRowModel
+} from '@tanstack/react-table'
+import type { GenericTableProps } from '@/types/table'
 
 export default function GenericTable<T extends { id: number }>({
   data,
@@ -20,7 +24,7 @@ export default function GenericTable<T extends { id: number }>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel()
-  });
+  })
 
   return (
     <div className="rounded-lg border overflow-x-auto w-full">
@@ -33,7 +37,10 @@ export default function GenericTable<T extends { id: number }>({
                 <TableHead key={header.id}>
                   {header.isPlaceholder
                     ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                 </TableHead>
               ))}
             </TableRow>
@@ -47,7 +54,9 @@ export default function GenericTable<T extends { id: number }>({
               <TableRow
                 key={row.id}
                 data-state={
-                  selectedRows.includes(row.original.id) ? 'selected' : undefined
+                  selectedRows.includes(row.original.id)
+                    ? 'selected'
+                    : undefined
                 }
                 onClick={() => onToggleSelectRow?.(row.original.id)}
                 className="cursor-pointer"
@@ -69,5 +78,5 @@ export default function GenericTable<T extends { id: number }>({
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }
