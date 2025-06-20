@@ -1,18 +1,9 @@
-'use client'
+"use client"
 
-import type { ReactNode } from 'react'
-import {
-  HelpCircle,
-  Settings,
-  Home,
-  Users,
-  Mail,
-  Bell,
-  ListChecks,
-  Rocket
-} from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
+import type { ReactNode } from "react"
+import { HelpCircle, Settings, Home, Users, Mail, Bell, ListChecks, Rocket } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   Sidebar,
   SidebarContent,
@@ -27,15 +18,10 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarRail,
-  SidebarTrigger
-} from '@/components/ui/sidebar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-import { Separator } from '@/components/ui/separator'
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Separator } from "@/components/ui/separator"
 
 interface AuthLayoutProps {
   header: string
@@ -51,53 +37,53 @@ interface AuthLayoutProps {
 // Navigation items
 const navigationItems = [
   {
-    title: 'Dashboard',
-    url: '/',
-    icon: Home
+    title: "Dashboard",
+    url: "/",
+    icon: Home,
   },
   {
-    title: 'Users',
-    url: '/users',
-    icon: Users
+    title: "Users",
+    url: "/users",
+    icon: Users,
   },
   {
-    title: 'Tasks',
-    url: '/tasks',
-    icon: ListChecks
+    title: "Tasks",
+    url: "/tasks",
+    icon: ListChecks,
   },
   {
-    title: 'Projects',
-    url: '/projects',
-    icon: Rocket
-  }
+    title: "Projects",
+    url: "/projects",
+    icon: Rocket,
+  },
 ]
 
 const supportItems = [
   {
-    title: 'Help Center',
-    url: '#',
-    icon: HelpCircle
+    title: "Help Center",
+    url: "#",
+    icon: HelpCircle,
   },
   {
-    title: 'Settings',
-    url: '#',
-    icon: Settings
-  }
+    title: "Settings",
+    url: "#",
+    icon: Settings,
+  },
 ]
 
 export default function AuthLayout({
   header,
   children,
   user = {
-    name: 'JOHN DOE',
-    title: 'TEAM LEAD',
-    avatarUrl: '/placeholder.svg?height=40&width=40',
-    initials: 'JD'
-  }
+    name: "JOHN DOE",
+    title: "TEAM LEAD",
+    avatarUrl: "/placeholder.svg?height=40&width=40",
+    initials: "JD",
+  },
 }: AuthLayoutProps) {
   return (
     <SidebarProvider>
-      <Sidebar>
+      <Sidebar collapsible="icon">
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -122,7 +108,7 @@ export default function AuthLayout({
               <SidebarMenu>
                 {navigationItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton asChild tooltip={item.title}>
                       <a href={item.url}>
                         <item.icon />
                         <span>{item.title}</span>
@@ -140,7 +126,7 @@ export default function AuthLayout({
               <SidebarMenu>
                 {supportItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton asChild tooltip={item.title}>
                       <a href={item.url}>
                         <item.icon />
                         <span>{item.title}</span>
@@ -161,18 +147,14 @@ export default function AuthLayout({
                   <SidebarMenuButton
                     size="lg"
                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                    tooltip={`${user.name} - ${user.title}`}
                   >
                     <Avatar className="h-8 w-8 border-2 border-primary">
-                      <AvatarImage
-                        src={user.avatarUrl || '/placeholder.svg'}
-                        alt={user.name}
-                      />
+                      <AvatarImage src={user.avatarUrl || "/placeholder.svg"} alt={user.name} />
                       <AvatarFallback>{user.initials}</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">
-                        {user.name}
-                      </span>
+                      <span className="truncate font-semibold">{user.name}</span>
                       <span className="truncate text-xs">{user.title}</span>
                     </div>
                   </SidebarMenuButton>
@@ -202,32 +184,22 @@ export default function AuthLayout({
 
       <SidebarInset>
         {/* Header */}
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-white px-4">
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 border-b bg-white px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />
           <h1 className="text-xl font-semibold">{header}</h1>
           <div className="ml-auto flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground"
-            >
+            <Button variant="ghost" size="icon" className="text-muted-foreground">
               <Mail className="h-4 w-4" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground"
-            >
+            <Button variant="ghost" size="icon" className="text-muted-foreground">
               <Bell className="h-4 w-4" />
             </Button>
           </div>
         </header>
 
         {/* Main content */}
-        <main className="flex flex-1 flex-col gap-4 p-4 md:p-6">
-          {children}
-        </main>
+        <main className="flex flex-1 flex-col gap-4 p-4 md:p-6">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   )
