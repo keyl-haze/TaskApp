@@ -1,7 +1,7 @@
 import AuthLayout from '@/app/layouts/authLayout'
 
-import { SignInButton, SignOutButton } from '@/components/custom/auth'
 import { auth } from '@/auth'
+import LoginForm from '@/components/custom/auth/LoginForm'
 
 export default async function Home() {
   const session = await auth()
@@ -15,8 +15,6 @@ export default async function Home() {
             This is your main dashboard area.
           </p>
         </div>
-        {/* Improve placement */}
-        <SignOutButton />
       </AuthLayout>
     )
   }
@@ -24,7 +22,8 @@ export default async function Home() {
   return (
     // Improve Login page
     <div>
-      <p> You Are Not Signed In</p> <SignInButton />
+      <p> You Are Not Signed In</p>
+      <LoginForm />
     </div>
   )
 }

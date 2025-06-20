@@ -36,6 +36,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
+import { SignOutButton } from '@/components/custom/auth'
 
 interface AuthLayoutProps {
   header: string
@@ -190,7 +191,7 @@ export default function AuthLayout({
                     <span>Billing</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <span>Sign out</span>
+                    <span><SignOutButton/></span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
