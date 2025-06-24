@@ -29,6 +29,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { SignOutButton } from '@/components/custom/auth'
 
 interface SidebarLayoutProps {
   user?: {
@@ -176,7 +177,7 @@ export default function SidebarLayout({
                   <span>Billing</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <span>Sign out</span>
+                  <span><SignOutButton/></span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
