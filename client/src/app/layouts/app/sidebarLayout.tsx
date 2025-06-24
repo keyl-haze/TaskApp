@@ -177,7 +177,9 @@ export default function SidebarLayout({
                   <span>Billing</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <span onClick={logout}>Sign Out</span>
+                  <button type="button" onClick={logout} className="w-full text-left">
+                    Sign Out
+                  </button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
