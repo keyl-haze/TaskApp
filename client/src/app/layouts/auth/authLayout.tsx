@@ -1,7 +1,7 @@
 'use client'
 import type { ReactNode } from 'react'
-import HeaderLayout from './app/headerLayout'
-import SidebarLayout from './app/sidebarLayout'
+import HeaderLayout from '../app/headerLayout'
+import SidebarLayout from '../app/sidebarLayout'
 import { SidebarProvider } from '@/components/ui/sidebar'
 interface AuthLayoutProps {
   header: string

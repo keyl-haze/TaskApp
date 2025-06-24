@@ -1,6 +1,6 @@
 'use client'
 
-import AuthLayout from '@/app/layouts/authLayout'
+import AuthLayout from '@/app/layouts/auth/authLayout'
 import { USER_API } from '@/routes/api/v1/user'
 import type { User as UserType } from '@/types/entities'
 import { useState, useEffect, useCallback } from 'react'
