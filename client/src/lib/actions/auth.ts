@@ -1,14 +1,21 @@
-'use server'
+import { signIn, signOut } from 'next-auth/react'
 
-import { signIn, signOut } from '@/auth'
-
-export const login = async (credentials: { email: string; password: string }) => {
-  await signIn('credentials', {
+export const login = async (credentials: {
+  email: string
+  password: string
+}) => {
+  const result = await signIn('credentials', {
     ...credentials,
-    redirectTo: '/'
+    redirect: false // * Prevent automatic redirection
   })
+
+  if (result?.error) {
+    console.error('Login error:', result.error)
+  } else {
+    window.location.href = '/'
+  }
 }
 
 export const logout = async () => {
-  await signOut({ redirectTo: '/' })
+  await signOut()
 }

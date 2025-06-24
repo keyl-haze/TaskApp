@@ -1,10 +1,10 @@
-import AuthLayout from '@/app/layouts/auth/authLayout'
-
-import { auth } from '@/auth'
-import LoginForm from '@/components/custom/auth/loginForm'
+import AuthLayout from '@/app/layouts/auth/authLayout';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/auth';
+import LoginForm from '@/components/custom/auth/loginForm';
 
 export default async function Home() {
-  const session = await auth()
+  const session = await getServerSession(authOptions);
 
   if (session?.user) {
     return (
@@ -16,14 +16,13 @@ export default async function Home() {
           </p>
         </div>
       </AuthLayout>
-    )
+    );
   }
 
   return (
-    // Improve Login page
     <div>
-      <p> You Are Not Signed In</p> 
+      <p>You Are Not Signed In</p>
       <LoginForm />
     </div>
-  )
+  );
 }

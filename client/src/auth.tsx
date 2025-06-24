@@ -2,17 +2,20 @@ import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { AUTH_API } from '@/routes/auth'
 
-export const { auth, handlers, signIn, signOut } = NextAuth({
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'text', placeholder: 'jsmith@example.com' },
+        email: {
+          label: 'Email',
+          type: 'text',
+          placeholder: 'jsmith@example.com'
+        },
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials, req) {
-
-        // TODO: Call backend here to login then fetch the user details
+        // Call backend to login and fetch user details
         const fetchOptions: RequestInit = {
           method: 'POST',
           headers: {
@@ -36,5 +39,10 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         return null
       }
     })
-  ]
-})
+  ],
+  pages: {
+    error: 'auth/error', // Error page URL
+  }
+}
+
+export default NextAuth(authOptions)
