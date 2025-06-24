@@ -31,15 +31,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { logout } from '@/lib/actions/auth'
 import { useSession } from 'next-auth/react'
-
-interface SidebarLayoutProps {
-  user?: {
-    name: string
-    title: string
-    avatarUrl?: string
-    initials?: string
-  }
-}
+import { useEffect, useState } from 'react'
+import { User } from '@/types/entities'
+import { USER_API } from '@/routes/api/v1/user'
 
 const navigationItems = [
   {
@@ -78,41 +72,55 @@ const supportItems = [
   }
 ]
 
+// Fetch user details from  API
+async function fetchUserDetails(id: string): Promise<User | null> {
+  const res = await fetch(USER_API.get(String(id)))
+  if (!res.ok) return null
+  const data = await res.json()
+  //console.log('Fetched user:', data)
+  return data.data as User
+}
 
-
-export default function SidebarLayout({
-  user: userProp = {
-    name: 'JOHN DOE',
-    title: 'TEAM LEAD',
-    avatarUrl: '/placeholder.svg?height=40&width=40',
-    initials: 'JD'
-  }
-}: SidebarLayoutProps) {
+export default function SidebarLayout() {
   const { data: session } = useSession()
+  //console.log('Session:', session)
+  const [userDetails, setUserDetails] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  // Inline type assertion for session user
-  type CustomUser = {
-    id: string
-    name: string
-    email: string
-    image?: string | null
-    role: string
+  useEffect(() => {
+  if (session?.user?.id) {
+    setLoading(true)
+    fetchUserDetails(String(session.user.id)).then((data) => {
+      setUserDetails(data)
+      setLoading(false)
+    })
+  } else {
+    setLoading(false)
   }
-  const sessionUser = session?.user as CustomUser | undefined
+}, [session?.user?.id])
 
-  const user = sessionUser
+if (loading) {
+  return <div>Loading...</div>
+}
+
+  // Prefer fetched user details for role and name
+  const user = userDetails
     ? {
-        name: sessionUser.name || 'Unknown User',
-        title: sessionUser.role || 'Member',
-        avatarUrl: sessionUser.image || '/placeholder.svg?height=40&width=40',
+        name: [userDetails.firstName, userDetails.lastName].filter(Boolean).join(' ') || userDetails.username || 'Unknown User',
+        title: userDetails.role || 'Member',
+        avatarUrl: '/placeholder.svg?height=40&width=40',
         initials:
-          sessionUser.name
-            ?.split(' ')
-            .map((n: string) => n[0])
-            .join('')
-            .toUpperCase() || 'UU'
+          ([userDetails.firstName, userDetails.lastName]
+            .filter(Boolean)
+            .map((n) => n[0])
+            .join('') || 'UU').toUpperCase()
       }
-    : userProp
+    : {
+        name: 'Unknown User',
+        title: 'Member',
+        avatarUrl: '/placeholder.svg?height=40&width=40',
+        initials: 'UU'
+      }
 
 
   return (

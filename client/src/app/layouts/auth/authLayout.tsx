@@ -17,14 +17,13 @@ interface AuthLayoutProps {
 export default function AuthLayout({
   header,
   children,
-  user
 }: AuthLayoutProps) {
   return (
     <SessionProvider>
     <SidebarProvider>
       <div className="flex h-screen">
         {/* Sidebar */}
-        <SidebarLayout user={user} />
+        <SidebarLayout  />
       </div>
       
       {/* Main Content */}
