@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import HeaderLayout from '../app/headerLayout'
 import SidebarLayout from '../app/sidebarLayout'
 import { SidebarProvider } from '@/components/ui/sidebar'
+import { SessionProvider } from 'next-auth/react'
 interface AuthLayoutProps {
   header: string
   children: ReactNode
@@ -19,6 +20,7 @@ export default function AuthLayout({
   user
 }: AuthLayoutProps) {
   return (
+    <SessionProvider>
     <SidebarProvider>
       <div className="flex h-screen">
         {/* Sidebar */}
@@ -35,6 +37,7 @@ export default function AuthLayout({
         </main>
       </div>
     </SidebarProvider>
+    </SessionProvider>
   )
 }
 

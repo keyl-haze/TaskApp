@@ -30,6 +30,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { logout } from '@/lib/actions/auth'
+import { useSession } from 'next-auth/react'
 
 interface SidebarLayoutProps {
   user?: {
@@ -77,14 +78,43 @@ const supportItems = [
   }
 ]
 
+
+
 export default function SidebarLayout({
-  user = {
+  user: userProp = {
     name: 'JOHN DOE',
     title: 'TEAM LEAD',
     avatarUrl: '/placeholder.svg?height=40&width=40',
     initials: 'JD'
   }
 }: SidebarLayoutProps) {
+  const { data: session } = useSession()
+
+  // Inline type assertion for session user
+  type CustomUser = {
+    id: string
+    name: string
+    email: string
+    image?: string | null
+    role: string
+  }
+  const sessionUser = session?.user as CustomUser | undefined
+
+  const user = sessionUser
+    ? {
+        name: sessionUser.name || 'Unknown User',
+        title: sessionUser.role || 'Member',
+        avatarUrl: sessionUser.image || '/placeholder.svg?height=40&width=40',
+        initials:
+          sessionUser.name
+            ?.split(' ')
+            .map((n: string) => n[0])
+            .join('')
+            .toUpperCase() || 'UU'
+      }
+    : userProp
+
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
