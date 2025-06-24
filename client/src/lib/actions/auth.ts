@@ -10,7 +10,7 @@ export const login = async (credentials: {
   })
 
   if (result?.error) {
-    console.error('Login error:', result.error)
+    throw new Error(result.error)
   } else {
     window.location.href = '/'
   }

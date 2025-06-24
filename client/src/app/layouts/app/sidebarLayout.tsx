@@ -3,11 +3,11 @@
 import {
   HelpCircle,
   Settings,
-  Home,
   Users,
   ListChecks,
   Rocket,
-  LayoutDashboard
+  LayoutDashboard,
+  CheckCheck
 } from 'lucide-react'
 import {
   Sidebar,
@@ -44,7 +44,8 @@ const navigationItems = [
   {
     title: 'Dashboard',
     url: '/',
-    icon: LayoutDashboard
+    icon: LayoutDashboard,
+    color: 'text-'
   },
   {
     title: 'Users',
@@ -90,9 +91,9 @@ export default function SidebarLayout({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#" className="font-semibold">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Home className="size-4" />
+              <a className="font-semibold">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-amber-500 text-sidebar-primary-foreground">
+                  <CheckCheck className="size-4.5" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">Task App</span>
@@ -177,7 +178,11 @@ export default function SidebarLayout({
                   <span>Billing</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <button type="button" onClick={logout} className="w-full text-left">
+                  <button
+                    type="button"
+                    onClick={logout}
+                    className="w-full text-left"
+                  >
                     Sign Out
                   </button>
                 </DropdownMenuItem>

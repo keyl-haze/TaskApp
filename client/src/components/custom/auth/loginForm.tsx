@@ -1,27 +1,33 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { login } from "@/lib/actions/auth"
+import type React from 'react'
+import { useState } from 'react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { login } from '@/lib/actions/auth'
+import {
+  showErrorToast,
+  showSuccessToast
+} from '@/components/custom/utils/errorSonner'
 
 export default function LoginForm() {
-  const [formData, setFormData] = useState({ email: "", password: "" })
+  const [formData, setFormData] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError("")
     try {
       await login(formData)
+      showSuccessToast('Login successful!')
     } catch (error) {
-      console.error("Login error:", error)
-      setError("Login failed")
+      console.error('Login error:', error)
+      showErrorToast(
+        'Login failed. Please check your credentials and try again.'
+      )
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
@@ -40,7 +46,9 @@ export default function LoginForm() {
               type="email"
               placeholder="Enter Email"
               value={formData.email}
-              onChange={(e) => setFormData((f) => ({ ...f, email: e.target.value }))}
+              onChange={(e) =>
+                setFormData((f) => ({ ...f, email: e.target.value }))
+              }
               required
               className="h-12 bg-gray-100 border-0 rounded-lg px-4 text-gray-700 placeholder:text-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-500"
             />
@@ -52,7 +60,9 @@ export default function LoginForm() {
               type="password"
               placeholder="Password"
               value={formData.password}
-              onChange={(e) => setFormData((f) => ({ ...f, password: e.target.value }))}
+              onChange={(e) =>
+                setFormData((f) => ({ ...f, password: e.target.value }))
+              }
               required
               className="h-12 bg-gray-100 border-0 rounded-lg px-4 pr-12 text-gray-700 placeholder:text-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-500"
             />
@@ -71,11 +81,8 @@ export default function LoginForm() {
             disabled={loading}
             className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
           >
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? 'Signing in...' : 'Sign in'}
           </Button>
-
-          {/* Error Message */}
-          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
         </form>
 
         {/* Sign Up Link */}
