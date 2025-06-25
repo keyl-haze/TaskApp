@@ -45,12 +45,13 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   pages: {
-    error: 'auth/error', // Error page URL
+    error: 'auth/error', // * Error page URL
   },
   session: {
-    strategy: "jwt", // or "database" if you use a session DB
-    maxAge: 300,     // 5 minutes in seconds
-    updateAge: 0     // update session expiry on every request
+    strategy: "jwt", 
+    maxAge: 300,     // * 5 minutes in seconds
+    updateAge: 0,     // * update session expiry on every API request
+
   },
   callbacks: {
     async jwt({ token, user }: { token: JWT; user?: UserWithRole }) {

@@ -30,7 +30,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { logout } from '@/lib/actions/auth'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { User } from '@/types/entities'
 import { USER_API } from '@/routes/api/v1/user'
@@ -88,40 +88,55 @@ const roleLabels: Record<string, string> = {
   viewer: 'Viewer'
 }
 
-
 export default function SidebarLayout() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   //console.log('Session:', session)
   const [userDetails, setUserDetails] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-  if (session?.user?.id) {
-    setLoading(true)
-    fetchUserDetails(String(session.user.id)).then((data) => {
-      setUserDetails(data)
+    if (session?.user?.id) {
+      setLoading(true)
+      fetchUserDetails(String(session.user.id)).then((data) => {
+        setUserDetails(data)
+        setLoading(false)
+      })
+    } else {
       setLoading(false)
-    })
-  } else {
-    setLoading(false)
-  }
-}, [session?.user?.id])
+    }
+  }, [session?.user?.id])
 
-if (loading) {
-  return <div>Loading...</div>
-}
+  //  * sign out user if session is unauthenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      signOut({ callbackUrl: '/' })
+    }
+  }, [status])
+
+  if (status === 'loading' || loading) {
+    return <div>Loading...</div>
+  }
 
   // Prefer fetched user details for role and name
   const user = userDetails
     ? {
-        name: [userDetails.firstName, userDetails.lastName].filter(Boolean).join(' ') || userDetails.username || 'Unknown User',
-        title: roleLabels[userDetails.role as keyof typeof roleLabels] || userDetails.role || 'Member',
+        name:
+          [userDetails.firstName, userDetails.lastName]
+            .filter(Boolean)
+            .join(' ') ||
+          userDetails.username ||
+          'Unknown User',
+        title:
+          roleLabels[userDetails.role as keyof typeof roleLabels] ||
+          userDetails.role ||
+          'Member',
         avatarUrl: '/placeholder.svg?height=40&width=40',
-        initials:
-          ([userDetails.firstName, userDetails.lastName]
+        initials: (
+          [userDetails.firstName, userDetails.lastName]
             .filter(Boolean)
             .map((n) => n[0])
-            .join('') || 'UU').toUpperCase()
+            .join('') || 'UU'
+        ).toUpperCase()
       }
     : {
         name: 'Unknown User',
@@ -129,7 +144,6 @@ if (loading) {
         avatarUrl: '/placeholder.svg?height=40&width=40',
         initials: 'UU'
       }
-
 
   return (
     <Sidebar collapsible="icon">
