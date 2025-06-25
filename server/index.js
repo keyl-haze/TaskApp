@@ -3,7 +3,6 @@ require('./globals');
 const cors = require('cors');
 const express = require('express');
 
-const secrets = require(`./secrets/${__env}`).database.taskManagement;
 const sequelize = require('./models').sequelize;
 const session = require('express-session');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
@@ -29,7 +28,7 @@ app.use(
   session({
     resave: true,
     saveUninitialized: true,
-    secret: secrets.sessionKey,
+    secret: process.env.DB_SESSION_KEY,
     store: serverSequelizeStore
   })
 );

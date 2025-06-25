@@ -49,7 +49,7 @@ Thumbs.db
 *.wmv
 
 # Environment files
-.env
+.env*
 
 # Secret files
 /server/secrets
