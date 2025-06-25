@@ -81,6 +81,14 @@ async function fetchUserDetails(id: string): Promise<User | null> {
   return data.data as User
 }
 
+const roleLabels: Record<string, string> = {
+  super_admin: 'Super Admin',
+  admin: 'Admin',
+  manager: 'Manager',
+  viewer: 'Viewer'
+}
+
+
 export default function SidebarLayout() {
   const { data: session } = useSession()
   //console.log('Session:', session)
@@ -107,7 +115,7 @@ if (loading) {
   const user = userDetails
     ? {
         name: [userDetails.firstName, userDetails.lastName].filter(Boolean).join(' ') || userDetails.username || 'Unknown User',
-        title: userDetails.role || 'Member',
+        title: roleLabels[userDetails.role as keyof typeof roleLabels] || userDetails.role || 'Member',
         avatarUrl: '/placeholder.svg?height=40&width=40',
         initials:
           ([userDetails.firstName, userDetails.lastName]
